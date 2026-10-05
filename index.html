@@ -147,7 +147,18 @@
             </div>
 
             <div id="stat-subtab-ragazzi" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-gray-700">Riepilogo Presenze Individuali</h2>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <h2 class="text-lg font-bold text-gray-700">Riepilogo Presenze Individuali</h2>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label class="text-xs font-semibold text-gray-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Ordina per:</label>
+                        <select id="ordinamento-select" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
+                            <option value="perc_desc">Percentuale (Alta ➔ Bassa)</option>
+                            <option value="perc_asc">Percentuale (Bassa ➔ Alta)</option>
+                            <option value="nome">Nome (A ➔ Z)</option>
+                            <option value="numero">Numero Maglia</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="statistiche-ragazzi-list" class="space-y-4"></div>
             </div>
 
@@ -261,21 +272,28 @@
         </div>
     </div>
 
-    <!-- Script Logica -->
+    <!-- Script Logica con Riordinamento Statistiche -->
     <script>
-        // Controllo versione cache (Aggiornato a 1.5 per caricare gli allenamenti pregressi)
-        const APP_VERSION = "1.5";
+        // Controllo versione cache (Aggiornato a 1.7 per ordinamento statistiche)
+        const APP_VERSION = "1.7";
         const savedVersion = localStorage.getItem('sq_version');
         if (savedVersion !== APP_VERSION) {
-            localStorage.removeItem('sq_calendario');
-            localStorage.removeItem('sq_allenamenti');
             localStorage.setItem('sq_version', APP_VERSION);
         }
 
+        // Funzione per generare l'hash SHA-256 della password
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         let utenti = JSON.parse(localStorage.getItem('sq_utenti')) || [
-            { username: "Alessandro", password: "123456" },
-            { username: "Anna", password: "123456" }
+            { username: "Alessandro", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" },
+            { username: "Anna", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" }
         ];
+
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
         let logAttivita = JSON.parse(localStorage.getItem('sq_log')) || [];
 
@@ -298,7 +316,6 @@
             { id: 16, nome: "Carlitos", cognome: "", numero: "98" }
         ];
 
-        // Allenamenti pregressi importati dal file Excel
         let allenamenti = JSON.parse(localStorage.getItem('sq_allenamenti')) || [
             {
                 id: 1700000000,
@@ -332,7 +349,6 @@
             }
         ];
 
-        // Calendario completo di Andata e Ritorno
         let calendarioPartite = JSON.parse(localStorage.getItem('sq_calendario')) || [
             { giornata: 1, data: "2026-10-04", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ATLETICO S.ELENA ASE", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "SPORTING MURIALDO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
@@ -401,12 +417,14 @@
             }
         }
 
-        function eseguiLogin(e) {
+        async function eseguiLogin(e) {
             e.preventDefault();
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value.trim();
 
-            const trovato = utenti.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
+            const pHash = await hashPassword(p);
+            const trovato = utenti.find(x => x.username.toLowerCase() === u.toLowerCase() && x.passwordHash === pHash);
+            
             if(trovato) {
                 utenteCorrente = trovato.username;
                 localStorage.setItem('sq_utente_corrente', utenteCorrente);
@@ -428,7 +446,7 @@
             }
         }
 
-        function creaNuovoUtente(e) {
+        async function creaNuovoUtente(e) {
             e.preventDefault();
             const u = document.getElementById('nuovo-user').value.trim();
             const p = document.getElementById('nuovo-pass').value.trim();
@@ -439,7 +457,8 @@
                 return;
             }
 
-            utenti.push({ username: u, password: p });
+            const pHash = await hashPassword(p);
+            utenti.push({ username: u, passwordHash: pHash });
             localStorage.setItem('sq_utenti', JSON.stringify(utenti));
             document.getElementById('nuovo-user').value = '';
             document.getElementById('nuovo-pass').value = '';
@@ -448,12 +467,12 @@
             alert("Utente creato con successo!");
         }
 
-        function cambiaPasswordUtente(username) {
+        async function cambiaPasswordUtente(username) {
             const nuovaPass = prompt(`Inserisci la nuova password per ${username}:`);
             if(nuovaPass) {
                 const u = utenti.find(x => x.username === username);
                 if(u) {
-                    u.password = nuovaPass;
+                    u.passwordHash = await hashPassword(nuovaPass);
                     localStorage.setItem('sq_utenti', JSON.stringify(utenti));
                     registraLog(`Modificata password per utente: ${username}`);
                     renderUtenti();
@@ -779,6 +798,20 @@
             };
         }
 
+        function calcolaStatisticheGiocatore(g) {
+            let totalAll = allenamenti.length;
+            let presenti = 0, ritardi = 0, assenti = 0;
+            allenamenti.forEach(a => {
+                const s = a.presenze[g.id];
+                if(s === 'presente') presenti++;
+                if(s === 'ritardo') ritardi++;
+                if(s === 'assente') assenti++;
+            });
+            const presTot = presenti + ritardi;
+            const percGlobal = totalAll > 0 ? Math.round((presTot / totalAll) * 100) : 0;
+            return { totalAll, presenti, ritardi, assenti, percGlobal };
+        }
+
         function renderConvocazioni() {
             const select = document.getElementById('select-partita-convocazione');
             if(select) {
@@ -856,25 +889,36 @@
             }).catch(() => alert("Errore durante la copia."));
         }
 
-        // --- STATISTICHE ---
+        // --- STATISTICHE & ORDINAMENTO ---
         function renderStatistiche() {
             const containerRagazzi = document.getElementById('statistiche-ragazzi-list');
             if(containerRagazzi) {
                 if(giocatori.length === 0) {
                     containerRagazzi.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
                 } else {
-                    containerRagazzi.innerHTML = giocatori.map(g => {
-                        let totalAll = allenamenti.length;
-                        let presenti = 0, ritardi = 0, assenti = 0;
-                        allenamenti.forEach(a => {
-                            const s = a.presenze[g.id];
-                            if(s === 'presente') presenti++;
-                            if(s === 'ritardo') ritardi++;
-                            if(s === 'assente') assenti++;
-                        });
-                        const presTot = presenti + ritardi;
-                        const percGlobal = totalAll > 0 ? Math.round((presTot / totalAll) * 100) : 0;
+                    const tipoOrdinamento = document.getElementById('ordinamento-select') ? document.getElementById('ordinamento-select').value : 'perc_desc';
 
+                    // Clona e ordina i giocatori in base alla selezione
+                    let giocatoriOrdinati = [...giocatori].sort((a, b) => {
+                        const statA = calcolaStatisticheGiocatore(a);
+                        const statB = calcolaStatisticheGiocatore(b);
+
+                        if (tipoOrdinamento === 'perc_desc') {
+                            return statB.percGlobal - statA.percGlobal || a.nome.localeCompare(b.nome);
+                        } else if (tipoOrdinamento === 'perc_asc') {
+                            return statA.percGlobal - statB.percGlobal || a.nome.localeCompare(b.nome);
+                        } else if (tipoOrdinamento === 'nome') {
+                            return a.nome.localeCompare(b.nome);
+                        } else if (tipoOrdinamento === 'numero') {
+                            const numA = parseInt(a.numero) || 999;
+                            const numB = parseInt(b.numero) || 999;
+                            return numA - numB || a.nome.localeCompare(b.nome);
+                        }
+                        return 0;
+                    });
+
+                    containerRagazzi.innerHTML = giocatoriOrdinati.map(g => {
+                        const { totalAll, presenti, ritardi, assenti, percGlobal } = calcolaStatisticheGiocatore(g);
                         return `
                             <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
