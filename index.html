@@ -105,10 +105,10 @@
         <div id="tab-convocazioni" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
                 <h2 class="text-lg font-bold mb-1 text-gray-700">Generatore Convocazioni WhatsApp</h2>
-                <p class="text-xs text-gray-500 mb-4">Seleziona la partita di riferimento, spunta i convocati e copia il messaggio.</p>
+                <p class="text-xs text-gray-500 mb-4">Seleziona la partita di riferimento dello Sporting Murialdo, spunta i convocati e copia il messaggio.</p>
                 
                 <div class="mb-5 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-                    <label class="block text-xs font-bold text-indigo-900 mb-1 uppercase tracking-wide">Associa a Partita di Campionato:</label>
+                    <label class="block text-xs font-bold text-indigo-900 mb-1 uppercase tracking-wide">Partita Sporting Murialdo:</label>
                     <select id="select-partita-convocazione" class="w-full border border-indigo-200 rounded-xl p-2.5 bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
                         <!-- Popolato via JS -->
                     </select>
@@ -128,8 +128,8 @@
         <!-- ================= SEZIONE CALENDARIO PARTITE ================= -->
         <div id="tab-calendario" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
-                <h2 class="text-lg font-bold mb-1 text-gray-700">Calendario Ufficiale Under 15 A 7 - Girone B</h2>
-                <p class="text-xs text-gray-500 mb-4">Sede: Milano | Tutte le giornate di Andata e Ritorno modificabili.</p>
+                <h2 class="text-lg font-bold mb-1 text-gray-700">Calendario Ufficiale - Sporting Murialdo Under 15 A 7</h2>
+                <p class="text-xs text-gray-500 mb-4">Partite ufficiali della squadra.</p>
                 <div id="lista-partite-calendario" class="space-y-4"></div>
             </div>
         </div>
@@ -286,60 +286,17 @@
 
         let allenamenti = JSON.parse(localStorage.getItem('sq_allenamenti')) || [];
 
+        // Calendario filtrato esclusivamente per le partite dello Sporting Murialdo
         let calendarioPartite = JSON.parse(localStorage.getItem('sq_calendario')) || [
-            { giornata: 1, data: "2026-10-04", ora: "18:15", casa: "S.DOMENICO SAVIO", fuori: "ROSARIO 2012", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
             { giornata: 1, data: "2026-10-04", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ATLETICO S.ELENA ASE", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 1, data: "2026-10-03", ora: "14:30", casa: "ACLI CAVANIS CORSICO BLU", fuori: "UP SETTIMO", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
-            { giornata: 1, data: "2026-10-03", ora: "16:30", casa: "S.FILIPPO NERI", fuori: "ASSISI", campo: "ORATORIO, VIA GABBRO 2, MILANO" },
-            { giornata: 1, data: "2026-10-04", ora: "15:30", casa: "JUVENILIA", fuori: "VALSESIA POLIS", campo: "CAMPO FOOTBALL CITY, P.ZA TIRANA 17, MILANO" },
-            
-            { giornata: 2, data: "2026-10-11", ora: "15:00", casa: "VALSESIA POLIS", fuori: "ASSISI", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
-            { giornata: 2, data: "2026-10-10", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "S.FILIPPO NERI", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
-            { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "UP SETTIMO", fuori: "ATLETICO S.ELENA ASE", campo: "C.S. COMUNALE, VIA DI VITTORIO 16, SETTIMO MILANESE" },
             { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "SPORTING MURIALDO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
-            { giornata: 2, data: "2026-10-10", ora: "15:00", casa: "JUVENILIA", fuori: "ROSARIO 2012", campo: "CAMPO FOOTBALL CITY, P.ZA TIRANA 17, MILANO" },
-
             { giornata: 3, data: "2026-10-18", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ROSARIO 2012", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 3, data: "2026-10-17", ora: "14:30", casa: "S.DOMENICO SAVIO", fuori: "UP SETTIMO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
-            { giornata: 3, data: "2026-10-17", ora: "16:30", casa: "S.FILIPPO NERI", fuori: "ATLETICO S.ELENA ASE", campo: "ORATORIO, VIA GABBRO 2, MILANO" },
-            { giornata: 3, data: "2026-10-18", ora: "15:30", casa: "VALSESIA POLIS", fuori: "ACLI CAVANIS CORSICO BLU", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
-            { giornata: 3, data: "2026-10-18", ora: "15:00", casa: "JUVENILIA", fuori: "ASSISI", campo: "CAMPO FOOTBALL CITY, P.ZA TIRANA 17, MILANO" },
-
-            { giornata: 4, data: "2026-10-24", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "ASSISI", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
-            { giornata: 4, data: "2026-10-25", ora: "17:00", casa: "ATLETICO S.ELENA ASE", fuori: "VALSESIA POLIS", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
-            { giornata: 4, data: "2026-10-25", ora: "17:00", casa: "S.FILIPPO NERI", fuori: "S.DOMENICO SAVIO", campo: "ORATORIO, VIA GABBRO 2, MILANO" },
-            { giornata: 4, data: "2026-10-25", ora: "18:15", casa: "ROSARIO 2012", fuori: "UP SETTIMO", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
             { giornata: 4, data: "2026-10-24", ora: "15:00", casa: "SPORTING MURIALDO", fuori: "JUVENILIA", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-
             { giornata: 5, data: "2026-10-31", ora: "14:30", casa: "SPORTING MURIALDO", fuori: "UP SETTIMO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 5, data: "2026-10-31", ora: "16:30", casa: "S.FILIPPO NERI", fuori: "ROSARIO 2012", campo: "ORATORIO, VIA GABBRO 2, MILANO" },
-            { giornata: 5, data: "2026-11-01", ora: "15:30", casa: "VALSESIA POLIS", fuori: "S.DOMENICO SAVIO", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
-            { giornata: 5, data: "2026-11-01", ora: "15:00", casa: "ASSISI", fuori: "ATLETICO S.ELENA ASE", campo: "ASSISISTADIUM, VIA USIGNOLO-CAROZZI, MILANO" },
-            { giornata: 5, data: "2026-10-31", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "JUVENILIA", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
-
-            { giornata: 6, data: "2026-11-08", ora: "17:00", casa: "ATLETICO S.ELENA ASE", fuori: "ACLI CAVANIS CORSICO BLU", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
-            { giornata: 6, data: "2026-11-08", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "ASSISI", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
-            { giornata: 6, data: "2026-11-08", ora: "18:15", casa: "VALSESIA POLIS", fuori: "ROSARIO 2012", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
             { giornata: 6, data: "2026-11-08", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.FILIPPO NERI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 6, data: "2026-11-07", ora: "15:00", casa: "JUVENILIA", fuori: "UP SETTIMO", campo: "CAMPO FOOTBALL CITY, P.ZA TIRANA 17, MILANO" },
-
-            { giornata: 7, data: "2026-11-14", ora: "16:30", casa: "S.FILIPPO NERI", fuori: "UP SETTIMO", campo: "ORATORIO, VIA GABBRO 2, MILANO" },
             { giornata: 7, data: "2026-11-15", ora: "15:30", casa: "VALSESIA POLIS", fuori: "SPORTING MURIALDO", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
-            { giornata: 7, data: "2026-11-15", ora: "15:00", casa: "ROSARIO 2012", fuori: "ASSISI", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
-            { giornata: 7, data: "2026-11-14", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "ACLI CAVANIS CORSICO BLU", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
-            { giornata: 7, data: "2026-11-15", ora: "17:00", casa: "ATLETICO S.ELENA ASE", fuori: "JUVENILIA", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
-
-            { giornata: 8, data: "2026-11-22", ora: "17:00", casa: "ATLETICO S.ELENA ASE", fuori: "S.DOMENICO SAVIO", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
-            { giornata: 8, data: "2026-11-22", ora: "18:15", casa: "ACLI CAVANIS CORSICO BLU", fuori: "ROSARIO 2012", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
             { giornata: 8, data: "2026-11-22", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 8, data: "2026-11-21", ora: "14:30", casa: "VALSESIA POLIS", fuori: "UP SETTIMO", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
-            { giornata: 8, data: "2026-11-21", ora: "15:00", casa: "JUVENILIA", fuori: "S.FILIPPO NERI", campo: "CAMPO FOOTBALL CITY, P.ZA TIRANA 17, MILANO" },
-
-            { giornata: 9, data: "2026-11-29", ora: "15:30", casa: "VALSESIA POLIS", fuori: "S.FILIPPO NERI", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
-            { giornata: 9, data: "2026-11-29", ora: "15:00", casa: "ASSISI", fuori: "UP SETTIMO", campo: "ASSISISTADIUM, VIA USIGNOLO-CAROZZI, MILANO" },
-            { giornata: 9, data: "2026-11-28", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "SPORTING MURIALDO", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
-            { giornata: 9, data: "2026-11-29", ora: "17:00", casa: "ATLETICO S.ELENA ASE", fuori: "ROSARIO 2012", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
-            { giornata: 9, data: "2026-11-29", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "JUVENILIA", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" }
+            { giornata: 9, data: "2026-11-28", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "SPORTING MURIALDO", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" }
         ];
 
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -836,7 +793,7 @@
                 testo += `📍 Campo: ${partita.campo}\n`;
                 testo += `⏱️ *Ritrovo:* Ore ${orarioRitrovo} direttamente sul campo di gioco\n\n`;
             }
-            testo += `*I convocati:*\n` + convocati.join('\n') + `\n\nForza Sporting Murialdo ❤️💙`;
+            testo += `*I convocati:*\n` + convocati.join('\n') + `\n\nForza ragazzi! 💪🔥`;
 
             navigator.clipboard.writeText(testo).then(() => {
                 registraLog("Copiate convocazioni WhatsApp");
