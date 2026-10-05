@@ -134,7 +134,7 @@
         <div id="tab-calendario" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
                 <h2 class="text-lg font-bold mb-1 text-gray-700">Calendario Ufficiale - Sporting Murialdo Under 15 A 7 (Andata e Ritorno)</h2>
-                <p class="text-xs text-gray-500 mb-4">Partite ufficiali della squadra (campi invertiti nel girone di ritorno).</p>
+                <p class="text-xs text-gray-500 mb-4">Partite ufficiali della squadra con campi invertiti nel girone di ritorno.</p>
                 <div id="lista-partite-calendario" class="space-y-4"></div>
             </div>
         </div>
@@ -263,8 +263,8 @@
 
     <!-- Script Logica -->
     <script>
-        // Incrementiamo la versione a 1.3 per forzare l'aggiornamento automatico del calendario con andata e ritorno
-        const APP_VERSION = "1.3";
+        // Controllo versione cache (Aggiornato a 1.4 per forzare il nuovo calendario completo)
+        const APP_VERSION = "1.4";
         const savedVersion = localStorage.getItem('sq_version');
         if (savedVersion !== APP_VERSION) {
             localStorage.removeItem('sq_calendario');
@@ -299,9 +299,8 @@
 
         let allenamenti = JSON.parse(localStorage.getItem('sq_allenamenti')) || [];
 
-        // Calendario completo di Andata (1-9) e Ritorno (10-18) con campi invertiti
+        // Calendario completo di Andata e Ritorno senza commenti HTML interni
         let calendarioPartite = JSON.parse(localStorage.getItem('sq_calendario')) || [
-            // --- ANDATA ---
             { giornata: 1, data: "2026-10-04", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ATLETICO S.ELENA ASE", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "SPORTING MURIALDO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
             { giornata: 3, data: "2026-10-18", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ROSARIO 2012", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
@@ -311,8 +310,6 @@
             { giornata: 7, data: "2026-11-15", ora: "15:30", casa: "VALSESIA POLIS", fuori: "SPORTING MURIALDO", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
             { giornata: 8, data: "2026-11-22", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 9, data: "2026-11-28", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "SPORTING MURIALDO", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
-            
-            // --- RITORNO (Campi Invertiti) ---
             { giornata: 10, data: "2026-12-06", ora: "16:30", casa: "ATLETICO S.ELENA ASE", fuori: "SPORTING MURIALDO", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
             { giornata: 11, data: "2026-12-13", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.DOMENICO SAVIO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 12, data: "2026-12-20", ora: "16:30", casa: "ROSARIO 2012", fuori: "SPORTING MURIALDO", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
@@ -401,4 +398,502 @@
         function creaNuovoUtente(e) {
             e.preventDefault();
             const u = document.getElementById('nuovo-user').value.trim();
-            const
+            const p = document.getElementById('nuovo-pass').value.trim();
+            if(!u || !p) return;
+
+            if(utenti.some(x => x.username.toLowerCase() === u.toLowerCase())) {
+                alert("Esiste già un utente con questo username!");
+                return;
+            }
+
+            utenti.push({ username: u, password: p });
+            localStorage.setItem('sq_utenti', JSON.stringify(utenti));
+            document.getElementById('nuovo-user').value = '';
+            document.getElementById('nuovo-pass').value = '';
+            registraLog(`Creato nuovo utente: ${u}`);
+            renderUtenti();
+            alert("Utente creato con successo!");
+        }
+
+        function cambiaPasswordUtente(username) {
+            const nuovaPass = prompt(`Inserisci la nuova password per ${username}:`);
+            if(nuovaPass) {
+                const u = utenti.find(x => x.username === username);
+                if(u) {
+                    u.password = nuovaPass;
+                    localStorage.setItem('sq_utenti', JSON.stringify(utenti));
+                    registraLog(`Modificata password per utente: ${username}`);
+                    renderUtenti();
+                    alert("Password aggiornata con successo!");
+                }
+            }
+        }
+
+        function eliminaUtente(username) {
+            if(username === utenteCorrente) {
+                alert("Non puoi eliminare l'utente con cui hai effettuato l'accesso!");
+                return;
+            }
+            if(confirm(`Vuoi eliminare l'utente ${username}?`)) {
+                utenti = utenti.filter(x => x.username !== username);
+                localStorage.setItem('sq_utenti', JSON.stringify(utenti));
+                registraLog(`Eliminato utente: ${username}`);
+                renderUtenti();
+            }
+        }
+
+        function renderUtenti() {
+            const container = document.getElementById('lista-utenti');
+            if(!container) return;
+            container.innerHTML = utenti.map(u => `
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100 text-sm">
+                    <div>
+                        <span class="font-bold text-gray-800"><i class="fa-solid fa-user mr-2 text-indigo-600"></i>${u.username}</span>
+                        ${u.username === utenteCorrente ? '<span class="ml-2 text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Attivo</span>' : ''}
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="cambiaPasswordUtente('${u.username}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1 rounded-lg text-xs font-medium transition">Cambia Password</button>
+                        ${utenti.length > 1 ? `<button onclick="eliminaUtente('${u.username}')" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function salvaDati() {
+            localStorage.setItem('sq_giocatori', JSON.stringify(giocatori));
+            localStorage.setItem('sq_allenamenti', JSON.stringify(allenamenti));
+            localStorage.setItem('sq_calendario', JSON.stringify(calendarioPartite));
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            ['allenamenti', 'convocazioni', 'calendario', 'statistiche', 'anagrafica', 'utenti'].forEach(t => {
+                const btn = document.getElementById('btn-tab-' + t);
+                if(btn) {
+                    if(t === tabId) {
+                        btn.className = "flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm bg-indigo-600 text-white transition whitespace-nowrap shadow-sm";
+                    } else {
+                        btn.className = "flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap";
+                    }
+                }
+            });
+
+            if(tabId === 'allenamenti') renderAllenamenti();
+            if(tabId === 'convocazioni') renderConvocazioni();
+            if(tabId === 'calendario') renderCalendario();
+            if(tabId === 'statistiche') renderStatistiche();
+            if(tabId === 'anagrafica') renderAnagrafica();
+            if(tabId === 'utenti') { renderUtenti(); renderLog(); }
+        }
+
+        function switchStatSubTab(sub) {
+            document.getElementById('stat-subtab-ragazzi').classList.toggle('hidden', sub !== 'ragazzi');
+            document.getElementById('stat-subtab-allenamenti').classList.toggle('hidden', sub !== 'allenamenti');
+
+            document.getElementById('btn-stat-ragazzi').className = sub === 'ragazzi' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
+            document.getElementById('btn-stat-allenamenti').className = sub === 'allenamenti' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
+        }
+
+        // --- ANAGRAFICA & MODIFICA GIOCATORI ---
+        function salvaGiocatore(e) {
+            e.preventDefault();
+            const idEdit = document.getElementById('edit-giocatore-id').value;
+            const nome = document.getElementById('input-nome').value.trim();
+            const cognome = document.getElementById('input-cognome').value.trim();
+            const numero = document.getElementById('input-numero').value.trim();
+            if(!nome) return;
+
+            if(idEdit) {
+                const g = giocatori.find(item => item.id == idEdit);
+                if(g) { g.nome = nome; g.cognome = cognome; g.numero = numero; registraLog(`Modificato giocatore: ${nome} ${cognome}`); }
+            } else {
+                giocatori.push({ id: Date.now(), nome, cognome, numero });
+                registraLog(`Aggiunto giocatore: ${nome} ${cognome}`);
+            }
+
+            salvaDati();
+            resetFormGiocatore();
+            renderAnagrafica();
+            renderConvocazioni();
+        }
+
+        function preparaModificaGiocatore(id) {
+            const g = giocatori.find(item => item.id === id);
+            if(!g) return;
+            document.getElementById('edit-giocatore-id').value = g.id;
+            document.getElementById('input-nome').value = g.nome;
+            document.getElementById('input-cognome').value = g.cognome;
+            document.getElementById('input-numero').value = g.numero;
+            document.getElementById('anagrafica-form-title').innerText = "Modifica Giocatore";
+            document.getElementById('btn-salva-giocatore').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Salva Modifiche`;
+            document.getElementById('btn-annulla-modifica').classList.remove('hidden');
+        }
+
+        function resetFormGiocatore() {
+            document.getElementById('edit-giocatore-id').value = '';
+            document.getElementById('input-nome').value = '';
+            document.getElementById('input-cognome').value = '';
+            document.getElementById('input-numero').value = '';
+            document.getElementById('anagrafica-form-title').innerText = "Aggiungi Giocatore";
+            document.getElementById('btn-salva-giocatore').innerHTML = `<i class="fa-solid fa-user-plus mr-1"></i> Aggiungi alla Rosa`;
+            document.getElementById('btn-annulla-modifica').classList.add('hidden');
+        }
+
+        function eliminaGiocatore(id) {
+            const g = giocatori.find(item => item.id === id);
+            if(confirm("Vuoi rimuovere questo giocatore?")) {
+                giocatori = giocatori.filter(item => item.id !== id);
+                salvaDati();
+                registraLog(`Eliminato giocatore: ${g ? g.nome : id}`);
+                renderAnagrafica();
+                renderConvocazioni();
+            }
+        }
+
+        function renderAnagrafica() {
+            const container = document.getElementById('lista-anagrafica');
+            if(!container) return;
+            if(giocatori.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm italic">Nessun giocatore in rosa.</p>`;
+                return;
+            }
+            container.innerHTML = giocatori.map(g => `
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div>
+                        <span class="font-bold text-gray-800">${g.nome} ${g.cognome}</span>
+                        ${g.numero ? `<span class="ml-2 text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">#${g.numero}</span>` : ''}
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="preparaModificaGiocatore(${g.id})" class="text-indigo-600 hover:text-indigo-800 p-1.5"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="eliminaGiocatore(${g.id})" class="text-red-500 hover:text-red-700 p-1.5"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- ALLENAMENTI ---
+        function creaAllenamentoOggi() {
+            creaAllenamento(new Date().toISOString().split('T')[0]);
+        }
+
+        function creaAllenamentoData() {
+            const data = document.getElementById('input-data-allenamento').value;
+            if(!data) { alert("Seleziona una data!"); return; }
+            creaAllenamento(data);
+        }
+
+        function creaAllenamento(data) {
+            if(allenamenti.some(a => a.data === data)) {
+                alert("Esiste già un allenamento in questa data!");
+                return;
+            }
+            const presenzeIniziali = {};
+            giocatori.forEach(g => presenzeIniziali[g.id] = 'presente');
+
+            const nuovo = { id: Date.now(), data, presenze: presenzeIniziali };
+            allenamenti.push(nuovo);
+            allenamenti.sort((a,b) => new Date(b.data) - new Date(a.data));
+            salvaDati();
+            registraLog(`Creato allenamento del ${data}`);
+            renderAllenamenti();
+            apriModalAllenamento(nuovo.id);
+        }
+
+        function eliminaAllenamento(id) {
+            if(confirm("Eliminare questo allenamento?")) {
+                allenamenti = allenamenti.filter(a => a.id !== id);
+                salvaDati();
+                registraLog("Eliminato un allenamento");
+                renderAllenamenti();
+            }
+        }
+
+        function renderAllenamenti() {
+            const container = document.getElementById('lista-allenamenti');
+            if(!container) return;
+            if(allenamenti.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm italic">Nessun allenamento registrato.</p>`;
+                return;
+            }
+            container.innerHTML = allenamenti.map(a => {
+                const dataF = new Date(a.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+                const presenti = Object.values(a.presenze).filter(p => p === 'presente' || p === 'ritardo').length;
+                return `
+                    <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div>
+                            <h3 class="font-bold text-gray-800"><i class="fa-regular fa-calendar mr-2 text-indigo-600"></i>${dataF}</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Partecipanti: ${presenti}/${giocatori.length}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="apriModalAllenamento(${a.id})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-pen-to-square mr-1"></i> Gestisci</button>
+                            <button onclick="eliminaAllenamento(${a.id})" class="text-red-500 hover:text-red-700 px-2 py-1.5"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function apriModalAllenamento(id) {
+            const allenamento = allenamenti.find(a => a.id === id);
+            if(!allenamento) return;
+            document.getElementById('modal-title').innerText = "Presenze del " + new Date(allenamento.data).toLocaleDateString('it-IT');
+            const container = document.getElementById('modal-presenze-list');
+
+            container.innerHTML = giocatori.map(g => {
+                const stato = allenamento.presenze[g.id] || 'presente';
+                return `
+                    <div class="py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <span class="font-medium text-gray-800">${g.nome} ${g.cognome} ${g.numero ? '('+g.numero+')' : ''}</span>
+                        <div class="flex gap-1 w-full sm:w-auto">
+                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'presente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'presente' ? 'bg-emerald-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Presente</button>
+                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'ritardo')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'ritardo' ? 'bg-amber-500 text-white shadow' : 'bg-gray-100 text-gray-600'}">In ritardo</button>
+                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'assente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'assente' ? 'bg-red-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Assente</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('modal-allenamento').classList.remove('hidden');
+        }
+
+        function chiudiModal() {
+            document.getElementById('modal-allenamento').classList.add('hidden');
+            renderAllenamenti();
+        }
+
+        function setStatoPresenza(allenamentoId, giocatoreId, stato) {
+            const a = allenamenti.find(item => item.id === allenamentoId);
+            if(a) { a.presenze[giocatoreId] = stato; salvaDati(); apriModalAllenamento(allenamentoId); }
+        }
+
+        // --- CALENDARIO PARTITE & MODIFICA ---
+        function renderCalendario() {
+            const container = document.getElementById('lista-partite-calendario');
+            if(!container) return;
+            container.innerHTML = calendarioPartite.map((p, idx) => `
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">Giornata ${p.giornata}</span>
+                        <h4 class="font-bold text-gray-800 mt-1">${p.casa} vs ${p.fuori}</h4>
+                        <p class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${new Date(p.data).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})} ore ${p.ora}</p>
+                        <p class="text-xs text-gray-400 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${p.campo}</p>
+                    </div>
+                    <button onclick="apriModalPartita(${idx})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium transition whitespace-nowrap"><i class="fa-solid fa-pen mr-1"></i> Modifica</button>
+                </div>
+            `).join('');
+        }
+
+        function apriModalPartita(idx) {
+            const p = calendarioPartite[idx];
+            document.getElementById('edit-partita-idx').value = idx;
+            document.getElementById('edit-casa').value = p.casa;
+            document.getElementById('edit-fuori').value = p.fuori;
+            document.getElementById('edit-data').value = p.data;
+            document.getElementById('edit-ora').value = p.ora;
+            document.getElementById('edit-campo').value = p.campo;
+            document.getElementById('modal-partita').classList.remove('hidden');
+        }
+
+        function chiudiModalPartita() {
+            document.getElementById('modal-partita').classList.add('hidden');
+        }
+
+        function salvaPartitaModificata() {
+            const idx = document.getElementById('edit-partita-idx').value;
+            calendarioPartite[idx] = {
+                ...calendarioPartite[idx],
+                casa: document.getElementById('edit-casa').value,
+                fuori: document.getElementById('edit-fuori').value,
+                data: document.getElementById('edit-data').value,
+                ora: document.getElementById('edit-ora').value,
+                campo: document.getElementById('edit-campo').value
+            };
+            salvaDati();
+            registraLog(`Modificata partita Giornata ${calendarioPartite[idx].giornata}`);
+            chiudiModalPartita();
+            renderCalendario();
+            renderConvocazioni();
+        }
+
+        // --- CALCOLO PERCENTUALI & CONVOCAZIONI ---
+        function calcolaPercentuali(giocatoreId) {
+            const oggi = new Date();
+            const anno = oggi.getFullYear(), mese = oggi.getMonth();
+            const giornoSett = oggi.getDay() || 7;
+            const inizioSett = new Date(oggi);
+            inizioSett.setDate(oggi.getDate() - giornoSett + 1);
+            inizioSett.setHours(0,0,0,0);
+
+            let allSett = 0, presSett = 0, allMese = 0, presMese = 0;
+
+            allenamenti.forEach(a => {
+                const dataAll = new Date(a.data);
+                const stato = a.presenze[giocatoreId];
+                const partecipato = (stato === 'presente' || stato === 'ritardo');
+
+                if (dataAll >= inizioSett) {
+                    allSett++; if(partecipato) presSett++;
+                }
+                if (dataAll.getFullYear() === anno && dataAll.getMonth() === mese) {
+                    allMese++; if(partecipato) presMese++;
+                }
+            });
+
+            return {
+                sett: allSett > 0 ? Math.round((presSett / allSett) * 100) : 100,
+                mese: allMese > 0 ? Math.round((presMese / allMese) * 100) : 100
+            };
+        }
+
+        function renderConvocazioni() {
+            const select = document.getElementById('select-partita-convocazione');
+            if(select) {
+                select.innerHTML = calendarioPartite.map((p, idx) => `
+                    <option value="${idx}">Giornata ${p.giornata}: ${p.casa} vs ${p.fuori} (${new Date(p.data).toLocaleDateString('it-IT')} ore ${p.ora})</option>
+                `).join('');
+            }
+
+            const container = document.getElementById('lista-convocazioni-checkbox');
+            if(!container) return;
+            if(giocatori.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm p-4">Nessun giocatore in anagrafica.</p>`;
+                return;
+            }
+
+            container.innerHTML = giocatori.map(g => {
+                const { sett, mese } = calcolaPercentuali(g.id);
+                return `
+                    <div class="py-3 flex items-center justify-between">
+                        <label class="flex items-center gap-3 cursor-pointer flex-1">
+                            <input type="checkbox" data-giocatore-id="${g.id}" class="convocato-checkbox w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" checked>
+                            <div>
+                                <span class="font-bold text-gray-800">${g.nome} ${g.cognome}</span>
+                                ${g.numero ? `<span class="ml-1 text-xs text-gray-500 font-semibold">#${g.numero}</span>` : ''}
+                            </div>
+                        </label>
+                        <div class="flex gap-2 text-xs">
+                            <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg font-medium">Sett: <strong>${sett}%</strong></span>
+                            <span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-lg font-medium">Mese: <strong>${mese}%</strong></span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calcolaOrarioRitrovo(oraPartita) {
+            if(!oraPartita || !oraPartita.includes(':')) return '30 minuti prima';
+            const [ore, minuti] = oraPartita.split(':').map(Number);
+            let d = new Date();
+            d.setHours(ore, minuti - 30, 0, 0);
+            return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
+        function copiaConvocazioniWhatsApp() {
+            const selectPartita = document.getElementById('select-partita-convocazione');
+            const partitaIdx = selectPartita ? selectPartita.value : 0;
+            const partita = calendarioPartite[partitaIdx];
+
+            const checkboxes = document.querySelectorAll('.convocato-checkbox');
+            const convocati = [];
+
+            checkboxes.forEach(cb => {
+                if(cb.checked) {
+                    const id = Number(cb.getAttribute('data-giocatore-id'));
+                    const g = giocatori.find(item => item.id === id);
+                    if(g) convocati.push(`• ${g.nome}${g.cognome ? ' ' + g.cognome : ''}`);
+                }
+            });
+
+            if(convocati.length === 0) { alert("Seleziona almeno un convocato!"); return; }
+
+            let testo = `⚽ *CONVOCAZIONI PARTITA* ⚽\n\n`;
+            if(partita) {
+                const orarioRitrovo = calcolaOrarioRitrovo(partita.ora);
+                testo += `📅 *Giornata ${partita.giornata}* - ${partita.casa} vs ${partita.fuori}\n`;
+                testo += `⏰ Data: ${new Date(partita.data).toLocaleDateString('it-IT')} ore ${partita.ora}\n`;
+                testo += `📍 Campo: ${partita.campo}\n`;
+                testo += `⏱️ *Ritrovo:* Ore ${orarioRitrovo} direttamente sul campo di gioco\n\n`;
+            }
+            testo += `*I convocati:*\n` + convocati.join('\n') + `\n\nForza ragazzi! 💪🔥`;
+
+            navigator.clipboard.writeText(testo).then(() => {
+                registraLog("Copiate convocazioni WhatsApp");
+                alert("Convocazioni, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
+            }).catch(() => alert("Errore durante la copia."));
+        }
+
+        // --- STATISTICHE ---
+        function renderStatistiche() {
+            const containerRagazzi = document.getElementById('statistiche-ragazzi-list');
+            if(containerRagazzi) {
+                if(giocatori.length === 0) {
+                    containerRagazzi.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
+                } else {
+                    containerRagazzi.innerHTML = giocatori.map(g => {
+                        let totalAll = allenamenti.length;
+                        let presenti = 0, ritardi = 0, assenti = 0;
+                        allenamenti.forEach(a => {
+                            const s = a.presenze[g.id];
+                            if(s === 'presente') presenti++;
+                            if(s === 'ritardo') ritardi++;
+                            if(s === 'assente') assenti++;
+                        });
+                        const presTot = presenti + ritardi;
+                        const percGlobal = totalAll > 0 ? Math.round((presTot / totalAll) * 100) : 0;
+
+                        return `
+                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-base">${g.nome} ${g.cognome} ${g.numero ? '(# '+g.numero+')' : ''}</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">Allenamenti registrati: ${totalAll} | Presenti: ${presenti} | In ritardo: ${ritardi} | Assenti: ${assenti}</p>
+                                </div>
+                                <div class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-center font-bold text-sm">
+                                    ${percGlobal}% <span class="text-xs font-normal block opacity-80">Presenza</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            const containerAll = document.getElementById('statistiche-allenamenti-list');
+            if(containerAll) {
+                if(allenamenti.length === 0) {
+                    containerAll.innerHTML = `<p class="text-gray-400 text-sm">Nessun allenamento.</p>`;
+                } else {
+                    containerAll.innerHTML = allenamenti.map(a => {
+                        const dataF = new Date(a.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+                        let pres = 0, rit = 0, ass = 0;
+                        Object.values(a.presenze).forEach(s => {
+                            if(s === 'presente') pres++;
+                            if(s === 'ritardo') rit++;
+                            if(s === 'assente') ass++;
+                        });
+                        return `
+                            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex justify-between items-center text-sm">
+                                <div>
+                                    <span class="font-bold text-gray-800"><i class="fa-regular fa-calendar mr-2 text-indigo-600"></i>${dataF}</span>
+                                    <div class="text-xs text-gray-500 mt-1">Presenti: <strong class="text-emerald-600">${pres}</strong> | In ritardo: <strong class="text-amber-500">${rit}</strong> | Assenti: <strong class="text-red-500">${ass}</strong></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        // Inizializzazione globale e verifica autenticazione
+        window.onload = function() {
+            checkAuth();
+            renderAllenamenti();
+            renderConvocazioni();
+            renderCalendario();
+            renderStatistiche();
+            renderAnagrafica();
+            renderUtenti();
+            renderLog();
+        };
+    </script>
+</body>
+</html>
