@@ -263,11 +263,12 @@
 
     <!-- Script Logica -->
     <script>
-        // Controllo versione cache (Aggiornato a 1.4 per forzare il nuovo calendario completo)
-        const APP_VERSION = "1.4";
+        // Controllo versione cache (Aggiornato a 1.5 per caricare gli allenamenti pregressi)
+        const APP_VERSION = "1.5";
         const savedVersion = localStorage.getItem('sq_version');
         if (savedVersion !== APP_VERSION) {
             localStorage.removeItem('sq_calendario');
+            localStorage.removeItem('sq_allenamenti');
             localStorage.setItem('sq_version', APP_VERSION);
         }
 
@@ -287,19 +288,51 @@
             { id: 6, nome: "Filippo", cognome: "", numero: "10" },
             { id: 7, nome: "Oualid", cognome: "", numero: "9" },
             { id: 8, nome: "Elia", cognome: "", numero: "7" },
-            { id: 9, nome: "Fabri", cognome: "", numero: "21" },
+            { id: 9, nome: "Fabrizio", cognome: "", numero: "21" },
             { id: 10, nome: "Abdul", cognome: "", numero: "2" },
             { id: 11, nome: "Carlos", cognome: "", numero: "15" },
-            { id: 12, nome: "Gabri", cognome: "", numero: "5" },
+            { id: 12, nome: "Gabriele", cognome: "", numero: "5" },
             { id: 13, nome: "Dylan", cognome: "", numero: "22" },
             { id: 14, nome: "Matteo", cognome: "", numero: "66" },
             { id: 15, nome: "Helia", cognome: "", numero: "99" },
             { id: 16, nome: "Carlitos", cognome: "", numero: "98" }
         ];
 
-        let allenamenti = JSON.parse(localStorage.getItem('sq_allenamenti')) || [];
+        // Allenamenti pregressi importati dal file Excel
+        let allenamenti = JSON.parse(localStorage.getItem('sq_allenamenti')) || [
+            {
+                id: 1700000000,
+                data: "2026-09-15",
+                presenze: { "8": "presente", "15": "assente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" }
+            },
+            {
+                id: 1700000001,
+                data: "2026-09-18",
+                presenze: { "8": "presente", "15": "assente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "assente", "2": "presente" }
+            },
+            {
+                id: 1700000002,
+                data: "2026-09-22",
+                presenze: { "8": "presente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" }
+            },
+            {
+                id: 1700000003,
+                data: "2026-09-25",
+                presenze: { "8": "assente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "assente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" }
+            },
+            {
+                id: 1700000004,
+                data: "2026-09-29",
+                presenze: { "8": "presente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "assente", "9": "presente", "6": "presente", "5": "assente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" }
+            },
+            {
+                id: 1700000005,
+                data: "2026-10-02",
+                presenze: { "8": "assente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "assente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "assente" }
+            }
+        ];
 
-        // Calendario completo di Andata e Ritorno senza commenti HTML interni
+        // Calendario completo di Andata e Ritorno
         let calendarioPartite = JSON.parse(localStorage.getItem('sq_calendario')) || [
             { giornata: 1, data: "2026-10-04", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ATLETICO S.ELENA ASE", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "SPORTING MURIALDO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
