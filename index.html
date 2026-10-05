@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Squadra Under 15 - Sporting Murialdo</title>
+    <!-- Meta tag per forzare il browser a non memorizzare la cache della pagina -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome per le icone -->
@@ -258,6 +263,15 @@
 
     <!-- Script Logica -->
     <script>
+        // Gestione versione cache dei dati nel localStorage
+        const APP_VERSION = "1.2";
+        const savedVersion = localStorage.getItem('sq_version');
+        if (savedVersion !== APP_VERSION) {
+            // Se la versione è cambiata, puliamo il vecchio calendario salvato per forzare quello nuovo
+            localStorage.removeItem('sq_calendario');
+            localStorage.setItem('sq_version', APP_VERSION);
+        }
+
         let utenti = JSON.parse(localStorage.getItem('sq_utenti')) || [
             { username: "Alessandro", password: "123456" },
             { username: "Anna", password: "123456" }
@@ -286,7 +300,7 @@
 
         let allenamenti = JSON.parse(localStorage.getItem('sq_allenamenti')) || [];
 
-        // Calendario filtrato esclusivamente per le partite dello Sporting Murialdo
+        // Calendario aggiornato con le sole partite dello Sporting Murialdo
         let calendarioPartite = JSON.parse(localStorage.getItem('sq_calendario')) || [
             { giornata: 1, data: "2026-10-04", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ATLETICO S.ELENA ASE", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "SPORTING MURIALDO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
