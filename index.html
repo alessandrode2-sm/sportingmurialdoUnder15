@@ -416,7 +416,7 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.8";
+        const APP_VERSION = "2.9";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
         let giocatori = [];
@@ -724,7 +724,8 @@
                 }
             });
 
-            renderTutto();
+            // Refresh automatico dei dati ogni volta che si cambia tab
+            window.inizializzaDatiCloud();
         }
 
         function switchStatSubTab(sub) {
@@ -1003,17 +1004,25 @@
             const link = document.getElementById('modal-es-link').value.trim();
             if(!titolo) { alert("Inserisci almeno il titolo dell'esercizio!"); return; }
 
+            // Crea l'esercizio nella libreria generale se non esiste già
+            const nuovoEsLib = { id: Date.now(), titolo, descrizione, link };
+            esercizi.push(nuovoEsLib);
+            await salvaCloud("esercizi", nuovoEsLib.id, nuovoEsLib);
+
             const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
             if(!a) return;
 
             if(!a.eserciziSessione) a.eserciziSessione = [];
-            a.eserciziSessione.push({ id: Date.now(), idIstanza: Date.now(), titolo, descrizione, link });
+            a.eserciziSessione.push({ ...nuovoEsLib, idIstanza: Date.now() });
 
             await salvaCloud("allenamenti", a.id, a);
+
             document.getElementById('modal-es-titolo').value = "";
             document.getElementById('modal-es-desc').value = "";
             document.getElementById('modal-es-link').value = "";
+            
             renderEserciziSessioneModal();
+            renderEsercizi();
             renderAllenamenti();
         }
 
