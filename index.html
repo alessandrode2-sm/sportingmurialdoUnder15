@@ -164,12 +164,13 @@
         <div id="tab-statistiche" class="tab-content hidden">
             <div class="flex gap-2 mb-4">
                 <button onclick="switchStatSubTab('ragazzi')" id="btn-stat-ragazzi" class="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition">Per Ragazzo</button>
+                <button onclick="switchStatSubTab('convocazioni')" id="btn-stat-convocazioni" class="flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition">Statistiche Convocazioni</button>
                 <button onclick="switchStatSubTab('allenamenti')" id="btn-stat-allenamenti" class="flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition">Per Allenamento</button>
             </div>
 
             <div id="stat-subtab-ragazzi" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                    <h2 class="text-lg font-bold text-gray-700">Riepilogo Presenze Individuali</h2>
+                    <h2 class="text-lg font-bold text-gray-700">Riepilogo Presenze Allenamenti</h2>
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <label class="text-xs font-semibold text-gray-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Ordina per:</label>
                         <select id="ordinamento-select" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
@@ -181,6 +182,13 @@
                     </div>
                 </div>
                 <div id="statistiche-ragazzi-list" class="space-y-4"></div>
+            </div>
+
+            <!-- Sotto-tab Statistiche Convocazioni Partite -->
+            <div id="stat-subtab-convocazioni" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200 hidden">
+                <h2 class="text-lg font-bold mb-1 text-gray-700">Statistiche Convocazioni Partite</h2>
+                <p class="text-xs text-gray-500 mb-4">Percentuale e numero di convocazioni ufficiali per ogni giocatore.</p>
+                <div id="statistiche-convocazioni-list" class="space-y-3"></div>
             </div>
 
             <div id="stat-subtab-allenamenti" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200 hidden">
@@ -254,6 +262,20 @@
         </div>
     </div>
 
+    <!-- Modal Storico Convocazioni Partita -->
+    <div id="modal-storico-convocazioni" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-xl overflow-hidden">
+            <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
+                <h3 id="modal-storico-title" class="font-bold text-lg">Storico Convocati</h3>
+                <button onclick="chiudiModalStorico()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-5 max-h-80 overflow-y-auto space-y-2" id="modal-storico-content"></div>
+            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                <button onclick="chiudiModalStorico()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium shadow">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Modifica Partita -->
     <div id="modal-partita" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-xl overflow-hidden">
@@ -295,7 +317,7 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.0";
+        const APP_VERSION = "2.1";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
         // Dati locali di fallback / default iniziali
@@ -344,7 +366,7 @@
             { giornata: 14, data: "2027-01-17", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "UP SETTIMO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 15, data: "2027-01-24", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.FILIPPO NERI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 16, data: "2027-01-31", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "VALSESIA POLIS", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 17, data: "2027-02-07", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
+            { giornata: 17, data: "2027-02-07", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASSISISTADIUM, VIA USIGNOLO-CAROZZI, MILANO" },
             { giornata: 18, data: "2027-02-14", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ACLI CAVANIS CORSICO BLU", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" }
         ];
 
@@ -605,9 +627,11 @@
 
         function switchStatSubTab(sub) {
             document.getElementById('stat-subtab-ragazzi').classList.toggle('hidden', sub !== 'ragazzi');
+            document.getElementById('stat-subtab-convocazioni').classList.toggle('hidden', sub !== 'convocazioni');
             document.getElementById('stat-subtab-allenamenti').classList.toggle('hidden', sub !== 'allenamenti');
 
             document.getElementById('btn-stat-ragazzi').className = sub === 'ragazzi' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
+            document.getElementById('btn-stat-convocazioni').className = sub === 'convocazioni' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
             document.getElementById('btn-stat-allenamenti').className = sub === 'allenamenti' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
         }
 
@@ -792,17 +816,44 @@
         function renderCalendario() {
             const container = document.getElementById('lista-partite-calendario');
             if(!container) return;
-            container.innerHTML = calendarioPartite.map((p, idx) => `
-                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div>
-                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">Giornata ${p.giornata}</span>
-                        <h4 class="font-bold text-gray-800 mt-1">${p.casa} vs ${p.fuori}</h4>
-                        <p class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${new Date(p.data).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})} ore ${p.ora}</p>
-                        <p class="text-xs text-gray-400 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${p.campo}</p>
+            container.innerHTML = calendarioPartite.map((p, idx) => {
+                const haConvocazioni = convocazioniStorico[p.giornata] && convocazioniStorico[p.giornata].length > 0;
+                return `
+                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">Giornata ${p.giornata}</span>
+                            <h4 class="font-bold text-gray-800 mt-1">${p.casa} vs ${p.fuori}</h4>
+                            <p class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${new Date(p.data).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})} ore ${p.ora}</p>
+                            <p class="text-xs text-gray-400 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${p.campo}</p>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto justify-end">
+                            ${haConvocazioni ? `<button onclick="apriModalStoricoConvocazioni(${p.giornata})" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap"><i class="fa-solid fa-list-check mr-1"></i> Storico Convocazioni</button>` : ''}
+                            <button onclick="apriModalPartita(${idx})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap"><i class="fa-solid fa-pen mr-1"></i> Modifica</button>
+                        </div>
                     </div>
-                    <button onclick="apriModalPartita(${idx})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium transition whitespace-nowrap"><i class="fa-solid fa-pen mr-1"></i> Modifica</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+
+        function apriModalStoricoConvocazioni(giornata) {
+            const part = calendarioPartite.find(p => p.giornata === giornata);
+            const convocatiIds = convocazioniStorico[giornata] || [];
+            document.getElementById('modal-storico-title').innerText = `Convocati Giornata ${giornata}`;
+            const container = document.getElementById('modal-storico-content');
+
+            if(convocatiIds.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore storicizzato per questa partita.</p>`;
+            } else {
+                container.innerHTML = convocatiIds.map(id => {
+                    const g = giocatori.find(item => item.id === Number(id));
+                    return g ? `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-sm font-medium"><i class="fa-solid fa-check text-emerald-600 mr-2"></i>${g.nome} ${g.cognome} ${g.numero ? '(# '+g.numero+')' : ''}</div>` : '';
+                }).join('');
+            }
+            document.getElementById('modal-storico-convocazioni').classList.remove('hidden');
+        }
+
+        function chiudiModalStorico() {
+            document.getElementById('modal-storico-convocazioni').classList.add('hidden');
         }
 
         function apriModalPartita(idx) {
@@ -881,11 +932,15 @@
 
             // Statistiche convocazioni partite
             let totaleConvocazioni = 0;
+            let partiteTotaliConvocabili = Object.keys(convocazioniStorico).length;
+
             Object.values(convocazioniStorico).forEach(convList => {
                 if(convList.includes(g.id)) totaleConvocazioni++;
             });
 
-            return { totalAll, presenti, ritardi, assenti, percGlobal, totaleConvocazioni };
+            const percConvocazione = partiteTotaliConvocabili > 0 ? Math.round((totaleConvocazioni / partiteTotaliConvocabili) * 100) : 0;
+
+            return { totalAll, presenti, ritardi, assenti, percGlobal, totaleConvocazioni, partiteTotaliConvocabili, percConvocazione };
         }
 
         function renderConvocazioni() {
@@ -965,11 +1020,13 @@
                 testo += `📍 Campo: ${partita.campo}\n`;
                 testo += `⏱️ *Ritrovo:* Ore ${orarioRitrovo} direttamente sul campo di gioco\n\n`;
             }
-            testo += `*I convocati:*\n` + convocatiNomi.join('\n') + `\n\nForza ragazzi! 💪🔥`;
+            testo += `*I convocati:*\n` + convocatiNomi.join('\n') + `\n\nForza Sporting Murialdo ❤️💙`;
 
             navigator.clipboard.writeText(testo).then(() => {
                 registraLog(`Generate e storicizzate convocazioni Giornata ${partita.giornata}`);
                 alert("Convocazioni salvate nello storico, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
+                renderCalendario();
+                renderStatistiche();
             }).catch(() => alert("Errore durante la copia."));
         }
 
@@ -1001,15 +1058,42 @@
                     });
 
                     containerRagazzi.innerHTML = giocatoriOrdinati.map(g => {
-                        const { totalAll, presenti, ritardi, assenti, percGlobal, totaleConvocazioni } = calcolaStatisticheGiocatore(g);
+                        const { totalAll, presenti, ritardi, assenti, percGlobal } = calcolaStatisticheGiocatore(g);
                         return `
                             <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
                                     <h4 class="font-bold text-gray-800 text-base">${g.nome} ${g.cognome} ${g.numero ? '(# '+g.numero+')' : ''}</h4>
-                                    <p class="text-xs text-gray-500 mt-0.5">All. reg.: ${totalAll} | Pres.: ${presenti} | Rit.: ${ritardi} | Ass.: ${assenti} | Convocazioni part.: <strong class="text-indigo-600">${totaleConvocazioni}</strong></p>
+                                    <p class="text-xs text-gray-500 mt-0.5">Allenamenti registrati: ${totalAll} | Presenti: ${presenti} | In ritardo: ${ritardi} | Assenti: ${assenti}</p>
                                 </div>
                                 <div class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-center font-bold text-sm">
-                                    ${percGlobal}% <span class="text-xs font-normal block opacity-80">Presenza All.</span>
+                                    ${percGlobal}% <span class="text-xs font-normal block opacity-80">Presenza</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            // Render Statistiche Convocazioni
+            const containerConv = document.getElementById('statistiche-convocazioni-list');
+            if(containerConv) {
+                if(giocatori.length === 0) {
+                    containerConv.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
+                } else {
+                    let giocatoriConvOrdinati = [...giocatori].sort((a, b) => {
+                        return calcolaStatisticheGiocatore(b).percConvocazione - calcolaStatisticheGiocatore(a).percConvocazione || a.nome.localeCompare(b.nome);
+                    });
+
+                    containerConv.innerHTML = giocatoriConvOrdinati.map(g => {
+                        const { totaleConvocazioni, partiteTotaliConvocabili, percConvocazione } = calcolaStatisticheGiocatore(g);
+                        return `
+                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-base">${g.nome} ${g.cognome} ${g.numero ? '(# '+g.numero+')' : ''}</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">Convocazioni ufficiali: <strong class="text-indigo-600">${totaleConvocazioni}</strong> su ${partiteTotaliConvocabili} partite generate</p>
+                                </div>
+                                <div class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-center font-bold text-sm">
+                                    ${percConvocazione}% <span class="text-xs font-normal block opacity-80">Convocazione</span>
                                 </div>
                             </div>
                         `;
@@ -1052,6 +1136,11 @@
             renderUtenti();
             renderLog();
         }
+
+        window.onload = function() {
+            checkAuth();
+            renderTutto();
+        };
     </script>
 </body>
 </html>
