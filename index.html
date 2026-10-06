@@ -209,7 +209,7 @@
                     <h2 class="text-lg font-bold text-gray-700">Riepilogo Presenze Allenamenti</h2>
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <label class="text-xs font-semibold text-gray-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Ordina per:</label>
-                        <select id="ordinamento-select" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
+                        <select id="ordinamento-ragazzi" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
                             <option value="perc_desc">Percentuale (Alta ➔ Bassa)</option>
                             <option value="perc_asc">Percentuale (Bassa ➔ Alta)</option>
                             <option value="nome">Nome (A ➔ Z)</option>
@@ -222,13 +222,37 @@
 
             <!-- Sotto-tab Statistiche Convocazioni Partite -->
             <div id="stat-subtab-convocazioni" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200 hidden">
-                <h2 class="text-lg font-bold mb-1 text-gray-700">Statistiche Convocazioni Partite</h2>
-                <p class="text-xs text-gray-500 mb-4">Percentuale e numero di convocazioni ufficiali per ogni giocatore.</p>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-700">Statistiche Convocazioni Partite</h2>
+                        <p class="text-xs text-gray-500">Percentuale e numero di convocazioni ufficiali per ogni giocatore.</p>
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label class="text-xs font-semibold text-gray-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Ordina per:</label>
+                        <select id="ordinamento-convocazioni" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
+                            <option value="perc_desc">Percentuale (Alta ➔ Bassa)</option>
+                            <option value="perc_asc">Percentuale (Bassa ➔ Alta)</option>
+                            <option value="nome">Nome (A ➔ Z)</option>
+                            <option value="numero">Numero Maglia</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="statistiche-convocazioni-list" class="space-y-3"></div>
             </div>
 
             <div id="stat-subtab-allenamenti" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200 hidden">
-                <h2 class="text-lg font-bold mb-4 text-gray-700">Riepilogo per Sessione</h2>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <h2 class="text-lg font-bold text-gray-700">Riepilogo per Sessione</h2>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label class="text-xs font-semibold text-gray-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Ordina per:</label>
+                        <select id="ordinamento-allenamenti" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
+                            <option value="data_desc">Data (Recente ➔ Meno recente)</option>
+                            <option value="data_asc">Data (Meno recente ➔ Recente)</option>
+                            <option value="perc_desc">Percentuale Presenza (Alta ➔ Bassa)</option>
+                            <option value="perc_asc">Percentuale Presenza (Bassa ➔ Alta)</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="statistiche-allenamenti-list" class="space-y-3"></div>
             </div>
         </div>
@@ -392,7 +416,7 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.7";
+        const APP_VERSION = "2.8";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
         let giocatori = [];
@@ -1301,12 +1325,13 @@
 
         // --- STATISTICHE ---
         function renderStatistiche() {
+            // 1. Tab Statistiche Ragazzi (Allenamenti)
             const containerRagazzi = document.getElementById('statistiche-ragazzi-list');
             if(containerRagazzi) {
                 if(giocatori.length === 0) {
                     containerRagazzi.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
                 } else {
-                    const tipoOrdinamento = document.getElementById('ordinamento-select') ? document.getElementById('ordinamento-select').value : 'perc_desc';
+                    const tipoOrdinamento = document.getElementById('ordinamento-ragazzi') ? document.getElementById('ordinamento-ragazzi').value : 'perc_desc';
 
                     let giocatoriOrdinati = [...giocatori].sort((a, b) => {
                         const statA = calcolaStatisticheGiocatore(a);
@@ -1343,13 +1368,30 @@
                 }
             }
 
+            // 2. Tab Statistiche Convocazioni Partite
             const containerConv = document.getElementById('statistiche-convocazioni-list');
             if(containerConv) {
                 if(giocatori.length === 0) {
                     containerConv.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
                 } else {
+                    const tipoOrdinamentoConv = document.getElementById('ordinamento-convocazioni') ? document.getElementById('ordinamento-convocazioni').value : 'perc_desc';
+
                     let giocatoriConvOrdinati = [...giocatori].sort((a, b) => {
-                        return calcolaStatisticheGiocatore(b).percConvocazione - calcolaStatisticheGiocatore(a).percConvocazione || a.nome.localeCompare(b.nome);
+                        const statA = calcolaStatisticheGiocatore(a);
+                        const statB = calcolaStatisticheGiocatore(b);
+
+                        if (tipoOrdinamentoConv === 'perc_desc') {
+                            return statB.percConvocazione - statA.percConvocazione || a.nome.localeCompare(b.nome);
+                        } else if (tipoOrdinamentoConv === 'perc_asc') {
+                            return statA.percConvocazione - statB.percConvocazione || a.nome.localeCompare(b.nome);
+                        } else if (tipoOrdinamentoConv === 'nome') {
+                            return a.nome.localeCompare(b.nome);
+                        } else if (tipoOrdinamentoConv === 'numero') {
+                            const numA = parseInt(a.numero) || 999;
+                            const numB = parseInt(b.numero) || 999;
+                            return numA - numB || a.nome.localeCompare(b.nome);
+                        }
+                        return 0;
                     });
 
                     containerConv.innerHTML = giocatoriConvOrdinati.map(g => {
@@ -1369,12 +1411,35 @@
                 }
             }
 
+            // 3. Tab Statistiche per Allenamento (con ordinamento dedicato)
             const containerAll = document.getElementById('statistiche-allenamenti-list');
             if(containerAll) {
                 if(allenamenti.length === 0) {
                     containerAll.innerHTML = `<p class="text-gray-400 text-sm">Nessun allenamento.</p>`;
                 } else {
-                    containerAll.innerHTML = allenamenti.map(a => {
+                    const tipoOrdinamentoAll = document.getElementById('ordinamento-allenamenti') ? document.getElementById('ordinamento-allenamenti').value : 'data_desc';
+
+                    let allenamentiOrdinati = [...allenamenti].sort((a, b) => {
+                        let presA = 0, ritA = 0, presB = 0, ritB = 0;
+                        Object.values(a.presenze || {}).forEach(s => { if(s === 'presente') presA++; if(s === 'ritardo') ritA++; });
+                        Object.values(b.presenze || {}).forEach(s => { if(s === 'presente') presB++; if(s === 'ritardo') ritB++; });
+                        const totRosa = giocatori.length > 0 ? giocatori.length : 1;
+                        const percA = Math.round(((presA + ritA) / totRosa) * 100);
+                        const percB = Math.round(((presB + ritB) / totRosa) * 100);
+
+                        if (tipoOrdinamentoAll === 'data_desc') {
+                            return new Date(b.data) - new Date(a.data);
+                        } else if (tipoOrdinamentoAll === 'data_asc') {
+                            return new Date(a.data) - new Date(b.data);
+                        } else if (tipoOrdinamentoAll === 'perc_desc') {
+                            return percB - percA || new Date(b.data) - new Date(a.data);
+                        } else if (tipoOrdinamentoAll === 'perc_asc') {
+                            return percA - percB || new Date(b.data) - new Date(a.data);
+                        }
+                        return 0;
+                    });
+
+                    containerAll.innerHTML = allenamentiOrdinati.map(a => {
                         const dataF = new Date(a.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
                         let pres = 0, rit = 0, ass = 0;
                         Object.values(a.presenze || {}).forEach(s => {
