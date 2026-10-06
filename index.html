@@ -284,46 +284,55 @@
 
     </main>
 
-    <!-- Modal Dettaglio Allenamento & Esercizi -->
-    <div id="modal-allenamento" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden">
+    <!-- Modal Gestione Esercizi Sessione -->
+    <div id="modal-esercizi-allenamento" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden">
             <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-                <h3 id="modal-title" class="font-bold text-lg">Gestione Allenamento</h3>
-                <button onclick="chiudiModal()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <h3 id="modal-es-title" class="font-bold text-lg">Preparazione Esercizi Sessione</h3>
+                <button onclick="chiudiModalEsercizi()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div class="p-5 overflow-y-auto flex-1 space-y-6">
-                <!-- Sezione Esercizi dell'Allenamento -->
+            <div class="p-5 overflow-y-auto flex-1 space-y-4">
                 <div class="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100 space-y-3">
-                    <h4 class="font-bold text-sm text-indigo-900"><i class="fa-solid fa-dumbbell mr-2"></i>Esercizi Programmati per la Sessione</h4>
-                    
-                    <!-- Richiama da libreria -->
+                    <h4 class="font-bold text-xs text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-bookmark mr-1"></i> Richiama da Archivio</h4>
                     <div class="flex gap-2">
                         <select id="select-esercizio-archivio" class="flex-1 border border-indigo-200 rounded-xl px-3 py-2 text-xs bg-white outline-none">
-                            <option value="">-- Seleziona esercizio dall'archivio --</option>
+                            <option value="">-- Seleziona esercizio --</option>
                         </select>
-                        <button onclick="aggiungiEsercizioDaArchivio()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap shadow"><i class="fa-solid fa-plus mr-1"></i> Aggiungi</button>
+                        <button onclick="aggiungiEsercizioDaArchivio()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-medium shadow"><i class="fa-solid fa-plus mr-1"></i> Aggiungi</button>
                     </div>
-
-                    <!-- Inserisci esercizio al volo -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
-                        <input type="text" id="modal-es-titolo" placeholder="Titolo esercizio *" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white">
-                        <input type="text" id="modal-es-link" placeholder="Link video (opzionale)" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white">
-                        <button onclick="aggiungiEsercizioAlVolo()" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-1.5 text-xs font-medium shadow"><i class="fa-solid fa-plus-circle mr-1"></i> Crea e Aggiungi</button>
-                    </div>
-
-                    <div id="modal-lista-esercizi-sessione" class="space-y-2 pt-2"></div>
                 </div>
 
-                <!-- Sezione Presenze Giocatori -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                    <h4 class="font-bold text-xs text-gray-700 uppercase tracking-wide"><i class="fa-solid fa-pen-to-square mr-1"></i> Oppure Inserisci al Volo</h4>
+                    <input type="text" id="modal-es-titolo" placeholder="Titolo esercizio *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs bg-white">
+                    <textarea id="modal-es-desc" rows="2" placeholder="Descrizione / note..." class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs bg-white"></textarea>
+                    <input type="url" id="modal-es-link" placeholder="Link video (opzionale)" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs bg-white">
+                    <button onclick="aggiungiEsercizioAlVolo()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 text-xs font-medium shadow"><i class="fa-solid fa-plus-circle mr-1"></i> Crea e Aggiungi alla Sessione</button>
+                </div>
+
                 <div>
-                    <h4 class="font-bold text-sm text-gray-700 mb-2"><i class="fa-solid fa-users mr-2 text-indigo-600"></i>Presenze Giocatori</h4>
-                    <div class="divide-y divide-gray-100 border border-gray-200 rounded-xl p-3 bg-gray-50" id="modal-presenze-list"></div>
+                    <h4 class="font-bold text-sm text-gray-700 mb-2">Esercizi in Programma</h4>
+                    <div id="modal-lista-esercizi-sessione" class="space-y-2"></div>
                 </div>
             </div>
 
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
-                <button onclick="chiudiModal()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-medium shadow hover:bg-indigo-700 transition">Salva e Chiudi</button>
+                <button onclick="chiudiModalEsercizi()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-medium shadow hover:bg-indigo-700 transition">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gestione Presenze -->
+    <div id="modal-presenze-allenamento" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden">
+            <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
+                <h3 id="modal-presenze-title" class="font-bold text-lg">Gestione Presenze</h3>
+                <button onclick="chiudiModalPresenze()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 divide-y divide-gray-100" id="modal-presenze-list"></div>
+            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                <button onclick="chiudiModalPresenze()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl font-medium shadow hover:bg-indigo-700 transition">Salva e Chiudi</button>
             </div>
         </div>
     </div>
@@ -383,7 +392,7 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.6";
+        const APP_VERSION = "2.7";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
         let giocatori = [];
@@ -884,7 +893,7 @@
             await salvaCloud("allenamenti", nuovo.id, nuovo);
             registraLog(`Creato allenamento del ${data}`);
             renderAllenamenti();
-            apriModalAllenamento(nuovo.id);
+            apriModalEsercizi(nuovo.id);
         }
 
         async function eliminaAllenamento(id) {
@@ -908,13 +917,14 @@
                 const presenti = Object.values(a.presenze || {}).filter(p => p === 'presente' || p === 'ritardo').length;
                 const numEs = (a.eserciziSessione || []).length;
                 return `
-                    <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <div>
                             <h3 class="font-bold text-gray-800"><i class="fa-regular fa-calendar mr-2 text-indigo-600"></i>${dataF}</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">Partecipanti: ${presenti}/${giocatori.length} | Esercizi: ${numEs}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Partecipanti: ${presenti}/${giocatori.length} | Esercizi sessione: ${numEs}</p>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="apriModalAllenamento(${a.id})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-pen-to-square mr-1"></i> Gestisci</button>
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
+                            <button onclick="apriModalEsercizi(${a.id})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap"><i class="fa-solid fa-dumbbell mr-1"></i> Gestisci Esercizi</button>
+                            <button onclick="apriModalPresenze(${a.id})" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap"><i class="fa-solid fa-clipboard-user mr-1"></i> Gestisci Presenze</button>
                             <button onclick="eliminaAllenamento(${a.id})" class="text-red-500 hover:text-red-700 px-2 py-1.5"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </div>
@@ -922,52 +932,26 @@
             }).join('');
         }
 
-        function apriModalAllenamento(id) {
+        // --- GESTIONE ESERCIZI SESSIONE (MODALE) ---
+        function apriModalEsercizi(id) {
             const allenamento = allenamenti.find(a => a.id === id);
             if(!allenamento) return;
             allenamentoCorrenteId = id;
-            document.getElementById('modal-title').innerText = "Gestione Allenamento del " + new Date(allenamento.data).toLocaleDateString('it-IT');
-            
-            // Popola select esercizi archivio
+            document.getElementById('modal-es-title').innerText = "Esercizi - Allenamento del " + new Date(allenamento.data).toLocaleDateString('it-IT');
+
             const selectArchivio = document.getElementById('select-esercizio-archivio');
-            selectArchivio.innerHTML = `<option value="">-- Seleziona esercizio dall'archivio --</option>` + esercizi.map(es => `
+            selectArchivio.innerHTML = `<option value="">-- Seleziona esercizio --</option>` + esercizi.map(es => `
                 <option value="${es.id}">${es.titolo}</option>
             `).join('');
 
             renderEserciziSessioneModal();
-
-            // Popola presenze
-            const containerPresenze = document.getElementById('modal-presenze-list');
-            containerPresenze.innerHTML = giocatori.map(g => {
-                const stato = allenamento.presenze[g.id] || 'presente';
-                return `
-                    <div class="py-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <span class="font-medium text-gray-800 text-sm">${g.nome} ${g.cognome} ${g.numero ? '('+g.numero+')' : ''}</span>
-                        <div class="flex gap-1 w-full sm:w-auto">
-                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'presente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'presente' ? 'bg-emerald-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Presente</button>
-                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'ritardo')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'ritardo' ? 'bg-amber-500 text-white shadow' : 'bg-gray-100 text-gray-600'}">In ritardo</button>
-                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'assente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'assente' ? 'bg-red-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Assente</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById('modal-allenamento').classList.remove('hidden');
+            document.getElementById('modal-esercizi-allenamento').classList.remove('hidden');
         }
 
-        function chiudiModal() {
-            document.getElementById('modal-allenamento').classList.add('hidden');
+        function chiudiModalEsercizi() {
+            document.getElementById('modal-esercizi-allenamento').classList.add('hidden');
             allenamentoCorrenteId = null;
             renderAllenamenti();
-        }
-
-        async function setStatoPresenza(allenamentoId, giocatoreId, stato) {
-            const a = allenamenti.find(item => item.id === allenamentoId);
-            if(a) { 
-                a.presenze[giocatoreId] = stato; 
-                await salvaCloud("allenamenti", a.id, a);
-                apriModalAllenamento(allenamentoId); 
-            }
         }
 
         async function aggiungiEsercizioDaArchivio() {
@@ -991,6 +975,7 @@
 
         async function aggiungiEsercizioAlVolo() {
             const titolo = document.getElementById('modal-es-titolo').value.trim();
+            const descrizione = document.getElementById('modal-es-desc').value.trim();
             const link = document.getElementById('modal-es-link').value.trim();
             if(!titolo) { alert("Inserisci almeno il titolo dell'esercizio!"); return; }
 
@@ -998,10 +983,11 @@
             if(!a) return;
 
             if(!a.eserciziSessione) a.eserciziSessione = [];
-            a.eserciziSessione.push({ id: Date.now(), idIstanza: Date.now(), titolo, descrizione: "", link });
+            a.eserciziSessione.push({ id: Date.now(), idIstanza: Date.now(), titolo, descrizione, link });
 
             await salvaCloud("allenamenti", a.id, a);
             document.getElementById('modal-es-titolo').value = "";
+            document.getElementById('modal-es-desc').value = "";
             document.getElementById('modal-es-link').value = "";
             renderEserciziSessioneModal();
             renderAllenamenti();
@@ -1029,14 +1015,55 @@
             }
 
             container.innerHTML = lista.map(es => `
-                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-indigo-100 text-xs">
-                    <div>
-                        <strong class="text-gray-800"><i class="fa-solid fa-futbol text-indigo-600 mr-1.5"></i>${es.titolo}</strong>
-                        ${es.link ? `<br><a href="${es.link}" target="_blank" class="text-indigo-600 hover:underline font-medium"><i class="fa-solid fa-video mr-1"></i>Guarda video</a>` : ''}
+                <div class="bg-white p-3 rounded-xl border border-indigo-100 text-xs space-y-1">
+                    <div class="flex justify-between items-start">
+                        <strong class="text-gray-800 text-sm"><i class="fa-solid fa-futbol text-indigo-600 mr-1.5"></i>${es.titolo}</strong>
+                        <button onclick="rimuoviEsercizioSessione(${es.idIstanza})" class="text-red-500 hover:text-red-700 px-1.5 py-0.5"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
-                    <button onclick="rimuoviEsercizioSessione(${es.idIstanza})" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>
+                    ${es.descrizione ? `<p class="text-gray-600 whitespace-pre-line">${es.descrizione}</p>` : ''}
+                    ${es.link ? `<div><a href="${es.link}" target="_blank" class="inline-flex items-center gap-1 text-indigo-600 hover:underline font-semibold mt-1"><i class="fa-solid fa-video"></i> Guarda Video</a></div>` : ''}
                 </div>
             `).join('');
+        }
+
+        // --- GESTIONE PRESENZE (MODALE) ---
+        function apriModalPresenze(id) {
+            const allenamento = allenamenti.find(a => a.id === id);
+            if(!allenamento) return;
+            allenamentoCorrenteId = id;
+            document.getElementById('modal-presenze-title').innerText = "Presenze del " + new Date(allenamento.data).toLocaleDateString('it-IT');
+            const container = document.getElementById('modal-presenze-list');
+
+            container.innerHTML = giocatori.map(g => {
+                const stato = (allenamento.presenze || {})[g.id] || 'presente';
+                return `
+                    <div class="py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <span class="font-medium text-gray-800">${g.nome} ${g.cognome} ${g.numero ? '('+g.numero+')' : ''}</span>
+                        <div class="flex gap-1 w-full sm:w-auto">
+                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'presente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'presente' ? 'bg-emerald-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Presente</button>
+                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'ritardo')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'ritardo' ? 'bg-amber-500 text-white shadow' : 'bg-gray-100 text-gray-600'}">In ritardo</button>
+                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'assente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'assente' ? 'bg-red-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Assente</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('modal-presenze-allenamento').classList.remove('hidden');
+        }
+
+        function chiudiModalPresenze() {
+            document.getElementById('modal-presenze-allenamento').classList.add('hidden');
+            allenamentoCorrenteId = null;
+            renderAllenamenti();
+        }
+
+        async function setStatoPresenza(allenamentoId, giocatoreId, stato) {
+            const a = allenamenti.find(item => item.id === allenamentoId);
+            if(a) { 
+                if(!a.presenze) a.presenze = {};
+                a.presenze[giocatoreId] = stato; 
+                await salvaCloud("allenamenti", a.id, a);
+                apriModalPresenze(allenamentoId); 
+            }
         }
 
         // --- CALENDARIO PARTITE ---
