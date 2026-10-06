@@ -416,7 +416,7 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.9";
+        const APP_VERSION = "2.9.1";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
         let giocatori = [];
@@ -563,7 +563,7 @@
         async function registraLog(azione) {
             const timestamp = new Date().toLocaleString('it-IT');
             const utente = utenteCorrente || 'Sistema';
-            const logItem = { id: Date.now().toString(), utente, azione, timestamp };
+            const logItem = { id: Date.now().toString() + Math.random().toString(36).substr(2, 5), utente, azione, timestamp };
             logAttivita.unshift(logItem);
             if(logAttivita.length > 50) logAttivita.pop();
             await salvaCloud("log", logItem.id, logItem);
@@ -591,6 +591,7 @@
                     await eliminaCloud("log", l.id);
                 }
                 logAttivita = [];
+                registraLog("Svuotato il registro log");
                 renderLog();
             }
         }
@@ -625,8 +626,8 @@
             if(trovato) {
                 utenteCorrente = trovato.username;
                 localStorage.setItem('sq_utente_corrente', utenteCorrente);
-                registraLog("Login effettuato");
                 checkAuth();
+                registraLog("Login effettuato");
             } else {
                 alert("Username o password errati!");
             }
@@ -754,7 +755,7 @@
             } else {
                 esObj = { id: Date.now(), titolo, descrizione, link };
                 esercizi.push(esObj);
-                registraLog(`Aggiunto esercizio: ${titolo}`);
+                registraLog(`Aggiunto esercizio in libreria: ${titolo}`);
             }
 
             await salvaCloud("esercizi", esObj.id, esObj);
@@ -830,7 +831,7 @@
             } else {
                 gObj = { id: Date.now(), nome, cognome, numero };
                 giocatori.push(gObj);
-                registraLog(`Aggiunto giocatore: ${nome} ${cognome}`);
+                registraLog(`Aggiunto giocatore in rosa: ${nome} ${cognome}`);
             }
 
             await salvaCloud("giocatori", gObj.id, gObj);
@@ -993,6 +994,7 @@
             a.eserciziSessione.push({ ...esTrovato, idIstanza: Date.now() });
 
             await salvaCloud("allenamenti", a.id, a);
+            registraLog(`Aggiunto esercizio "${esTrovato.titolo}" all'allenamento del ${a.data}`);
             select.value = "";
             renderEserciziSessioneModal();
             renderAllenamenti();
@@ -1008,6 +1010,7 @@
             const nuovoEsLib = { id: Date.now(), titolo, descrizione, link };
             esercizi.push(nuovoEsLib);
             await salvaCloud("esercizi", nuovoEsLib.id, nuovoEsLib);
+            registraLog(`Creato nuovo esercizio in libreria (al volo): ${titolo}`);
 
             const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
             if(!a) return;
@@ -1016,6 +1019,7 @@
             a.eserciziSessione.push({ ...nuovoEsLib, idIstanza: Date.now() });
 
             await salvaCloud("allenamenti", a.id, a);
+            registraLog(`Aggiunto esercizio "${titolo}" all'allenamento del ${a.data}`);
 
             document.getElementById('modal-es-titolo').value = "";
             document.getElementById('modal-es-desc').value = "";
@@ -1032,6 +1036,7 @@
 
             a.eserciziSessione = (a.eserciziSessione || []).filter(x => x.idIstanza !== idIstanza);
             await salvaCloud("allenamenti", a.id, a);
+            registraLog(`Rimosso esercizio dall'allenamento del ${a.data}`);
             renderEserciziSessioneModal();
             renderAllenamenti();
         }
@@ -1086,6 +1091,7 @@
         function chiudiModalPresenze() {
             document.getElementById('modal-presenze-allenamento').classList.add('hidden');
             allenamentoCorrenteId = null;
+            registraLog("Aggiornate presenze allenamento");
             renderAllenamenti();
         }
 
@@ -1325,7 +1331,7 @@
             testo += `*I convocati:*\n` + convocatiNomi.join('\n') + `\n\nForza Sporting Murialdo ❤️💙`;
 
             navigator.clipboard.writeText(testo).then(() => {
-                registraLog(`Aggiornate/Generate convocazioni Giornata ${partita.giornata}`);
+                registraLog(`Generate/Aggiornate convocazioni WhatsApp Giornata ${partita.giornata}`);
                 alert("Convocazioni salvate nello storico, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
                 renderCalendario();
                 renderStatistiche();
