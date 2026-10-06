@@ -271,10 +271,11 @@
 
     <!-- Script Logica -->
     <script>
-        // Controllo versione cache (Aggiornato a 1.8)
-        const APP_VERSION = "1.8";
+        // Controllo versione cache (Aggiornato a 1.9 per calendario corretto Andata e Ritorno)
+        const APP_VERSION = "1.9";
         const savedVersion = localStorage.getItem('sq_version');
         if (savedVersion !== APP_VERSION) {
+            localStorage.removeItem('sq_calendario');
             localStorage.setItem('sq_version', APP_VERSION);
         }
 
@@ -346,24 +347,28 @@
             }
         ];
 
+        // Calendario corretto: date di andata a sinistra (giornate 1-9) e date di ritorno a destra (giornate 10-18) con campi e squadre invertiti
         let calendarioPartite = JSON.parse(localStorage.getItem('sq_calendario')) || [
+            // GIRONE DI ANDATA (Giornate 1 - 9)
             { giornata: 1, data: "2026-10-04", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ATLETICO S.ELENA ASE", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "SPORTING MURIALDO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
             { giornata: 3, data: "2026-10-18", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ROSARIO 2012", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 4, data: "2026-10-24", ora: "15:00", casa: "SPORTING MURIALDO", fuori: "JUVENILIA", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 5, data: "2026-10-31", ora: "14:30", casa: "SPORTING MURIALDO", fuori: "UP SETTIMO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 6, data: "2026-11-08", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.FILIPPO NERI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
+            { giornata: 4, data: "2026-10-25", ora: "16:30", casa: "JUVENILIA", fuori: "SPORTING MURIALDO", campo: "CAMPO FOOTBALL CITY, P.ZA TIRANA 17, MILANO" },
+            { giornata: 5, data: "2026-11-01", ora: "16:30", casa: "UP SETTIMO", fuori: "SPORTING MURIALDO", campo: "C.S. COMUNALE, VIA DI VITTORIO 16, SETTIMO MILANESE" },
+            { giornata: 6, data: "2026-11-08", ora: "16:30", casa: "S.FILIPPO NERI", fuori: "SPORTING MURIALDO", campo: "ORATORIO, VIA GABBRO 2, MILANO" },
             { giornata: 7, data: "2026-11-15", ora: "15:30", casa: "VALSESIA POLIS", fuori: "SPORTING MURIALDO", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
-            { giornata: 8, data: "2026-11-22", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 9, data: "2026-11-28", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "SPORTING MURIALDO", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
+            { giornata: 8, data: "2026-11-22", ora: "16:30", casa: "ASSISI", fuori: "SPORTING MURIALDO", campo: "ASSISISTADIUM, VIA USIGNOLO-CAROZZI, MILANO" },
+            { giornata: 9, data: "2026-11-29", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "SPORTING MURIALDO", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
+
+            // GIRONE DI RITORNO (Giornate 10 - 18, campi e squadre invertiti rispetto all'andata)
             { giornata: 10, data: "2026-12-06", ora: "16:30", casa: "ATLETICO S.ELENA ASE", fuori: "SPORTING MURIALDO", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
             { giornata: 11, data: "2026-12-13", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.DOMENICO SAVIO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 12, data: "2026-12-20", ora: "16:30", casa: "ROSARIO 2012", fuori: "SPORTING MURIALDO", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
-            { giornata: 13, data: "2027-01-10", ora: "16:30", casa: "JUVENILIA", fuori: "SPORTING MURIALDO", campo: "CAMPO FOOTBALL CITY, P.ZA TIRANA 17, MILANO" },
-            { giornata: 14, data: "2027-01-17", ora: "16:30", casa: "UP SETTIMO", fuori: "SPORTING MURIALDO", campo: "C.S. COMUNALE, VIA DI VITTORIO 16, SETTIMO MILANESE" },
-            { giornata: 15, data: "2027-01-24", ora: "16:30", casa: "S.FILIPPO NERI", fuori: "SPORTING MURIALDO", campo: "ORATORIO, VIA GABBRO 2, MILANO" },
+            { giornata: 13, data: "2027-01-10", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "JUVENILIA", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
+            { giornata: 14, data: "2027-01-17", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "UP SETTIMO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
+            { giornata: 15, data: "2027-01-24", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.FILIPPO NERI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 16, data: "2027-01-31", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "VALSESIA POLIS", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 17, data: "2027-02-07", ora: "16:30", casa: "ASSISI", fuori: "SPORTING MURIALDO", campo: "ASSISISTADIUM, VIA USIGNOLO-CAROZZI, MILANO" },
+            { giornata: 17, data: "2027-02-07", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 18, data: "2027-02-14", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ACLI CAVANIS CORSICO BLU", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" }
         ];
 
