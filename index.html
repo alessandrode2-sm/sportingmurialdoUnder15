@@ -13,6 +13,30 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs (Modulari via CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2CBWUhu35BQYWqu-SfVnL4be9MSVKX6c",
+            authDomain: "sportingmurialdo-under15.firebaseapp.com",
+            projectId: "sportingmurialdo-under15",
+            storageBucket: "sportingmurialdo-under15.firebasestorage.app",
+            messagingSenderId: "59563381758",
+            appId: "1:59563381758:web:15ceba33b57e0bedd326af",
+            measurementId: "G-22VSLT6CM5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db;
+        window.firebaseEnabled = true;
+
+        // Avvia il caricamento dei dati da Firebase all'avvio
+        window.inizializzaDatiCloud();
+    </script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-20">
 
@@ -269,33 +293,13 @@
         </div>
     </div>
 
-    <!-- Script Logica -->
+    <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        // Controllo versione cache (Aggiornato a 1.9 per calendario corretto Andata e Ritorno)
-        const APP_VERSION = "1.9";
-        const savedVersion = localStorage.getItem('sq_version');
-        if (savedVersion !== APP_VERSION) {
-            localStorage.removeItem('sq_calendario');
-            localStorage.setItem('sq_version', APP_VERSION);
-        }
-
-        // Funzione per generare l'hash SHA-256 della password
-        async function hashPassword(password) {
-            const msgBuffer = new TextEncoder().encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        let utenti = JSON.parse(localStorage.getItem('sq_utenti')) || [
-            { username: "Alessandro", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" },
-            { username: "Anna", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" }
-        ];
-
+        const APP_VERSION = "2.0";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
-        let logAttivita = JSON.parse(localStorage.getItem('sq_log')) || [];
 
-        let giocatori = JSON.parse(localStorage.getItem('sq_giocatori')) || [
+        // Dati locali di fallback / default iniziali
+        let giocatori = [
             { id: 1, nome: "Usman", cognome: "", numero: "12" },
             { id: 2, nome: "Luca", cognome: "", numero: "99" },
             { id: 3, nome: "Rayan", cognome: "", numero: "95" },
@@ -314,42 +318,16 @@
             { id: 16, nome: "Carlitos", cognome: "", numero: "98" }
         ];
 
-        let allenamenti = JSON.parse(localStorage.getItem('sq_allenamenti')) || [
-            {
-                id: 1700000000,
-                data: "2026-09-15",
-                presenze: { "8": "presente", "15": "assente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" }
-            },
-            {
-                id: 1700000001,
-                data: "2026-09-18",
-                presenze: { "8": "presente", "15": "assente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "assente", "2": "presente" }
-            },
-            {
-                id: 1700000002,
-                data: "2026-09-22",
-                presenze: { "8": "presente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" }
-            },
-            {
-                id: 1700000003,
-                data: "2026-09-25",
-                presenze: { "8": "assente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "assente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" }
-            },
-            {
-                id: 1700000004,
-                data: "2026-09-29",
-                presenze: { "8": "presente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "assente", "9": "presente", "6": "presente", "5": "assente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" }
-            },
-            {
-                id: 1700000005,
-                data: "2026-10-02",
-                presenze: { "8": "assente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "assente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "assente" }
-            }
+        let allenamenti = [
+            { id: 1700000000, data: "2026-09-15", presenze: { "8": "presente", "15": "assente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" } },
+            { id: 1700000001, data: "2026-09-18", presenze: { "8": "presente", "15": "assente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "assente", "2": "presente" } },
+            { id: 1700000002, data: "2026-09-22", presenze: { "8": "presente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" } },
+            { id: 1700000003, data: "2026-09-25", presenze: { "8": "assente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "assente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" } },
+            { id: 1700000004, data: "2026-09-29", presenze: { "8": "presente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "assente", "9": "presente", "6": "presente", "5": "assente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" } },
+            { id: 1700000005, data: "2026-10-02", presenze: { "8": "assente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "assente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "assente" } }
         ];
 
-        // Calendario corretto: date di andata a sinistra (giornate 1-9) e date di ritorno a destra (giornate 10-18) con campi e squadre invertiti
-        let calendarioPartite = JSON.parse(localStorage.getItem('sq_calendario')) || [
-            // GIRONE DI ANDATA (Giornate 1 - 9)
+        let calendarioPartite = [
             { giornata: 1, data: "2026-10-04", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ATLETICO S.ELENA ASE", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "SPORTING MURIALDO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
             { giornata: 3, data: "2026-10-18", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ROSARIO 2012", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
@@ -359,8 +337,6 @@
             { giornata: 7, data: "2026-11-15", ora: "15:30", casa: "VALSESIA POLIS", fuori: "SPORTING MURIALDO", campo: "C.S. FAZIO, VIA VALSESIA 52, MILANO" },
             { giornata: 8, data: "2026-11-22", ora: "16:30", casa: "ASSISI", fuori: "SPORTING MURIALDO", campo: "ASSISISTADIUM, VIA USIGNOLO-CAROZZI, MILANO" },
             { giornata: 9, data: "2026-11-29", ora: "17:00", casa: "ACLI CAVANIS CORSICO BLU", fuori: "SPORTING MURIALDO", campo: "CAMPO SPORT.S.ANTONIO, P.ZA PAPA GIOVANNI XXIII 1, CORSICO" },
-
-            // GIRONE DI RITORNO (Giornate 10 - 18, campi e squadre invertiti rispetto all'andata)
             { giornata: 10, data: "2026-12-06", ora: "16:30", casa: "ATLETICO S.ELENA ASE", fuori: "SPORTING MURIALDO", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
             { giornata: 11, data: "2026-12-13", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.DOMENICO SAVIO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 12, data: "2026-12-20", ora: "16:30", casa: "ROSARIO 2012", fuori: "SPORTING MURIALDO", campo: "U.S.TRIESTINA 1946, VIA FLEMING 13, MILANO" },
@@ -372,15 +348,101 @@
             { giornata: 18, data: "2027-02-14", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ACLI CAVANIS CORSICO BLU", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" }
         ];
 
+        let utenti = [
+            { username: "Alessandro", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" },
+            { username: "Anna", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" }
+        ];
+
+        let logAttivita = [];
+        let convocazioniStorico = {};
+
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
 
+        // --- FUNZIONI CLOUD (FIREBASE) ---
+        window.inizializzaDatiCloud = async function() {
+            try {
+                const { collection, getDocs, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                const db = window.db;
+
+                // Carica Giocatori
+                const snapG = await getDocs(collection(db, "giocatori"));
+                if (!snapG.empty) {
+                    giocatori = snapG.docs.map(d => d.data());
+                } else {
+                    for(let g of giocatori) await setDoc(doc(db, "giocatori", String(g.id)), g);
+                }
+
+                // Carica Allenamenti
+                const snapA = await getDocs(collection(db, "allenamenti"));
+                if (!snapA.empty) {
+                    allenamenti = snapA.docs.map(d => d.data());
+                    allenamenti.sort((a,b) => new Date(b.data) - new Date(a.data));
+                } else {
+                    for(let a of allenamenti) await setDoc(doc(db, "allenamenti", String(a.id)), a);
+                }
+
+                // Carica Calendario
+                const snapC = await getDocs(collection(db, "calendario"));
+                if (!snapC.empty) {
+                    calendarioPartite = snapC.docs.map(d => d.data());
+                    calendarioPartite.sort((a,b) => a.giornata - b.giornata);
+                } else {
+                    for(let c of calendarioPartite) await setDoc(doc(db, "calendario", String(c.giornata)), c);
+                }
+
+                // Carica Utenti
+                const snapU = await getDocs(collection(db, "utenti"));
+                if (!snapU.empty) {
+                    utenti = snapU.docs.map(d => d.data());
+                } else {
+                    for(let u of utenti) await setDoc(doc(db, "utenti", u.username), u);
+                }
+
+                // Carica Log
+                const snapL = await getDocs(collection(db, "log"));
+                if (!snapL.empty) {
+                    logAttivita = snapL.docs.map(d => d.data());
+                    logAttivita.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                }
+
+                // Carica Storico Convocazioni Partite
+                const snapConv = await getDocs(collection(db, "convocazioni_storico"));
+                if (!snapConv.empty) {
+                    snapConv.docs.forEach(d => {
+                        convocazioniStorico[d.id] = d.data().convocati;
+                    });
+                }
+
+                renderTutto();
+            } catch (e) {
+                console.error("Errore caricamento cloud:", e);
+            }
+        };
+
+        async function salvaCloud(collezione, id, dati) {
+            if(!window.firebaseEnabled) return;
+            try {
+                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                await setDoc(doc(window.db, collezione, String(id)), dati);
+            } catch(e) { console.error("Errore salvataggio cloud:", e); }
+        }
+
+        async function eliminaCloud(collezione, id) {
+            if(!window.firebaseEnabled) return;
+            try {
+                const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                await deleteDoc(doc(window.db, collezione, String(id)));
+            } catch(e) { console.error("Errore eliminazione cloud:", e); }
+        }
+
         // --- SISTEMA DI LOG & UTENZE ---
-        function registraLog(azione) {
+        async function registraLog(azione) {
             const timestamp = new Date().toLocaleString('it-IT');
             const utente = utenteCorrente || 'Sistema';
-            logAttivita.unshift({ utente, azione, timestamp });
+            const logItem = { id: Date.now().toString(), utente, azione, timestamp };
+            logAttivita.unshift(logItem);
             if(logAttivita.length > 50) logAttivita.pop();
-            localStorage.setItem('sq_log', JSON.stringify(logAttivita));
+            await salvaCloud("log", logItem.id, logItem);
             renderLog();
         }
 
@@ -399,10 +461,12 @@
             `).join('');
         }
 
-        function pulisciLog() {
+        async function pulisciLog() {
             if(confirm("Vuoi svuotare tutti i log delle attività?")) {
+                for(let l of logAttivita) {
+                    await eliminaCloud("log", l.id);
+                }
                 logAttivita = [];
-                localStorage.removeItem('sq_log');
                 renderLog();
             }
         }
@@ -417,6 +481,13 @@
                 renderUtenti();
                 renderLog();
             }
+        }
+
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function eseguiLogin(e) {
@@ -460,8 +531,9 @@
             }
 
             const pHash = await hashPassword(p);
-            utenti.push({ username: u, passwordHash: pHash });
-            localStorage.setItem('sq_utenti', JSON.stringify(utenti));
+            const nuovoU = { username: u, passwordHash: pHash };
+            utenti.push(nuovoU);
+            await salvaCloud("utenti", u, nuovoU);
             document.getElementById('nuovo-user').value = '';
             document.getElementById('nuovo-pass').value = '';
             registraLog(`Creato nuovo utente: ${u}`);
@@ -475,7 +547,7 @@
                 const u = utenti.find(x => x.username === username);
                 if(u) {
                     u.passwordHash = await hashPassword(nuovaPass);
-                    localStorage.setItem('sq_utenti', JSON.stringify(utenti));
+                    await salvaCloud("utenti", u.username, u);
                     registraLog(`Modificata password per utente: ${username}`);
                     renderUtenti();
                     alert("Password aggiornata con successo!");
@@ -483,14 +555,14 @@
             }
         }
 
-        function eliminaUtente(username) {
+        async function eliminaUtente(username) {
             if(username === utenteCorrente) {
                 alert("Non puoi eliminare l'utente con cui hai effettuato l'accesso!");
                 return;
             }
             if(confirm(`Vuoi eliminare l'utente ${username}?`)) {
                 utenti = utenti.filter(x => x.username !== username);
-                localStorage.setItem('sq_utenti', JSON.stringify(utenti));
+                await eliminaCloud("utenti", username);
                 registraLog(`Eliminato utente: ${username}`);
                 renderUtenti();
             }
@@ -513,12 +585,6 @@
             `).join('');
         }
 
-        function salvaDati() {
-            localStorage.setItem('sq_giocatori', JSON.stringify(giocatori));
-            localStorage.setItem('sq_allenamenti', JSON.stringify(allenamenti));
-            localStorage.setItem('sq_calendario', JSON.stringify(calendarioPartite));
-        }
-
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
@@ -534,12 +600,7 @@
                 }
             });
 
-            if(tabId === 'allenamenti') renderAllenamenti();
-            if(tabId === 'convocazioni') renderConvocazioni();
-            if(tabId === 'calendario') renderCalendario();
-            if(tabId === 'statistiche') renderStatistiche();
-            if(tabId === 'anagrafica') renderAnagrafica();
-            if(tabId === 'utenti') { renderUtenti(); renderLog(); }
+            renderTutto();
         }
 
         function switchStatSubTab(sub) {
@@ -550,8 +611,8 @@
             document.getElementById('btn-stat-allenamenti').className = sub === 'allenamenti' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
         }
 
-        // --- ANAGRAFICA & MODIFICA GIOCATORI ---
-        function salvaGiocatore(e) {
+        // --- ANAGRAFICA ---
+        async function salvaGiocatore(e) {
             e.preventDefault();
             const idEdit = document.getElementById('edit-giocatore-id').value;
             const nome = document.getElementById('input-nome').value.trim();
@@ -559,15 +620,17 @@
             const numero = document.getElementById('input-numero').value.trim();
             if(!nome) return;
 
+            let gObj;
             if(idEdit) {
                 const g = giocatori.find(item => item.id == idEdit);
-                if(g) { g.nome = nome; g.cognome = cognome; g.numero = numero; registraLog(`Modificato giocatore: ${nome} ${cognome}`); }
+                if(g) { g.nome = nome; g.cognome = cognome; g.numero = numero; gObj = g; registraLog(`Modificato giocatore: ${nome} ${cognome}`); }
             } else {
-                giocatori.push({ id: Date.now(), nome, cognome, numero });
+                gObj = { id: Date.now(), nome, cognome, numero };
+                giocatori.push(gObj);
                 registraLog(`Aggiunto giocatore: ${nome} ${cognome}`);
             }
 
-            salvaDati();
+            await salvaCloud("giocatori", gObj.id, gObj);
             resetFormGiocatore();
             renderAnagrafica();
             renderConvocazioni();
@@ -595,11 +658,11 @@
             document.getElementById('btn-annulla-modifica').classList.add('hidden');
         }
 
-        function eliminaGiocatore(id) {
+        async function eliminaGiocatore(id) {
             const g = giocatori.find(item => item.id === id);
             if(confirm("Vuoi rimuovere questo giocatore?")) {
                 giocatori = giocatori.filter(item => item.id !== id);
-                salvaDati();
+                await eliminaCloud("giocatori", id);
                 registraLog(`Eliminato giocatore: ${g ? g.nome : id}`);
                 renderAnagrafica();
                 renderConvocazioni();
@@ -638,7 +701,7 @@
             creaAllenamento(data);
         }
 
-        function creaAllenamento(data) {
+        async function creaAllenamento(data) {
             if(allenamenti.some(a => a.data === data)) {
                 alert("Esiste già un allenamento in questa data!");
                 return;
@@ -649,16 +712,16 @@
             const nuovo = { id: Date.now(), data, presenze: presenzeIniziali };
             allenamenti.push(nuovo);
             allenamenti.sort((a,b) => new Date(b.data) - new Date(a.data));
-            salvaDati();
+            await salvaCloud("allenamenti", nuovo.id, nuovo);
             registraLog(`Creato allenamento del ${data}`);
             renderAllenamenti();
             apriModalAllenamento(nuovo.id);
         }
 
-        function eliminaAllenamento(id) {
+        async function eliminaAllenamento(id) {
             if(confirm("Eliminare questo allenamento?")) {
                 allenamenti = allenamenti.filter(a => a.id !== id);
-                salvaDati();
+                await eliminaCloud("allenamenti", id);
                 registraLog("Eliminato un allenamento");
                 renderAllenamenti();
             }
@@ -716,12 +779,16 @@
             renderAllenamenti();
         }
 
-        function setStatoPresenza(allenamentoId, giocatoreId, stato) {
+        async function setStatoPresenza(allenamentoId, giocatoreId, stato) {
             const a = allenamenti.find(item => item.id === allenamentoId);
-            if(a) { a.presenze[giocatoreId] = stato; salvaDati(); apriModalAllenamento(allenamentoId); }
+            if(a) { 
+                a.presenze[giocatoreId] = stato; 
+                await salvaCloud("allenamenti", a.id, a);
+                apriModalAllenamento(allenamentoId); 
+            }
         }
 
-        // --- CALENDARIO PARTITE & MODIFICA ---
+        // --- CALENDARIO PARTITE ---
         function renderCalendario() {
             const container = document.getElementById('lista-partite-calendario');
             if(!container) return;
@@ -753,7 +820,7 @@
             document.getElementById('modal-partita').classList.add('hidden');
         }
 
-        function salvaPartitaModificata() {
+        async function salvaPartitaModificata() {
             const idx = document.getElementById('edit-partita-idx').value;
             calendarioPartite[idx] = {
                 ...calendarioPartite[idx],
@@ -763,14 +830,14 @@
                 ora: document.getElementById('edit-ora').value,
                 campo: document.getElementById('edit-campo').value
             };
-            salvaDati();
+            await salvaCloud("calendario", calendarioPartite[idx].giornata, calendarioPartite[idx]);
             registraLog(`Modificata partita Giornata ${calendarioPartite[idx].giornata}`);
             chiudiModalPartita();
             renderCalendario();
             renderConvocazioni();
         }
 
-        // --- CALCOLO PERCENTUALI & CONVOCAZIONI ---
+        // --- CONVOCAZIONI & STORICIZZAZIONE ---
         function calcolaPercentuali(giocatoreId) {
             const oggi = new Date();
             const anno = oggi.getFullYear(), mese = oggi.getMonth();
@@ -811,7 +878,14 @@
             });
             const presTot = presenti + ritardi;
             const percGlobal = totalAll > 0 ? Math.round((presTot / totalAll) * 100) : 0;
-            return { totalAll, presenti, ritardi, assenti, percGlobal };
+
+            // Statistiche convocazioni partite
+            let totaleConvocazioni = 0;
+            Object.values(convocazioniStorico).forEach(convList => {
+                if(convList.includes(g.id)) totaleConvocazioni++;
+            });
+
+            return { totalAll, presenti, ritardi, assenti, percGlobal, totaleConvocazioni };
         }
 
         function renderConvocazioni() {
@@ -857,23 +931,31 @@
             return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
         }
 
-        function copiaConvocazioniWhatsApp() {
+        async function copiaConvocazioniWhatsApp() {
             const selectPartita = document.getElementById('select-partita-convocazione');
             const partitaIdx = selectPartita ? selectPartita.value : 0;
             const partita = calendarioPartite[partitaIdx];
 
             const checkboxes = document.querySelectorAll('.convocato-checkbox');
-            const convocati = [];
+            const convocatiIds = [];
+            const convocatiNomi = [];
 
             checkboxes.forEach(cb => {
                 if(cb.checked) {
                     const id = Number(cb.getAttribute('data-giocatore-id'));
                     const g = giocatori.find(item => item.id === id);
-                    if(g) convocati.push(`• ${g.nome}${g.cognome ? ' ' + g.cognome : ''}`);
+                    if(g) {
+                        convocatiIds.push(g.id);
+                        convocatiNomi.push(`• ${g.nome}${g.cognome ? ' ' + g.cognome : ''}`);
+                    }
                 }
             });
 
-            if(convocati.length === 0) { alert("Seleziona almeno un convocato!"); return; }
+            if(convocatiNomi.length === 0) { alert("Seleziona almeno un convocato!"); return; }
+
+            // Salva storico convocazioni per questa giornata sul cloud
+            convocazioniStorico[partita.giornata] = convocatiIds;
+            await salvaCloud("convocazioni_storico", partita.giornata, { giornata: partita.giornata, convocati: convocatiIds });
 
             let testo = `⚽ *CONVOCAZIONI PARTITA* ⚽\n\n`;
             if(partita) {
@@ -883,22 +965,22 @@
                 testo += `📍 Campo: ${partita.campo}\n`;
                 testo += `⏱️ *Ritrovo:* Ore ${orarioRitrovo} direttamente sul campo di gioco\n\n`;
             }
-            testo += `*I convocati:*\n` + convocati.join('\n') + `\n\nForza ragazzi! 💪🔥`;
+            testo += `*I convocati:*\n` + convocatiNomi.join('\n') + `\n\nForza ragazzi! 💪🔥`;
 
             navigator.clipboard.writeText(testo).then(() => {
-                registraLog("Copiate convocazioni WhatsApp");
-                alert("Convocazioni, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
+                registraLog(`Generate e storicizzate convocazioni Giornata ${partita.giornata}`);
+                alert("Convocazioni salvate nello storico, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
             }).catch(() => alert("Errore durante la copia."));
         }
 
-        // --- STATISTICHE & ORDINAMENTO ---
+        // --- STATISTICHE ---
         function renderStatistiche() {
             const containerRagazzi = document.getElementById('statistiche-ragazzi-list');
             if(containerRagazzi) {
                 if(giocatori.length === 0) {
                     containerRagazzi.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
                 } else {
-                    const tipoOrdinamento = document.getElementById('ordinamento-select') ? document.getElementById('ordinamento-select').value : 'perc_desc';
+                    const tipoOrdinamento = document.getElementById('ordinamento-select') ? document.getElementById('ordinamento-select'].value : 'perc_desc';
 
                     let giocatoriOrdinati = [...giocatori].sort((a, b) => {
                         const statA = calcolaStatisticheGiocatore(a);
@@ -919,15 +1001,15 @@
                     });
 
                     containerRagazzi.innerHTML = giocatoriOrdinati.map(g => {
-                        const { totalAll, presenti, ritardi, assenti, percGlobal } = calcolaStatisticheGiocatore(g);
+                        const { totalAll, presenti, ritardi, assenti, percGlobal, totaleConvocazioni } = calcolaStatisticheGiocatore(g);
                         return `
                             <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
                                     <h4 class="font-bold text-gray-800 text-base">${g.nome} ${g.cognome} ${g.numero ? '(# '+g.numero+')' : ''}</h4>
-                                    <p class="text-xs text-gray-500 mt-0.5">Allenamenti registrati: ${totalAll} | Presenti: ${presenti} | In ritardo: ${ritardi} | Assenti: ${assenti}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">All. reg.: ${totalAll} | Pres.: ${presenti} | Rit.: ${ritardi} | Ass.: ${assenti} | Convocazioni part.: <strong class="text-indigo-600">${totaleConvocazioni}</strong></p>
                                 </div>
                                 <div class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-center font-bold text-sm">
-                                    ${percGlobal}% <span class="text-xs font-normal block opacity-80">Presenza</span>
+                                    ${percGlobal}% <span class="text-xs font-normal block opacity-80">Presenza All.</span>
                                 </div>
                             </div>
                         `;
@@ -961,9 +1043,7 @@
             }
         }
 
-        // Inizializzazione globale e verifica autenticazione
-        window.onload = function() {
-            checkAuth();
+        function renderTutto() {
             renderAllenamenti();
             renderConvocazioni();
             renderCalendario();
@@ -971,6 +1051,11 @@
             renderAnagrafica();
             renderUtenti();
             renderLog();
+        }
+
+        window.onload = function() {
+            checkAuth();
+            renderTutto();
         };
     </script>
 </body>
