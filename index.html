@@ -87,6 +87,9 @@
             <button onclick="switchTab('allenamenti')" id="btn-tab-allenamenti" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm bg-indigo-600 text-white transition whitespace-nowrap">
                 <i class="fa-solid fa-clipboard-user mr-1"></i> Allenamenti
             </button>
+            <button onclick="switchTab('esercizi')" id="btn-tab-esercizi" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
+                <i class="fa-solid fa-futbol mr-1"></i> Esercizi
+            </button>
             <button onclick="switchTab('convocazioni')" id="btn-tab-convocazioni" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
                 <i class="fa-brands fa-whatsapp mr-1"></i> Convocazioni
             </button>
@@ -127,11 +130,44 @@
             </div>
         </div>
 
+        <!-- ================= SEZIONE ESERCIZI ================= -->
+        <div id="tab-esercizi" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
+                <h2 class="text-lg font-bold mb-4 text-gray-700"><i class="fa-solid fa-dumbbell mr-2 text-indigo-600"></i>Aggiungi Esercizio / Esercitazione</h2>
+                <form onsubmit="salvaEsercizio(event)" class="space-y-3">
+                    <input type="hidden" id="edit-esercizio-id">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Titolo Esercizio *</label>
+                        <input type="text" id="input-titolo-esercizio" placeholder="Es. Possesso palla 4v4 + 2" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Descrizione / Note</label>
+                        <textarea id="input-desc-esercizio" rows="3" placeholder="Spiegazione dell'esercitazione, regole, obiettivi..." class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Link Video (YouTube / Instagram)</label>
+                        <input type="url" id="input-link-esercizio" placeholder="https://www.youtube.com/watch?v=..." class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="flex gap-2 pt-2">
+                        <button type="submit" id="btn-salva-esercizio" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl shadow transition text-sm">
+                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi Esercizio
+                        </button>
+                        <button type="button" id="btn-annulla-esercizio" onclick="resetFormEsercizio()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition text-sm">Annulla</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
+                <h2 class="text-lg font-bold mb-4 text-gray-700"><i class="fa-solid fa-list mr-2 text-indigo-600"></i>Libreria Esercizi</h2>
+                <div id="lista-esercizi" class="space-y-3"></div>
+            </div>
+        </div>
+
         <!-- ================= SEZIONE CONVOCAZIONI & WHATSAPP ================= -->
         <div id="tab-convocazioni" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
                 <h2 class="text-lg font-bold mb-1 text-gray-700">Generatore Convocazioni WhatsApp</h2>
-                <p class="text-xs text-gray-500 mb-4">Seleziona la partita di riferimento dello Sporting Murialdo, verifica i convocati e copia il messaggio.</p>
+                <p class="text-xs text-gray-500 mb-4">Seleziona la partita di riferimento dello Sporting Murialdo, verifica i convocati e crea il messaggio.</p>
                 
                 <div class="mb-5 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
                     <label class="block text-xs font-bold text-indigo-900 mb-1 uppercase tracking-wide">Partita Sporting Murialdo:</label>
@@ -143,7 +179,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-sm font-semibold text-gray-600">Giocatori in Rosa & Presenze recenti</span>
                     <button onclick="copiaConvocazioniWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2.5 px-4 rounded-xl shadow transition flex items-center">
-                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Copia per WhatsApp
+                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Salva e crea il messaggio
                     </button>
                 </div>
 
@@ -317,11 +353,20 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.2";
+        const APP_VERSION = "2.4";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
-        // Dati locali di fallback / default iniziali
-        let giocatori = [
+        // Array vuoti: i dati verranno caricati interamente da Firebase al primo avvio
+        let giocatori = [];
+        let allenamenti = [];
+        let calendarioPartite = [];
+        let esercizi = [];
+        let utenti = [];
+        let logAttivita = [];
+        let convocazioniStorico = {};
+
+        // Dati di default iniziali (usati solo se il database cloud è completamente vuoto)
+        const DEFAULT_GIOCATORI = [
             { id: 1, nome: "Usman", cognome: "", numero: "12" },
             { id: 2, nome: "Luca", cognome: "", numero: "99" },
             { id: 3, nome: "Rayan", cognome: "", numero: "95" },
@@ -340,16 +385,7 @@
             { id: 16, nome: "Carlitos", cognome: "", numero: "98" }
         ];
 
-        let allenamenti = [
-            { id: 1700000000, data: "2026-09-15", presenze: { "8": "presente", "15": "assente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" } },
-            { id: 1700000001, data: "2026-09-18", presenze: { "8": "presente", "15": "assente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "assente", "2": "presente" } },
-            { id: 1700000002, data: "2026-09-22", presenze: { "8": "presente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" } },
-            { id: 1700000003, data: "2026-09-25", presenze: { "8": "assente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "assente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" } },
-            { id: 1700000004, data: "2026-09-29", presenze: { "8": "presente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "assente", "9": "presente", "6": "presente", "5": "assente", "7": "presente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "presente" } },
-            { id: 1700000005, data: "2026-10-02", presenze: { "8": "assente", "15": "presente", "10": "presente", "1": "presente", "3": "presente", "14": "presente", "12": "presente", "9": "presente", "6": "presente", "5": "presente", "7": "assente", "11": "presente", "16": "presente", "13": "presente", "4": "presente", "2": "assente" } }
-        ];
-
-        let calendarioPartite = [
+        const DEFAULT_CALENDARIO = [
             { giornata: 1, data: "2026-10-04", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ATLETICO S.ELENA ASE", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 2, data: "2026-10-11", ora: "17:00", casa: "S.DOMENICO SAVIO", fuori: "SPORTING MURIALDO", campo: "ORAT. SAN DOMENICO SAVIO, P.ZA MADONNA DEI POVERI 1, MILANO" },
             { giornata: 3, data: "2026-10-18", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ROSARIO 2012", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
@@ -366,17 +402,14 @@
             { giornata: 14, data: "2027-01-17", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "UP SETTIMO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 15, data: "2027-01-24", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.FILIPPO NERI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 16, data: "2027-01-31", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "VALSESIA POLIS", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 17, data: "2027-02-07", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
+            { giornata: 17, data: "2027-02-07", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASSISISTADIUM, VIA USIGNOLO-CAROZZI, MILANO" },
             { giornata: 18, data: "2027-02-14", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ACLI CAVANIS CORSICO BLU", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" }
         ];
 
-        let utenti = [
+        const DEFAULT_UTENTI = [
             { username: "Alessandro", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" },
             { username: "Anna", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" }
         ];
-
-        let logAttivita = [];
-        let convocazioniStorico = {};
 
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
 
@@ -391,6 +424,7 @@
                 if (!snapG.empty) {
                     giocatori = snapG.docs.map(d => d.data());
                 } else {
+                    giocatori = DEFAULT_GIOCATORI;
                     for(let g of giocatori) await setDoc(doc(db, "giocatori", String(g.id)), g);
                 }
 
@@ -399,8 +433,6 @@
                 if (!snapA.empty) {
                     allenamenti = snapA.docs.map(d => d.data());
                     allenamenti.sort((a,b) => new Date(b.data) - new Date(a.data));
-                } else {
-                    for(let a of allenamenti) await setDoc(doc(db, "allenamenti", String(a.id)), a);
                 }
 
                 // Carica Calendario
@@ -409,7 +441,14 @@
                     calendarioPartite = snapC.docs.map(d => d.data());
                     calendarioPartite.sort((a,b) => a.giornata - b.giornata);
                 } else {
+                    calendarioPartite = DEFAULT_CALENDARIO;
                     for(let c of calendarioPartite) await setDoc(doc(db, "calendario", String(c.giornata)), c);
+                }
+
+                // Carica Esercizi
+                const snapE = await getDocs(collection(db, "esercizi"));
+                if (!snapE.empty) {
+                    esercizi = snapE.docs.map(d => d.data());
                 }
 
                 // Carica Utenti
@@ -417,6 +456,7 @@
                 if (!snapU.empty) {
                     utenti = snapU.docs.map(d => d.data());
                 } else {
+                    utenti = DEFAULT_UTENTI;
                     for(let u of utenti) await setDoc(doc(db, "utenti", u.username), u);
                 }
 
@@ -431,7 +471,6 @@
                 const snapConv = await getDocs(collection(db, "convocazioni_storico"));
                 if (!snapConv.empty) {
                     snapConv.docs.forEach(d => {
-                        // Firebase salva l'id come stringa, convertiamolo in numero/chiave corretta
                         convocazioniStorico[d.id] = d.data().convocati;
                     });
                 }
@@ -612,7 +651,7 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
 
-            ['allenamenti', 'convocazioni', 'calendario', 'statistiche', 'anagrafica', 'utenti'].forEach(t => {
+            ['allenamenti', 'esercizi', 'convocazioni', 'calendario', 'statistiche', 'anagrafica', 'utenti'].forEach(t => {
                 const btn = document.getElementById('btn-tab-' + t);
                 if(btn) {
                     if(t === tabId) {
@@ -634,6 +673,82 @@
             document.getElementById('btn-stat-ragazzi').className = sub === 'ragazzi' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
             document.getElementById('btn-stat-convocazioni').className = sub === 'convocazioni' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
             document.getElementById('btn-stat-allenamenti').className = sub === 'allenamenti' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
+        }
+
+        // --- ESERCIZI ---
+        async function salvaEsercizio(e) {
+            e.preventDefault();
+            const idEdit = document.getElementById('edit-esercizio-id').value;
+            const titolo = document.getElementById('input-titolo-esercizio').value.trim();
+            const descrizione = document.getElementById('input-desc-esercizio').value.trim();
+            const link = document.getElementById('input-link-esercizio').value.trim();
+            if(!titolo) return;
+
+            let esObj;
+            if(idEdit) {
+                const es = esercizi.find(item => item.id == idEdit);
+                if(es) { es.titolo = titolo; es.descrizione = descrizione; es.link = link; esObj = es; registraLog(`Modificato esercizio: ${titolo}`); }
+            } else {
+                esObj = { id: Date.now(), titolo, descrizione, link };
+                esercizi.push(esObj);
+                registraLog(`Aggiunto esercizio: ${titolo}`);
+            }
+
+            await salvaCloud("esercizi", esObj.id, esObj);
+            resetFormEsercizio();
+            renderEsercizi();
+        }
+
+        function preparaModificaEsercizio(id) {
+            const es = esercizi.find(item => item.id == id);
+            if(!es) return;
+            document.getElementById('edit-esercizio-id').value = es.id;
+            document.getElementById('input-titolo-esercizio').value = es.titolo;
+            document.getElementById('input-desc-esercizio').value = es.descrizione || '';
+            document.getElementById('input-link-esercizio').value = es.link || '';
+            document.getElementById('btn-salva-esercizio').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Salva Modifiche`;
+            document.getElementById('btn-annulla-esercizio').classList.remove('hidden');
+        }
+
+        function resetFormEsercizio() {
+            document.getElementById('edit-esercizio-id').value = '';
+            document.getElementById('input-titolo-esercizio').value = '';
+            document.getElementById('input-desc-esercizio').value = '';
+            document.getElementById('input-link-esercizio').value = '';
+            document.getElementById('btn-salva-esercizio').innerHTML = `<i class="fa-solid fa-plus mr-1"></i> Aggiungi Esercizio`;
+            document.getElementById('btn-annulla-esercizio').classList.add('hidden');
+        }
+
+        async function eliminaEsercizio(id) {
+            const es = esercizi.find(item => item.id == id);
+            if(confirm("Vuoi eliminare questo esercizio?")) {
+                esercizi = esercizi.filter(item => item.id != id);
+                await eliminaCloud("esercizi", id);
+                registraLog(`Eliminato esercizio: ${es ? es.titolo : id}`);
+                renderEsercizi();
+            }
+        }
+
+        function renderEsercizi() {
+            const container = document.getElementById('lista-esercizi');
+            if(!container) return;
+            if(esercizi.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm italic">Nessun esercizio inserito.</p>`;
+                return;
+            }
+            container.innerHTML = esercizi.map(es => `
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="space-y-1 flex-1">
+                        <h4 class="font-bold text-gray-800 text-base"><i class="fa-solid fa-futbol text-indigo-600 mr-2"></i>${es.titolo}</h4>
+                        ${es.descrizione ? `<p class="text-xs text-gray-600 whitespace-pre-line">${es.descrizione}</p>` : ''}
+                        ${es.link ? `<a href="${es.link}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-semibold px-2.5 py-1 rounded-lg mt-1 transition"><i class="fa-solid fa-video"></i> Guarda Video (YouTube / Instagram)</a>` : ''}
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="preparaModificaEsercizio(${es.id})" class="text-indigo-600 hover:text-indigo-800 p-1.5"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="eliminaEsercizio(${es.id})" class="text-red-500 hover:text-red-700 p-1.5"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         // --- ANAGRAFICA ---
@@ -968,12 +1083,10 @@
 
             const partitaIdx = selectPartita.value !== "" ? selectPartita.value : 0;
             const partita = calendarioPartite[partitaIdx];
-            // Recupera i convocati salvati in precedenza per questa giornata (se esistono)
             const convocatiEsistenti = partita ? (convocazioniStorico[partita.giornata] || null) : null;
 
             container.innerHTML = giocatori.map(g => {
                 const { sett, mese } = calcolaPercentuali(g.id);
-                // Se esiste uno storico per questa partita, spunta solo chi c'era nello storico. Altrimenti di default spunta tutti (true).
                 let isChecked = true;
                 if(convocatiEsistenti !== null) {
                     isChecked = convocatiEsistenti.includes(g.id) || convocatiEsistenti.includes(String(g.id));
@@ -1043,7 +1156,7 @@
 
             navigator.clipboard.writeText(testo).then(() => {
                 registraLog(`Aggiornate/Generate convocazioni Giornata ${partita.giornata}`);
-                alert("Convocazioni aggiornate nello storico, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
+                alert("Convocazioni salvate nello storico, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
                 renderCalendario();
                 renderStatistiche();
             }).catch(() => alert("Errore durante la copia."));
@@ -1148,6 +1261,7 @@
 
         function renderTutto() {
             renderAllenamenti();
+            renderEsercizi();
             renderConvocazioni();
             renderCalendario();
             renderStatistiche();
