@@ -131,11 +131,11 @@
         <div id="tab-convocazioni" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
                 <h2 class="text-lg font-bold mb-1 text-gray-700">Generatore Convocazioni WhatsApp</h2>
-                <p class="text-xs text-gray-500 mb-4">Seleziona la partita di riferimento dello Sporting Murialdo, spunta i convocati e copia il messaggio.</p>
+                <p class="text-xs text-gray-500 mb-4">Seleziona la partita di riferimento dello Sporting Murialdo, verifica i convocati e copia il messaggio.</p>
                 
                 <div class="mb-5 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
                     <label class="block text-xs font-bold text-indigo-900 mb-1 uppercase tracking-wide">Partita Sporting Murialdo:</label>
-                    <select id="select-partita-convocazione" class="w-full border border-indigo-200 rounded-xl p-2.5 bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <select id="select-partita-convocazione" onchange="renderConvocazioniCheckboxes()" class="w-full border border-indigo-200 rounded-xl p-2.5 bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
                         <!-- Popolato via JS -->
                     </select>
                 </div>
@@ -317,7 +317,7 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.1";
+        const APP_VERSION = "2.2";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
         // Dati locali di fallback / default iniziali
@@ -366,7 +366,7 @@
             { giornata: 14, data: "2027-01-17", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "UP SETTIMO", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 15, data: "2027-01-24", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "S.FILIPPO NERI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 16, data: "2027-01-31", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "VALSESIA POLIS", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
-            { giornata: 17, data: "2027-02-07", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASSISISTADIUM, VIA USIGNOLO-CAROZZI, MILANO" },
+            { giornata: 17, data: "2027-02-07", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ASSISI", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" },
             { giornata: 18, data: "2027-02-14", ora: "16:30", casa: "SPORTING MURIALDO", fuori: "ACLI CAVANIS CORSICO BLU", campo: "ASD SPORTING MURIALDO, VIA INGANNI 16, MILANO" }
         ];
 
@@ -431,6 +431,7 @@
                 const snapConv = await getDocs(collection(db, "convocazioni_storico"));
                 if (!snapConv.empty) {
                     snapConv.docs.forEach(d => {
+                        // Firebase salva l'id come stringa, convertiamolo in numero/chiave corretta
                         convocazioniStorico[d.id] = d.data().convocati;
                     });
                 }
@@ -836,7 +837,6 @@
         }
 
         function apriModalStoricoConvocazioni(giornata) {
-            const part = calendarioPartite.find(p => p.giornata === giornata);
             const convocatiIds = convocazioniStorico[giornata] || [];
             document.getElementById('modal-storico-title').innerText = `Convocati Giornata ${giornata}`;
             const container = document.getElementById('modal-storico-content');
@@ -930,12 +930,11 @@
             const presTot = presenti + ritardi;
             const percGlobal = totalAll > 0 ? Math.round((presTot / totalAll) * 100) : 0;
 
-            // Statistiche convocazioni partite
             let totaleConvocazioni = 0;
             let partiteTotaliConvocabili = Object.keys(convocazioniStorico).length;
 
             Object.values(convocazioniStorico).forEach(convList => {
-                if(convList.includes(g.id)) totaleConvocazioni++;
+                if(convList.includes(g.id) || convList.includes(String(g.id))) totaleConvocazioni++;
             });
 
             const percConvocazione = partiteTotaliConvocabili > 0 ? Math.round((totaleConvocazioni / partiteTotaliConvocabili) * 100) : 0;
@@ -946,24 +945,44 @@
         function renderConvocazioni() {
             const select = document.getElementById('select-partita-convocazione');
             if(select) {
+                const selectedVal = select.value;
                 select.innerHTML = calendarioPartite.map((p, idx) => `
                     <option value="${idx}">Giornata ${p.giornata}: ${p.casa} vs ${p.fuori} (${new Date(p.data).toLocaleDateString('it-IT')} ore ${p.ora})</option>
                 `).join('');
+                if(selectedVal !== "" && select.options[selectedVal]) {
+                    select.value = selectedVal;
+                }
             }
+            renderConvocazioniCheckboxes();
+        }
 
+        function renderConvocazioniCheckboxes() {
+            const selectPartita = document.getElementById('select-partita-convocazione');
             const container = document.getElementById('lista-convocazioni-checkbox');
-            if(!container) return;
+            if(!container || !selectPartita) return;
+
             if(giocatori.length === 0) {
                 container.innerHTML = `<p class="text-gray-400 text-sm p-4">Nessun giocatore in anagrafica.</p>`;
                 return;
             }
 
+            const partitaIdx = selectPartita.value !== "" ? selectPartita.value : 0;
+            const partita = calendarioPartite[partitaIdx];
+            // Recupera i convocati salvati in precedenza per questa giornata (se esistono)
+            const convocatiEsistenti = partita ? (convocazioniStorico[partita.giornata] || null) : null;
+
             container.innerHTML = giocatori.map(g => {
                 const { sett, mese } = calcolaPercentuali(g.id);
+                // Se esiste uno storico per questa partita, spunta solo chi c'era nello storico. Altrimenti di default spunta tutti (true).
+                let isChecked = true;
+                if(convocatiEsistenti !== null) {
+                    isChecked = convocatiEsistenti.includes(g.id) || convocatiEsistenti.includes(String(g.id));
+                }
+
                 return `
                     <div class="py-3 flex items-center justify-between">
                         <label class="flex items-center gap-3 cursor-pointer flex-1">
-                            <input type="checkbox" data-giocatore-id="${g.id}" class="convocato-checkbox w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" checked>
+                            <input type="checkbox" data-giocatore-id="${g.id}" class="convocato-checkbox w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" ${isChecked ? 'checked' : ''}>
                             <div>
                                 <span class="font-bold text-gray-800">${g.nome} ${g.cognome}</span>
                                 ${g.numero ? `<span class="ml-1 text-xs text-gray-500 font-semibold">#${g.numero}</span>` : ''}
@@ -1008,7 +1027,7 @@
 
             if(convocatiNomi.length === 0) { alert("Seleziona almeno un convocato!"); return; }
 
-            // Salva storico convocazioni per questa giornata sul cloud
+            // Salva o aggiorna lo storico convocazioni per questa giornata sul cloud
             convocazioniStorico[partita.giornata] = convocatiIds;
             await salvaCloud("convocazioni_storico", partita.giornata, { giornata: partita.giornata, convocati: convocatiIds });
 
@@ -1023,8 +1042,8 @@
             testo += `*I convocati:*\n` + convocatiNomi.join('\n') + `\n\nForza Sporting Murialdo ❤️💙`;
 
             navigator.clipboard.writeText(testo).then(() => {
-                registraLog(`Generate e storicizzate convocazioni Giornata ${partita.giornata}`);
-                alert("Convocazioni salvate nello storico, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
+                registraLog(`Aggiornate/Generate convocazioni Giornata ${partita.giornata}`);
+                alert("Convocazioni aggiornate nello storico, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
                 renderCalendario();
                 renderStatistiche();
             }).catch(() => alert("Errore durante la copia."));
