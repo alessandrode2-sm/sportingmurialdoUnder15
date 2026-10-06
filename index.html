@@ -284,16 +284,46 @@
 
     </main>
 
-    <!-- Modal Dettaglio Allenamento -->
+    <!-- Modal Dettaglio Allenamento & Esercizi -->
     <div id="modal-allenamento" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden">
             <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-                <h3 id="modal-title" class="font-bold text-lg">Modifica Presenze</h3>
+                <h3 id="modal-title" class="font-bold text-lg">Gestione Allenamento</h3>
                 <button onclick="chiudiModal()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 divide-y divide-gray-100" id="modal-presenze-list"></div>
+            
+            <div class="p-5 overflow-y-auto flex-1 space-y-6">
+                <!-- Sezione Esercizi dell'Allenamento -->
+                <div class="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100 space-y-3">
+                    <h4 class="font-bold text-sm text-indigo-900"><i class="fa-solid fa-dumbbell mr-2"></i>Esercizi Programmati per la Sessione</h4>
+                    
+                    <!-- Richiama da libreria -->
+                    <div class="flex gap-2">
+                        <select id="select-esercizio-archivio" class="flex-1 border border-indigo-200 rounded-xl px-3 py-2 text-xs bg-white outline-none">
+                            <option value="">-- Seleziona esercizio dall'archivio --</option>
+                        </select>
+                        <button onclick="aggiungiEsercizioDaArchivio()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap shadow"><i class="fa-solid fa-plus mr-1"></i> Aggiungi</button>
+                    </div>
+
+                    <!-- Inserisci esercizio al volo -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+                        <input type="text" id="modal-es-titolo" placeholder="Titolo esercizio *" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white">
+                        <input type="text" id="modal-es-link" placeholder="Link video (opzionale)" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white">
+                        <button onclick="aggiungiEsercizioAlVolo()" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-1.5 text-xs font-medium shadow"><i class="fa-solid fa-plus-circle mr-1"></i> Crea e Aggiungi</button>
+                    </div>
+
+                    <div id="modal-lista-esercizi-sessione" class="space-y-2 pt-2"></div>
+                </div>
+
+                <!-- Sezione Presenze Giocatori -->
+                <div>
+                    <h4 class="font-bold text-sm text-gray-700 mb-2"><i class="fa-solid fa-users mr-2 text-indigo-600"></i>Presenze Giocatori</h4>
+                    <div class="divide-y divide-gray-100 border border-gray-200 rounded-xl p-3 bg-gray-50" id="modal-presenze-list"></div>
+                </div>
+            </div>
+
             <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
-                <button onclick="chiudiModal()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl font-medium shadow hover:bg-indigo-700 transition">Salva e Chiudi</button>
+                <button onclick="chiudiModal()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-medium shadow hover:bg-indigo-700 transition">Salva e Chiudi</button>
             </div>
         </div>
     </div>
@@ -353,10 +383,9 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.4";
+        const APP_VERSION = "2.6";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
-        // Array vuoti: i dati verranno caricati interamente da Firebase al primo avvio
         let giocatori = [];
         let allenamenti = [];
         let calendarioPartite = [];
@@ -364,8 +393,8 @@
         let utenti = [];
         let logAttivita = [];
         let convocazioniStorico = {};
+        let allenamentoCorrenteId = null;
 
-        // Dati di default iniziali (usati solo se il database cloud è completamente vuoto)
         const DEFAULT_GIOCATORI = [
             { id: 1, nome: "Usman", cognome: "", numero: "12" },
             { id: 2, nome: "Luca", cognome: "", numero: "99" },
@@ -849,7 +878,7 @@
             const presenzeIniziali = {};
             giocatori.forEach(g => presenzeIniziali[g.id] = 'presente');
 
-            const nuovo = { id: Date.now(), data, presenze: presenzeIniziali };
+            const nuovo = { id: Date.now(), data, presenze: presenzeIniziali, eserciziSessione: [] };
             allenamenti.push(nuovo);
             allenamenti.sort((a,b) => new Date(b.data) - new Date(a.data));
             await salvaCloud("allenamenti", nuovo.id, nuovo);
@@ -876,12 +905,13 @@
             }
             container.innerHTML = allenamenti.map(a => {
                 const dataF = new Date(a.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
-                const presenti = Object.values(a.presenze).filter(p => p === 'presente' || p === 'ritardo').length;
+                const presenti = Object.values(a.presenze || {}).filter(p => p === 'presente' || p === 'ritardo').length;
+                const numEs = (a.eserciziSessione || []).length;
                 return `
                     <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
                         <div>
                             <h3 class="font-bold text-gray-800"><i class="fa-regular fa-calendar mr-2 text-indigo-600"></i>${dataF}</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">Partecipanti: ${presenti}/${giocatori.length}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Partecipanti: ${presenti}/${giocatori.length} | Esercizi: ${numEs}</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="apriModalAllenamento(${a.id})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-pen-to-square mr-1"></i> Gestisci</button>
@@ -895,14 +925,24 @@
         function apriModalAllenamento(id) {
             const allenamento = allenamenti.find(a => a.id === id);
             if(!allenamento) return;
-            document.getElementById('modal-title').innerText = "Presenze del " + new Date(allenamento.data).toLocaleDateString('it-IT');
-            const container = document.getElementById('modal-presenze-list');
+            allenamentoCorrenteId = id;
+            document.getElementById('modal-title').innerText = "Gestione Allenamento del " + new Date(allenamento.data).toLocaleDateString('it-IT');
+            
+            // Popola select esercizi archivio
+            const selectArchivio = document.getElementById('select-esercizio-archivio');
+            selectArchivio.innerHTML = `<option value="">-- Seleziona esercizio dall'archivio --</option>` + esercizi.map(es => `
+                <option value="${es.id}">${es.titolo}</option>
+            `).join('');
 
-            container.innerHTML = giocatori.map(g => {
+            renderEserciziSessioneModal();
+
+            // Popola presenze
+            const containerPresenze = document.getElementById('modal-presenze-list');
+            containerPresenze.innerHTML = giocatori.map(g => {
                 const stato = allenamento.presenze[g.id] || 'presente';
                 return `
-                    <div class="py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <span class="font-medium text-gray-800">${g.nome} ${g.cognome} ${g.numero ? '('+g.numero+')' : ''}</span>
+                    <div class="py-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <span class="font-medium text-gray-800 text-sm">${g.nome} ${g.cognome} ${g.numero ? '('+g.numero+')' : ''}</span>
                         <div class="flex gap-1 w-full sm:w-auto">
                             <button onclick="setStatoPresenza(${id}, ${g.id}, 'presente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'presente' ? 'bg-emerald-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Presente</button>
                             <button onclick="setStatoPresenza(${id}, ${g.id}, 'ritardo')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'ritardo' ? 'bg-amber-500 text-white shadow' : 'bg-gray-100 text-gray-600'}">In ritardo</button>
@@ -911,11 +951,13 @@
                     </div>
                 `;
             }).join('');
+
             document.getElementById('modal-allenamento').classList.remove('hidden');
         }
 
         function chiudiModal() {
             document.getElementById('modal-allenamento').classList.add('hidden');
+            allenamentoCorrenteId = null;
             renderAllenamenti();
         }
 
@@ -926,6 +968,75 @@
                 await salvaCloud("allenamenti", a.id, a);
                 apriModalAllenamento(allenamentoId); 
             }
+        }
+
+        async function aggiungiEsercizioDaArchivio() {
+            const select = document.getElementById('select-esercizio-archivio');
+            const esId = select.value;
+            if(!esId) { alert("Seleziona un esercizio dall'archivio!"); return; }
+            const esTrovato = esercizi.find(x => x.id == esId);
+            if(!esTrovato) return;
+
+            const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
+            if(!a) return;
+
+            if(!a.eserciziSessione) a.eserciziSessione = [];
+            a.eserciziSessione.push({ ...esTrovato, idIstanza: Date.now() });
+
+            await salvaCloud("allenamenti", a.id, a);
+            select.value = "";
+            renderEserciziSessioneModal();
+            renderAllenamenti();
+        }
+
+        async function aggiungiEsercizioAlVolo() {
+            const titolo = document.getElementById('modal-es-titolo').value.trim();
+            const link = document.getElementById('modal-es-link').value.trim();
+            if(!titolo) { alert("Inserisci almeno il titolo dell'esercizio!"); return; }
+
+            const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
+            if(!a) return;
+
+            if(!a.eserciziSessione) a.eserciziSessione = [];
+            a.eserciziSessione.push({ id: Date.now(), idIstanza: Date.now(), titolo, descrizione: "", link });
+
+            await salvaCloud("allenamenti", a.id, a);
+            document.getElementById('modal-es-titolo').value = "";
+            document.getElementById('modal-es-link').value = "";
+            renderEserciziSessioneModal();
+            renderAllenamenti();
+        }
+
+        async function rimuoviEsercizioSessione(idIstanza) {
+            const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
+            if(!a) return;
+
+            a.eserciziSessione = (a.eserciziSessione || []).filter(x => x.idIstanza !== idIstanza);
+            await salvaCloud("allenamenti", a.id, a);
+            renderEserciziSessioneModal();
+            renderAllenamenti();
+        }
+
+        function renderEserciziSessioneModal() {
+            const container = document.getElementById('modal-lista-esercizi-sessione');
+            const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
+            if(!container || !a) return;
+
+            const lista = a.eserciziSessione || [];
+            if(lista.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-xs italic">Nessun esercizio inserito in questa sessione.</p>`;
+                return;
+            }
+
+            container.innerHTML = lista.map(es => `
+                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-indigo-100 text-xs">
+                    <div>
+                        <strong class="text-gray-800"><i class="fa-solid fa-futbol text-indigo-600 mr-1.5"></i>${es.titolo}</strong>
+                        ${es.link ? `<br><a href="${es.link}" target="_blank" class="text-indigo-600 hover:underline font-medium"><i class="fa-solid fa-video mr-1"></i>Guarda video</a>` : ''}
+                    </div>
+                    <button onclick="rimuoviEsercizioSessione(${es.idIstanza})" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `).join('');
         }
 
         // --- CALENDARIO PARTITE ---
@@ -1016,7 +1127,7 @@
 
             allenamenti.forEach(a => {
                 const dataAll = new Date(a.data);
-                const stato = a.presenze[giocatoreId];
+                const stato = (a.presenze || {})[giocatoreId];
                 const partecipato = (stato === 'presente' || stato === 'ritardo');
 
                 if (dataAll >= inizioSett) {
@@ -1037,7 +1148,7 @@
             let totalAll = allenamenti.length;
             let presenti = 0, ritardi = 0, assenti = 0;
             allenamenti.forEach(a => {
-                const s = a.presenze[g.id];
+                const s = (a.presenze || {})[g.id];
                 if(s === 'presente') presenti++;
                 if(s === 'ritardo') ritardi++;
                 if(s === 'assente') assenti++;
@@ -1140,7 +1251,6 @@
 
             if(convocatiNomi.length === 0) { alert("Seleziona almeno un convocato!"); return; }
 
-            // Salva o aggiorna lo storico convocazioni per questa giornata sul cloud
             convocazioniStorico[partita.giornata] = convocatiIds;
             await salvaCloud("convocazioni_storico", partita.giornata, { giornata: partita.giornata, convocati: convocatiIds });
 
@@ -1206,7 +1316,6 @@
                 }
             }
 
-            // Render Statistiche Convocazioni
             const containerConv = document.getElementById('statistiche-convocazioni-list');
             if(containerConv) {
                 if(giocatori.length === 0) {
@@ -1241,16 +1350,22 @@
                     containerAll.innerHTML = allenamenti.map(a => {
                         const dataF = new Date(a.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
                         let pres = 0, rit = 0, ass = 0;
-                        Object.values(a.presenze).forEach(s => {
+                        Object.values(a.presenze || {}).forEach(s => {
                             if(s === 'presente') pres++;
                             if(s === 'ritardo') rit++;
                             if(s === 'assente') ass++;
                         });
+                        const totRosa = giocatori.length > 0 ? giocatori.length : 1;
+                        const percPresenze = Math.round(((pres + rit) / totRosa) * 100);
+
                         return `
-                            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex justify-between items-center text-sm">
+                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
-                                    <span class="font-bold text-gray-800"><i class="fa-regular fa-calendar mr-2 text-indigo-600"></i>${dataF}</span>
-                                    <div class="text-xs text-gray-500 mt-1">Presenti: <strong class="text-emerald-600">${pres}</strong> | In ritardo: <strong class="text-amber-500">${rit}</strong> | Assenti: <strong class="text-red-500">${ass}</strong></div>
+                                    <h4 class="font-bold text-gray-800 text-base"><i class="fa-regular fa-calendar mr-2 text-indigo-600"></i>${dataF}</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Presenti: <strong class="text-emerald-600">${pres}</strong> | In ritardo: <strong class="text-amber-500">${rit}</strong> | Assenti: <strong class="text-red-500">${ass}</strong> (Tot. Rosa: ${giocatori.length})</p>
+                                </div>
+                                <div class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-center font-bold text-sm">
+                                    ${percPresenze}% <span class="text-xs font-normal block opacity-80">Presenza Squadra</span>
                                 </div>
                             </div>
                         `;
