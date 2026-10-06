@@ -980,7 +980,7 @@
                 if(giocatori.length === 0) {
                     containerRagazzi.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
                 } else {
-                    const tipoOrdinamento = document.getElementById('ordinamento-select') ? document.getElementById('ordinamento-select'].value : 'perc_desc';
+                    const tipoOrdinamento = document.getElementById('ordinamento-select') ? document.getElementById('ordinamento-select').value : 'perc_desc';
 
                     let giocatoriOrdinati = [...giocatori].sort((a, b) => {
                         const statA = calcolaStatisticheGiocatore(a);
