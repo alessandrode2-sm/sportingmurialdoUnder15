@@ -201,25 +201,27 @@
 
         <!-- ================= SEZIONE CSI MILANO ================= -->
         <div id="tab-csi" class="tab-content hidden">
-            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div>
-                        <h2 class="text-lg font-bold text-gray-700"><i class="fa-solid fa-globe text-indigo-600 mr-2"></i>CSI Milano - Portale Ufficiale</h2>
-                        <p class="text-xs text-gray-500">Risultati, calendari e classifiche ufficiali con i filtri preselezionati per il girone.</p>
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200 text-center space-y-6">
+                <div class="max-w-md mx-auto space-y-2">
+                    <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+                        <i class="fa-solid fa-trophy"></i>
                     </div>
-                    <a href="https://www.csi.milano.it/albo/risultati-calendario-classifiche-squadre.html?q=cal" target="_blank" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-external-link-alt"></i> Apri in nuova scheda
+                    <h2 class="text-xl font-bold text-gray-800">Calendari e Classifiche CSI Milano</h2>
+                    <p class="text-xs text-gray-500">Accedi direttamente al portale ufficiale CSI per visualizzare risultati, classifiche e variazioni di campo in formato ottimizzato.</p>
+                </div>
+
+                <div class="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100 max-w-lg mx-auto text-left space-y-2">
+                    <h4 class="font-bold text-xs text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-circle-info mr-1"></i> Filtri preimpostati consigliati:</h4>
+                    <p class="text-xs text-indigo-800">• <strong>Sport:</strong> Calcio a 7</p>
+                    <p class="text-xs text-indigo-800">• <strong>Campionato:</strong> Under 15 a 7</p>
+                    <p class="text-xs text-indigo-800">• <strong>Girone:</strong> Girone B</p>
+                    <p class="text-xs text-indigo-800">• <strong>Squadra:</strong> Sporting Murialdo</p>
+                </div>
+
+                <div class="pt-2">
+                    <a href="https://www.csi.milano.it/albo/risultati-calendario-classifiche-squadre.html?q=cal" target="_blank" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3.5 rounded-xl shadow-lg transition text-sm">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Apri Portale CSI Milano
                     </a>
-                </div>
-
-                <div class="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100 text-xs text-indigo-900 space-y-1">
-                    <p class="font-bold"><i class="fa-solid fa-info-circle mr-1"></i> Filtri preimpostati sul portale CSI:</p>
-                    <p>• <strong>Sport:</strong> Calcio a 7 &nbsp;|&nbsp; <strong>Campionato:</strong> Under 15 a 7 &nbsp;|&nbsp; <strong>Girone:</strong> Girone B &nbsp;|&nbsp; <strong>Squadra:</strong> Sporting Murialdo</p>
-                </div>
-
-                <!-- Iframe incorporato con filtri -->
-                <div class="w-full h-[650px] rounded-xl border border-gray-200 overflow-hidden bg-white shadow-inner">
-                    <iframe src="https://www.csi.milano.it/albo/risultati-calendario-classifiche-squadre.html?q=cal" class="w-full h-full border-0"></iframe>
                 </div>
             </div>
         </div>
@@ -444,7 +446,7 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "3.0";
+        const APP_VERSION = "3.1";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
         let giocatori = [];
