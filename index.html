@@ -1,23 +1,250 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione Squadra Under 15 - Sporting Murialdo</title>
-    <!-- Meta tag per forzare il browser a non memorizzare la cache della pagina -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Under 15 - Sporting Murialdo</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- App-like su Android / iOS (PWA, WebView, Capacitor) -->
+    <meta name="theme-color" content="#0D1C47" id="meta-theme-color">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Font del design system (Barlow / Barlow Condensed) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700&display=swap">
     <!-- FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- Tema: segue il sistema, oppure la scelta salvata -->
+    <script>
+        (function () {
+            var scelta = 'auto';
+            try { scelta = localStorage.getItem('sm_tema') || 'auto'; } catch (e) {}
+            var scuro = scelta === 'dark' || (scelta === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.setAttribute('data-theme', scuro ? 'dark' : 'light');
+        })();
+    </script>
+
+    <style>
+/* ===== Token: Murialdo U15 design system (tokens.json) ===== */
+:root, [data-theme="light"] {--surface:#F3F5FA;--surface-raised:#FFFFFF;--surface-sunken:#E8ECF5;--ink:#111A2E;--ink-muted:#525D75;--border:#D5DBE8;--border-strong:#7A849A;--primary:#1C3D99;--on-primary:#FFFFFF;--primary-tint:#E4EAFA;--accent:#C8102E;--on-accent:#FFFFFF;--accent-tint:#FCE7EA;--appbar:#0D1C47;--on-appbar:#FFFFFF;--success:#0B7356;--on-success:#FFFFFF;--success-tint:#DFF3EC;--warning:#A84E06;--on-warning:#FFFFFF;--warning-tint:#FDF0DC;--danger:#B4232A;--on-danger:#FFFFFF;--danger-tint:#FBE5E4;--focus:#1C3D99;--scrim:rgba(8, 14, 32, 0.56);--inverse-surface:#1B2337;--inverse-ink:#EDF1FA;--inverse-accent:#8DAAFF;--shadow-card:0 1px 2px rgba(13, 28, 71, 0.06);--shadow-fab:0 6px 16px rgba(200, 16, 46, 0.32);--shadow-sheet:0 -8px 32px rgba(13, 28, 71, 0.18);}
+[data-theme="dark"] {--surface:#0A1020;--surface-raised:#131B2E;--surface-sunken:#1B2540;--ink:#EDF1FA;--ink-muted:#9BA6BE;--border:#26314B;--border-strong:#6B7896;--primary:#8DAAFF;--on-primary:#0A1020;--primary-tint:#1B2A55;--accent:#FF6E7E;--on-accent:#1A0408;--accent-tint:#3A1520;--appbar:#131B2E;--on-appbar:#EDF1FA;--success:#4FD8A0;--on-success:#0A1020;--success-tint:#103328;--warning:#F4B248;--on-warning:#1A1000;--warning-tint:#3A2A0C;--danger:#FF8A80;--on-danger:#0A1020;--danger-tint:#3D1716;--focus:#8DAAFF;--scrim:rgba(0, 0, 0, 0.64);--inverse-surface:#EDF1FA;--inverse-ink:#111A2E;--inverse-accent:#1C3D99;--shadow-card:none;--shadow-fab:0 6px 16px rgba(0, 0, 0, 0.5);--shadow-sheet:0 -8px 32px rgba(0, 0, 0, 0.6);}
+:root {--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--radius-sm:6px;--radius-md:12px;--radius-lg:16px;--radius-xl:24px;--radius-pill:999px;--size-touch:48px;--size-appbar:56px;--size-bottomnav:56px;--font-display:"Barlow Condensed", "Arial Narrow", sans-serif;--font-sans:"Barlow", system-ui, sans-serif;}
+
+
+/* ===== Componenti: Murialdo U15 design system (components/bundle.css) ===== */
+/* Sporting Murialdo U15 — componenti mobile (prefisso sm-). Tutti i valori vengono da tokens.css. */
+*, *::before, *::after { box-sizing: border-box; }
+.sm-root { font-family: var(--font-sans); color: var(--ink); background: var(--surface); font-size: 15px; line-height: 22px; -webkit-tap-highlight-color: transparent; }
+.sm-root :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ---------- App bar ---------- */
+.sm-appbar { display: flex; align-items: center; gap: var(--space-3); min-height: var(--size-appbar); padding: 0 var(--space-2) 0 var(--space-4); background: var(--appbar); color: var(--on-appbar); }
+.sm-appbar__logo { width: 36px; height: 36px; border-radius: var(--radius-pill); background: #ffffff; object-fit: contain; padding: 2px; flex: none; }
+.sm-appbar__text { flex: 1; min-width: 0; }
+.sm-appbar__title { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 24px; letter-spacing: .01em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm-appbar__sub { font-size: 12px; line-height: 16px; opacity: .8; }
+.sm-appbar .sm-iconbtn { color: var(--on-appbar); }
+.sm-appbar :focus-visible { outline-color: var(--on-appbar); }
+.sm-appbar__stripe { height: 4px; background: var(--accent); }
+
+/* ---------- Bottom navigation ---------- */
+.sm-bottomnav { display: flex; background: var(--surface-raised); border-top: 1px solid var(--border); padding: var(--space-1) var(--space-1) calc(var(--space-1) + env(safe-area-inset-bottom, 0px)); }
+.sm-bottomnav__item { flex: 1; min-width: 0; min-height: var(--size-bottomnav); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; background: none; color: var(--ink-muted); font: inherit; font-size: 12px; line-height: 16px; font-weight: 600; cursor: pointer; padding: 0; }
+.sm-bottomnav__icon { display: grid; place-items: center; width: 56px; height: 30px; border-radius: var(--radius-pill); font-size: 18px; transition: background .15s; }
+.sm-bottomnav__item[aria-current="page"] { color: var(--primary); }
+.sm-bottomnav__item[aria-current="page"] .sm-bottomnav__icon { background: var(--primary-tint); }
+
+/* ---------- Buttons ---------- */
+.sm-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: var(--size-touch); padding: 0 var(--space-5); border-radius: var(--radius-pill); border: 0; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; white-space: nowrap; transition: filter .15s, background .15s; }
+.sm-btn:active { filter: brightness(.92); }
+.sm-btn[disabled] { opacity: .45; pointer-events: none; }
+.sm-btn--primary { background: var(--primary); color: var(--on-primary); }
+.sm-btn--accent { background: var(--accent); color: var(--on-accent); }
+.sm-btn--success { background: var(--success); color: var(--on-success); }
+.sm-btn--tonal { background: var(--primary-tint); color: var(--primary); }
+.sm-btn--ghost { background: transparent; color: var(--primary); }
+.sm-btn--danger { background: var(--danger-tint); color: var(--danger); }
+.sm-btn--sm { min-height: 36px; padding: 0 var(--space-4); font-size: 13px; }
+.sm-btn--block { width: 100%; }
+.sm-iconbtn { display: inline-grid; place-items: center; width: var(--size-touch); height: var(--size-touch); border-radius: var(--radius-pill); border: 0; background: transparent; color: var(--ink-muted); font-size: 18px; cursor: pointer; flex: none; }
+.sm-iconbtn:active { background: var(--surface-sunken); }
+.sm-iconbtn--danger { color: var(--danger); }
+
+/* ---------- FAB ---------- */
+.sm-fab { display: inline-flex; align-items: center; gap: var(--space-3); height: 56px; padding: 0 var(--space-5); border-radius: var(--radius-lg); border: 0; background: var(--accent); color: var(--on-accent); font: inherit; font-weight: 700; font-size: 15px; box-shadow: var(--shadow-fab); cursor: pointer; }
+.sm-fab i { font-size: 20px; }
+
+/* ---------- Cards & sections ---------- */
+.sm-card { background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); box-shadow: var(--shadow-card); }
+.sm-card + .sm-card { margin-top: var(--space-3); }
+.sm-card__title { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 24px; margin: 0 0 var(--space-1); }
+.sm-card__sub { color: var(--ink-muted); font-size: 13px; line-height: 18px; margin: 0 0 var(--space-3); }
+.sm-overline { font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); margin: var(--space-5) var(--space-1) var(--space-2); }
+
+/* ---------- Hero (prossima partita) ---------- */
+.sm-hero { position: relative; overflow: hidden; background: var(--appbar); color: var(--on-appbar); border-radius: var(--radius-lg); padding: var(--space-4); }
+.sm-hero::after { content: ""; position: absolute; right: -24px; top: -24px; width: 120px; height: 120px; border-radius: var(--radius-pill); border: 16px solid var(--accent); opacity: .9; }
+.sm-hero__label { font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.sm-hero__teams { position: relative; z-index: 1; font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 28px; text-transform: uppercase; margin: var(--space-2) 0; max-width: 85%; }
+.sm-hero__teams small { display: block; font-size: 14px; line-height: 18px; opacity: .7; font-family: var(--font-sans); font-weight: 600; text-transform: none; }
+.sm-hero__meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); font-size: 13px; line-height: 18px; opacity: .9; }
+
+/* ---------- List items ---------- */
+.sm-list { display: flex; flex-direction: column; }
+.sm-list > .sm-item + .sm-item { border-top: 1px solid var(--border); }
+.sm-item { display: flex; align-items: center; gap: var(--space-3); min-height: 64px; padding: var(--space-2) 0; }
+.sm-item__body { flex: 1; min-width: 0; }
+.sm-item__title { font-weight: 600; font-size: 16px; line-height: 22px; overflow: hidden; text-overflow: ellipsis; }
+.sm-item__meta { color: var(--ink-muted); font-size: 13px; line-height: 18px; }
+.sm-item__trail { display: flex; align-items: center; gap: 2px; flex: none; }
+.sm-item--tap { cursor: pointer; }
+
+/* ---------- Jersey number ---------- */
+.sm-jersey { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-pill); background: var(--primary-tint); color: var(--primary); font-family: var(--font-display); font-weight: 700; font-size: 18px; flex: none; }
+.sm-jersey--empty { background: var(--surface-sunken); color: var(--ink-muted); font-size: 14px; }
+
+/* ---------- Chips ---------- */
+.sm-chip { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 var(--space-2); border-radius: var(--radius-pill); font-size: 12px; line-height: 16px; font-weight: 700; white-space: nowrap; background: var(--surface-sunken); color: var(--ink-muted); }
+.sm-chip--primary { background: var(--primary-tint); color: var(--primary); }
+.sm-chip--accent { background: var(--accent-tint); color: var(--accent); }
+.sm-chip--success { background: var(--success-tint); color: var(--success); }
+.sm-chip--warning { background: var(--warning-tint); color: var(--warning); }
+.sm-chip--danger { background: var(--danger-tint); color: var(--danger); }
+
+/* ---------- Segmented control (sotto-tab e presenze) ---------- */
+.sm-seg { display: flex; background: var(--surface-sunken); border-radius: var(--radius-pill); padding: 4px; gap: 4px; }
+.sm-seg__opt { flex: 1; min-height: 40px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--ink-muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 var(--space-2); white-space: nowrap; }
+.sm-seg__opt[aria-pressed="true"] { background: var(--surface-raised); color: var(--primary); box-shadow: var(--shadow-card); }
+.sm-seg--attendance .sm-seg__opt[aria-pressed="true"][data-v="presente"] { background: var(--success); color: var(--on-success); }
+.sm-seg--attendance .sm-seg__opt[aria-pressed="true"][data-v="ritardo"] { background: var(--warning); color: var(--on-warning); }
+.sm-seg--attendance .sm-seg__opt[aria-pressed="true"][data-v="assente"] { background: var(--danger); color: var(--on-danger); }
+
+/* ---------- Form fields ---------- */
+.sm-field { display: flex; flex-direction: column; gap: 6px; }
+.sm-field + .sm-field { margin-top: var(--space-3); }
+.sm-label { font-size: 13px; line-height: 18px; font-weight: 600; color: var(--ink-muted); }
+.sm-input, .sm-select, .sm-textarea { width: 100%; min-height: var(--size-touch); padding: 0 var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--surface-raised); color: var(--ink); font: inherit; font-size: 16px; }
+.sm-textarea { padding: var(--space-3); min-height: 96px; resize: vertical; }
+.sm-select { appearance: none; padding-right: 40px; background-image: linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%), linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+.sm-input:focus, .sm-select:focus, .sm-textarea:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: var(--focus); }
+.sm-row { display: flex; gap: var(--space-3); }
+.sm-row > * { flex: 1; min-width: 0; }
+
+/* ---------- Checkbox convocazioni ---------- */
+.sm-check { appearance: none; width: 24px; height: 24px; border: 2px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface-raised); display: grid; place-items: center; flex: none; cursor: pointer; margin: 0; }
+.sm-check:checked { background: var(--primary); border-color: var(--primary); }
+.sm-check:checked::after { content: ""; width: 6px; height: 12px; border: solid var(--on-primary); border-width: 0 3px 3px 0; transform: translateY(-2px) rotate(45deg); }
+
+/* ---------- Match card ---------- */
+.sm-match { background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); }
+.sm-match + .sm-match { margin-top: var(--space-3); }
+.sm-match--past { opacity: .72; }
+.sm-match__head { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+.sm-match__date { margin-left: auto; font-size: 13px; line-height: 18px; color: var(--ink-muted); font-weight: 600; }
+.sm-match__teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-2); }
+.sm-match__team { font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 20px; text-transform: uppercase; }
+.sm-match__team:last-child { text-align: right; }
+.sm-match__team--us { color: var(--primary); }
+.sm-match__vs { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--accent); }
+.sm-match__place { display: flex; gap: var(--space-2); margin-top: var(--space-3); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.sm-match__actions { display: flex; gap: var(--space-2); margin-top: var(--space-3); flex-wrap: wrap; }
+
+/* ---------- Stat row ---------- */
+.sm-stat { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; }
+.sm-stat + .sm-stat { border-top: 1px solid var(--border); }
+.sm-stat__body { flex: 1; min-width: 0; }
+.sm-stat__name { font-weight: 600; font-size: 15px; line-height: 20px; }
+.sm-stat__detail { color: var(--ink-muted); font-size: 12px; line-height: 16px; margin-top: 2px; }
+.sm-stat__value { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 28px; min-width: 56px; text-align: right; }
+.sm-progress { height: 6px; border-radius: var(--radius-pill); background: var(--surface-sunken); overflow: hidden; margin-top: 6px; }
+.sm-progress > span { display: block; height: 100%; border-radius: inherit; background: var(--primary); }
+.sm-progress--success > span { background: var(--success); }
+.sm-progress--warning > span { background: var(--warning); }
+.sm-progress--danger > span { background: var(--danger); }
+
+/* ---------- Bottom sheet ---------- */
+.sm-scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 60; display: flex; align-items: flex-end; justify-content: center; }
+.sm-sheet { width: 100%; max-width: 560px; max-height: 92vh; display: flex; flex-direction: column; background: var(--surface-raised); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: var(--shadow-sheet); padding-bottom: env(safe-area-inset-bottom, 0px); animation: sm-up .22s ease-out; }
+@keyframes sm-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sm-sheet__handle { width: 36px; height: 4px; border-radius: var(--radius-pill); background: var(--border-strong); margin: var(--space-2) auto 0; flex: none; }
+.sm-sheet__head { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5); }
+.sm-sheet__title { flex: 1; font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 28px; margin: 0; }
+.sm-sheet__body { padding: 0 var(--space-5) var(--space-4); overflow-y: auto; flex: 1; }
+.sm-sheet__foot { display: flex; gap: var(--space-3); padding: var(--space-3) var(--space-5) var(--space-4); border-top: 1px solid var(--border); }
+.sm-sheet__foot > .sm-btn { flex: 1; }
+
+/* ---------- Snackbar ---------- */
+.sm-snackbar { display: flex; align-items: center; gap: var(--space-3); min-height: 48px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--inverse-surface); color: var(--inverse-ink); font-size: 14px; line-height: 20px; box-shadow: var(--shadow-sheet); }
+.sm-snackbar i { color: var(--inverse-accent); }
+
+/* ---------- Empty state ---------- */
+.sm-empty { text-align: center; padding: var(--space-6) var(--space-4); color: var(--ink-muted); font-size: 14px; line-height: 20px; }
+.sm-empty i { display: block; font-size: 28px; margin-bottom: var(--space-2); color: var(--border-strong); }
+
+
+/* ===== Layout dell'app ===== */
+html, body { margin: 0; min-height: 100%; background: var(--surface); }
+body { overscroll-behavior-y: contain; }
+.hidden { display: none !important; }
+.app-top { position: sticky; top: 0; z-index: 40; padding-top: env(safe-area-inset-top, 0px); background: var(--appbar); }
+.app-sync { height: 3px; background: transparent; overflow: hidden; }
+.app-sync.on::after { content: ""; display: block; width: 40%; height: 100%; background: var(--accent); animation: sync 1.1s ease-in-out infinite; }
+@keyframes sync { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+.app-main { max-width: 560px; margin: 0 auto; padding: var(--space-4) var(--space-4) calc(var(--size-bottomnav) + 120px + env(safe-area-inset-bottom, 0px)); }
+.app-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; }
+.app-nav .sm-bottomnav { max-width: 560px; margin: 0 auto; }
+@media (min-width: 561px) { .app-nav { background: var(--surface-raised); border-top: 1px solid var(--border); } .app-nav .sm-bottomnav { border-top: 0; } }
+.app-fab { position: fixed; z-index: 44; right: max(var(--space-4), calc(50% - 280px + var(--space-4))); bottom: calc(var(--size-bottomnav) + var(--space-4) + var(--space-2) + env(safe-area-inset-bottom, 0px)); }
+.app-snack { position: fixed; z-index: 80; left: var(--space-4); right: var(--space-4); bottom: calc(var(--size-bottomnav) + var(--space-4) + var(--space-2) + env(safe-area-inset-bottom, 0px)); max-width: 528px; margin: 0 auto; transition: opacity .2s, transform .2s; }
+.app-snack.out { opacity: 0; transform: translateY(12px); pointer-events: none; }
+.app-sticky { position: sticky; bottom: calc(var(--size-bottomnav) + var(--space-2) + env(safe-area-inset-bottom, 0px)); z-index: 30; margin-top: var(--space-3); }
+.app-sticky .sm-btn { box-shadow: var(--shadow-sheet); }
+.screen-head { display: flex; align-items: center; gap: var(--space-1); margin: calc(var(--space-2) * -1) 0 var(--space-2) calc(var(--space-2) * -1); }
+.screen-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 28px; margin: 0; }
+.sm-overline:first-child { margin-top: var(--space-1); }
+.stack > * + * { margin-top: var(--space-3); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.actions .sm-iconbtn { margin-left: auto; }
+.ex-link { display: inline-flex; align-items: center; gap: 6px; margin-top: var(--space-2); color: var(--primary); font-weight: 600; font-size: 13px; text-decoration: none; }
+.desc { color: var(--ink-muted); font-size: 13px; line-height: 18px; white-space: pre-line; margin-top: 2px; }
+.conv-item { display: flex; align-items: center; gap: var(--space-3); min-height: 64px; padding: var(--space-2) 0; cursor: pointer; }
+.conv-item + .conv-item { border-top: 1px solid var(--border); }
+.conv-chips { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+.pres-row { padding: var(--space-3) 0; }
+.pres-row + .pres-row { border-top: 1px solid var(--border); }
+.pres-row .sm-item__title { margin-bottom: var(--space-2); }
+.log-row { display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0; font-size: 13px; line-height: 18px; }
+.log-row + .log-row { border-top: 1px solid var(--border); }
+.log-row time { color: var(--ink-muted); font-size: 12px; white-space: nowrap; }
+.tool-row { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+.tool-row .sm-select { min-height: 40px; font-size: 14px; }
+.csi-card { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; color: inherit; }
+.csi-card .sm-jersey { background: var(--accent-tint); color: var(--accent); }
+.login { position: fixed; inset: 0; z-index: 90; background: var(--appbar); display: flex; flex-direction: column; justify-content: flex-end; padding-top: env(safe-area-inset-top, 0px); }
+.login__brand { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); color: var(--on-appbar); text-align: center; padding: var(--space-6) var(--space-4); }
+.login__logo { width: 88px; height: 88px; border-radius: var(--radius-pill); background: #ffffff; padding: 6px; object-fit: contain; box-shadow: 0 0 0 6px var(--accent); }
+.login__name { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 36px; text-transform: uppercase; margin: var(--space-2) 0 0; }
+.login__sub { opacity: .8; font-size: 14px; margin: 0; }
+.login__sheet { background: var(--surface-raised); border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: var(--space-6) var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom, 0px)); max-width: 560px; width: 100%; margin: 0 auto; }
+.menu-item { display: flex; align-items: center; gap: var(--space-3); min-height: 60px; width: 100%; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; padding: var(--space-2) 0; text-decoration: none; }
+.menu-item + .menu-item { border-top: 1px solid var(--border); }
+.menu-item .sm-jersey { font-size: 16px; }
+.menu-item > i:last-child { color: var(--ink-muted); }
+.app-version { text-align: center; color: var(--ink-muted); font-size: 12px; margin-top: var(--space-6); }
+    </style>
+
     <!-- Firebase SDKs (Modulari via CDN) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC2CBWUhu35BQYWqu-SfVnL4be9MSVKX6c",
@@ -38,416 +265,364 @@
         window.inizializzaDatiCloud();
     </script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-20">
+<body class="sm-root">
 
-    <!-- Schermata di Login -->
-    <div id="auth-overlay" class="fixed inset-0 bg-indigo-900/90 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <div class="text-center mb-6">
-                <img src="https://back.ww-cdn.com/superstatic/version/4151385/iphone/10/photo/navBar_titleImage@2x.png?v=1744996840" alt="Logo" class="w-16 h-16 object-contain mx-auto mb-2 bg-indigo-50 rounded-full p-2 shadow">
-                <h2 class="text-xl font-bold text-gray-800">Sporting Murialdo Under 15</h2>
-                <p class="text-xs text-gray-500">Inserisci le credenziali per accedere</p>
-            </div>
-
-            <form onsubmit="eseguiLogin(event)" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Username</label>
-                    <input type="text" id="login-username" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Username">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
-                    <input type="password" id="login-password" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Password">
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl shadow transition text-sm mt-2">Accedi</button>
-            </form>
+    <!-- ================= LOGIN ================= -->
+    <div id="auth-overlay" class="login hidden">
+        <div class="login__brand">
+            <img src="https://back.ww-cdn.com/superstatic/version/4151385/iphone/10/photo/navBar_titleImage@2x.png?v=1744996840" alt="Logo Sporting Murialdo" class="login__logo">
+            <h1 class="login__name">Sporting Murialdo<br>Under 15</h1>
+            <p class="login__sub">Gestione squadra</p>
         </div>
+        <form class="login__sheet" onsubmit="eseguiLogin(event)">
+            <div class="sm-field">
+                <label class="sm-label" for="login-username">Username</label>
+                <input type="text" id="login-username" required class="sm-input" autocomplete="username" autocapitalize="none">
+            </div>
+            <div class="sm-field">
+                <label class="sm-label" for="login-password">Password</label>
+                <input type="password" id="login-password" required class="sm-input" autocomplete="current-password">
+            </div>
+            <button type="submit" class="sm-btn sm-btn--accent sm-btn--block" style="margin-top: var(--space-5)">Accedi</button>
+        </form>
     </div>
 
-    <!-- Header / Navbar -->
-    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="https://back.ww-cdn.com/superstatic/version/4151385/iphone/10/photo/navBar_titleImage@2x.png?v=1744996840" alt="Logo Sporting Murialdo" class="w-9 h-9 object-contain bg-white rounded-full p-0.5 shadow">
-                <h1 class="text-base sm:text-lg font-bold leading-tight">Under 15 - Sporting Murialdo</h1>
+    <!-- ================= APP BAR ================= -->
+    <div class="app-top">
+        <header class="sm-appbar">
+            <img src="https://back.ww-cdn.com/superstatic/version/4151385/iphone/10/photo/navBar_titleImage@2x.png?v=1744996840" alt="Logo Sporting Murialdo" class="sm-appbar__logo">
+            <div class="sm-appbar__text">
+                <div class="sm-appbar__title">Under 15 · Murialdo</div>
+                <div class="sm-appbar__sub"><span id="current-date"></span> · <span id="logged-user-label">—</span></div>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="current-date" class="text-xs sm:text-sm opacity-90 hidden sm:inline"></span>
-                <button onclick="eseguiLogout()" class="bg-indigo-700 hover:bg-indigo-800 text-xs px-3 py-1.5 rounded-lg transition border border-indigo-500 flex items-center gap-1">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span id="logged-user-label">Esci</span>
+            <button class="sm-iconbtn" onclick="eseguiLogout()" aria-label="Esci"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </header>
+        <div class="sm-appbar__stripe"></div>
+        <div id="sync-bar" class="app-sync" style="background: var(--surface)"></div>
+    </div>
+
+    <main class="app-main">
+
+        <!-- ================= ALLENAMENTI ================= -->
+        <section id="tab-allenamenti" class="tab-content">
+            <div class="sm-overline">Prossima partita</div>
+            <div id="hero-prossima"></div>
+            <div class="sm-overline">Storico allenamenti</div>
+            <div id="lista-allenamenti" class="stack"></div>
+        </section>
+
+        <!-- ================= PARTITE ================= -->
+        <section id="tab-calendario" class="tab-content hidden">
+            <a class="sm-card csi-card" href="https://www.csi.milano.it/albo/risultati-calendario-classifiche-squadre.html?q=cal" target="_blank" rel="noopener">
+                <span class="sm-jersey"><i class="fa-solid fa-trophy"></i></span>
+                <div class="sm-item__body">
+                    <div class="sm-item__title">Classifiche CSI Milano</div>
+                    <div class="sm-item__meta">Calcio a 7 · Under 15 · Girone B</div>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square" style="color: var(--ink-muted)"></i>
+            </a>
+            <div class="sm-overline">Calendario · andata e ritorno</div>
+            <div id="lista-partite-calendario"></div>
+        </section>
+
+        <!-- ================= CONVOCAZIONI ================= -->
+        <section id="tab-convocazioni" class="tab-content hidden">
+            <div class="sm-card">
+                <div class="sm-field">
+                    <label class="sm-label" for="select-partita-convocazione">Partita</label>
+                    <select id="select-partita-convocazione" onchange="renderConvocazioniCheckboxes()" class="sm-select"></select>
+                </div>
+            </div>
+            <div class="sm-overline" style="display:flex;justify-content:space-between;align-items:center">
+                <span>Convocati · presenze recenti</span>
+                <span id="conteggio-convocati" class="sm-chip sm-chip--primary"></span>
+            </div>
+            <div class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)">
+                <div id="lista-convocazioni-checkbox"></div>
+            </div>
+            <div class="app-sticky">
+                <button onclick="copiaConvocazioniWhatsApp()" class="sm-btn sm-btn--success sm-btn--block">
+                    <i class="fa-brands fa-whatsapp" style="font-size:20px"></i> Salva e crea il messaggio
                 </button>
             </div>
-        </div>
-    </header>
+        </section>
 
-    <!-- Container Principale -->
-    <main class="max-w-4xl mx-auto px-4 py-6">
-
-        <!-- Tab di Navigazione -->
-        <div class="flex bg-white rounded-xl shadow-sm p-1 mb-6 border border-gray-200 overflow-x-auto">
-            <button onclick="switchTab('allenamenti')" id="btn-tab-allenamenti" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm bg-indigo-600 text-white transition whitespace-nowrap">
-                <i class="fa-solid fa-clipboard-user mr-1"></i> Allenamenti
-            </button>
-            <button onclick="switchTab('esercizi')" id="btn-tab-esercizi" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
-                <i class="fa-solid fa-futbol mr-1"></i> Esercizi
-            </button>
-            <button onclick="switchTab('convocazioni')" id="btn-tab-convocazioni" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
-                <i class="fa-brands fa-whatsapp mr-1"></i> Convocazioni
-            </button>
-            <button onclick="switchTab('calendario')" id="btn-tab-calendario" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
-                <i class="fa-regular fa-calendar-days mr-1"></i> Partite
-            </button>
-            <button onclick="switchTab('csi')" id="btn-tab-csi" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
-                <i class="fa-solid fa-globe mr-1"></i> CSI Milano
-            </button>
-            <button onclick="switchTab('statistiche')" id="btn-tab-statistiche" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
-                <i class="fa-solid fa-chart-pie mr-1"></i> Statistiche
-            </button>
-            <button onclick="switchTab('anagrafica')" id="btn-tab-anagrafica" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
-                <i class="fa-solid fa-users mr-1"></i> Anagrafica
-            </button>
-            <button onclick="switchTab('utenti')" id="btn-tab-utenti" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
-                <i class="fa-solid fa-user-gear mr-1"></i> Utenti & Log
-            </button>
-        </div>
-
-        <!-- ================= SEZIONE ALLENAMENTI ================= -->
-        <div id="tab-allenamenti" class="tab-content">
-            <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-gray-700">Nuovo Allenamento</h2>
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <button onclick="creaAllenamentoOggi()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow transition flex items-center justify-center">
-                        <i class="fa-solid fa-plus-circle mr-2 text-lg"></i> Crea per Oggi
-                    </button>
-                    <div class="flex-1 flex gap-2">
-                        <input type="date" id="input-data-allenamento" class="border border-gray-300 rounded-xl px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <button onclick="creaAllenamentoData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow transition flex items-center justify-center">
-                            <i class="fa-solid fa-calendar-plus mr-1"></i> Data
-                        </button>
-                    </div>
-                </div>
+        <!-- ================= STATISTICHE ================= -->
+        <section id="tab-statistiche" class="tab-content hidden">
+            <div class="sm-seg" role="group" aria-label="Tipo di statistica">
+                <button onclick="switchStatSubTab('ragazzi')" id="btn-stat-ragazzi" class="sm-seg__opt" aria-pressed="true">Per ragazzo</button>
+                <button onclick="switchStatSubTab('convocazioni')" id="btn-stat-convocazioni" class="sm-seg__opt" aria-pressed="false">Convocazioni</button>
+                <button onclick="switchStatSubTab('allenamenti')" id="btn-stat-allenamenti" class="sm-seg__opt" aria-pressed="false">Allenamenti</button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-gray-700">Storico Allenamenti</h2>
-                <div id="lista-allenamenti" class="space-y-3"></div>
-            </div>
-        </div>
-
-        <!-- ================= SEZIONE ESERCIZI ================= -->
-        <div id="tab-esercizi" class="tab-content hidden">
-            <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-gray-700"><i class="fa-solid fa-dumbbell mr-2 text-indigo-600"></i>Aggiungi Esercizio / Esercitazione</h2>
-                <form onsubmit="salvaEsercizio(event)" class="space-y-3">
-                    <input type="hidden" id="edit-esercizio-id">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Titolo Esercizio *</label>
-                        <input type="text" id="input-titolo-esercizio" placeholder="Es. Possesso palla 4v4 + 2" required class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Descrizione / Note</label>
-                        <textarea id="input-desc-esercizio" rows="3" placeholder="Spiegazione dell'esercitazione, regole, obiettivi..." class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Link Video (YouTube / Instagram)</label>
-                        <input type="url" id="input-link-esercizio" placeholder="https://www.youtube.com/watch?v=..." class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div class="flex gap-2 pt-2">
-                        <button type="submit" id="btn-salva-esercizio" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl shadow transition text-sm">
-                            <i class="fa-solid fa-plus mr-1"></i> Aggiungi Esercizio
-                        </button>
-                        <button type="button" id="btn-annulla-esercizio" onclick="resetFormEsercizio()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition text-sm">Annulla</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-gray-700"><i class="fa-solid fa-list mr-2 text-indigo-600"></i>Libreria Esercizi</h2>
-                <div id="lista-esercizi" class="space-y-3"></div>
-            </div>
-        </div>
-
-        <!-- ================= SEZIONE CONVOCAZIONI & WHATSAPP ================= -->
-        <div id="tab-convocazioni" class="tab-content hidden">
-            <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
-                <h2 class="text-lg font-bold mb-1 text-gray-700">Generatore Convocazioni WhatsApp</h2>
-                <p class="text-xs text-gray-500 mb-4">Seleziona la partita di riferimento dello Sporting Murialdo, verifica i convocati e crea il messaggio.</p>
-                
-                <div class="mb-5 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-                    <label class="block text-xs font-bold text-indigo-900 mb-1 uppercase tracking-wide">Partita Sporting Murialdo:</label>
-                    <select id="select-partita-convocazione" onchange="renderConvocazioniCheckboxes()" class="w-full border border-indigo-200 rounded-xl p-2.5 bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
-                        <!-- Popolato via JS -->
+            <div id="stat-subtab-ragazzi">
+                <div class="sm-overline">Presenze agli allenamenti</div>
+                <div class="tool-row">
+                    <i class="fa-solid fa-arrow-down-wide-short" style="color: var(--ink-muted)"></i>
+                    <select id="ordinamento-ragazzi" onchange="renderStatistiche()" class="sm-select" aria-label="Ordina per">
+                        <option value="perc_desc">Percentuale (alta → bassa)</option>
+                        <option value="perc_asc">Percentuale (bassa → alta)</option>
+                        <option value="nome">Nome (A → Z)</option>
+                        <option value="numero">Numero maglia</option>
                     </select>
                 </div>
+                <div id="statistiche-ragazzi-list" class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)"></div>
+            </div>
 
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-sm font-semibold text-gray-600">Giocatori in Rosa & Presenze recenti</span>
-                    <button onclick="copiaConvocazioniWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2.5 px-4 rounded-xl shadow transition flex items-center">
-                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Salva e crea il messaggio
-                    </button>
+            <div id="stat-subtab-convocazioni" class="hidden">
+                <div class="sm-overline">Convocazioni ufficiali per giocatore</div>
+                <div class="tool-row">
+                    <i class="fa-solid fa-arrow-down-wide-short" style="color: var(--ink-muted)"></i>
+                    <select id="ordinamento-convocazioni" onchange="renderStatistiche()" class="sm-select" aria-label="Ordina per">
+                        <option value="perc_desc">Percentuale (alta → bassa)</option>
+                        <option value="perc_asc">Percentuale (bassa → alta)</option>
+                        <option value="nome">Nome (A → Z)</option>
+                        <option value="numero">Numero maglia</option>
+                    </select>
                 </div>
-
-                <div id="lista-convocazioni-checkbox" class="divide-y divide-gray-100"></div>
+                <div id="statistiche-convocazioni-list" class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)"></div>
             </div>
-        </div>
 
-        <!-- ================= SEZIONE CALENDARIO PARTITE ================= -->
-        <div id="tab-calendario" class="tab-content hidden">
-            <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
-                <h2 class="text-lg font-bold mb-1 text-gray-700">Calendario Ufficiale - Sporting Murialdo Under 15 A 7 (Andata e Ritorno)</h2>
-                <p class="text-xs text-gray-500 mb-4">Partite ufficiali della squadra con campi invertiti nel girone di ritorno.</p>
-                <div id="lista-partite-calendario" class="space-y-4"></div>
-            </div>
-        </div>
-
-        <!-- ================= SEZIONE CSI MILANO ================= -->
-        <div id="tab-csi" class="tab-content hidden">
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200 text-center space-y-6">
-                <div class="max-w-md mx-auto space-y-2">
-                    <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <h2 class="text-xl font-bold text-gray-800">Calendari e Classifiche CSI Milano</h2>
-                    <p class="text-xs text-gray-500">Accedi direttamente al portale ufficiale CSI per visualizzare risultati, classifiche e variazioni di campo in formato ottimizzato.</p>
+            <div id="stat-subtab-allenamenti" class="hidden">
+                <div class="sm-overline">Presenza della squadra per sessione</div>
+                <div class="tool-row">
+                    <i class="fa-solid fa-arrow-down-wide-short" style="color: var(--ink-muted)"></i>
+                    <select id="ordinamento-allenamenti" onchange="renderStatistiche()" class="sm-select" aria-label="Ordina per">
+                        <option value="data_desc">Data (recente → meno recente)</option>
+                        <option value="data_asc">Data (meno recente → recente)</option>
+                        <option value="perc_desc">Presenza (alta → bassa)</option>
+                        <option value="perc_asc">Presenza (bassa → alta)</option>
+                    </select>
                 </div>
-
-                <div class="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100 max-w-lg mx-auto text-left space-y-2">
-                    <h4 class="font-bold text-xs text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-circle-info mr-1"></i> Filtri preimpostati consigliati:</h4>
-                    <p class="text-xs text-indigo-800">• <strong>Sport:</strong> Calcio a 7</p>
-                    <p class="text-xs text-indigo-800">• <strong>Campionato:</strong> Under 15 a 7</p>
-                    <p class="text-xs text-indigo-800">• <strong>Girone:</strong> Girone B</p>
-                    <p class="text-xs text-indigo-800">• <strong>Squadra:</strong> Sporting Murialdo</p>
-                </div>
-
-                <div class="pt-2">
-                    <a href="https://www.csi.milano.it/albo/risultati-calendario-classifiche-squadre.html?q=cal" target="_blank" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3.5 rounded-xl shadow-lg transition text-sm">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Apri Portale CSI Milano
-                    </a>
-                </div>
+                <div id="statistiche-allenamenti-list" class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- ================= SEZIONE STATISTICHE ================= -->
-        <div id="tab-statistiche" class="tab-content hidden">
-            <div class="flex gap-2 mb-4">
-                <button onclick="switchStatSubTab('ragazzi')" id="btn-stat-ragazzi" class="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition">Per Ragazzo</button>
-                <button onclick="switchStatSubTab('convocazioni')" id="btn-stat-convocazioni" class="flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition">Statistiche Convocazioni</button>
-                <button onclick="switchStatSubTab('allenamenti')" id="btn-stat-allenamenti" class="flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition">Per Allenamento</button>
+        <!-- ================= ALTRO (menu) ================= -->
+        <section id="tab-altro" class="tab-content hidden">
+            <div class="sm-overline">Squadra</div>
+            <div class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)">
+                <button class="menu-item" onclick="switchTab('esercizi')"><span class="sm-jersey"><i class="fa-solid fa-dumbbell"></i></span><div class="sm-item__body"><div class="sm-item__title">Libreria esercizi</div><div class="sm-item__meta" id="menu-meta-esercizi"></div></div><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="menu-item" onclick="switchTab('anagrafica')"><span class="sm-jersey"><i class="fa-solid fa-users"></i></span><div class="sm-item__body"><div class="sm-item__title">Rosa giocatori</div><div class="sm-item__meta" id="menu-meta-rosa"></div></div><i class="fa-solid fa-chevron-right"></i></button>
+                <a class="menu-item" href="https://www.csi.milano.it/albo/risultati-calendario-classifiche-squadre.html?q=cal" target="_blank" rel="noopener"><span class="sm-jersey"><i class="fa-solid fa-trophy"></i></span><div class="sm-item__body"><div class="sm-item__title">CSI Milano</div><div class="sm-item__meta">Calcio a 7 · Under 15 · Girone B</div></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
             </div>
-
-            <div id="stat-subtab-ragazzi" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                    <h2 class="text-lg font-bold text-gray-700">Riepilogo Presenze Allenamenti</h2>
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <label class="text-xs font-semibold text-gray-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Ordina per:</label>
-                        <select id="ordinamento-ragazzi" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
-                            <option value="perc_desc">Percentuale (Alta ➔ Bassa)</option>
-                            <option value="perc_asc">Percentuale (Bassa ➔ Alta)</option>
-                            <option value="nome">Nome (A ➔ Z)</option>
-                            <option value="numero">Numero Maglia</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="statistiche-ragazzi-list" class="space-y-4"></div>
+            <div class="sm-overline">Amministrazione</div>
+            <div class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)">
+                <button class="menu-item" onclick="switchTab('utenti')"><span class="sm-jersey"><i class="fa-solid fa-user-gear"></i></span><div class="sm-item__body"><div class="sm-item__title">Utenti e log attività</div><div class="sm-item__meta">Accessi, password, registro</div></div><i class="fa-solid fa-chevron-right"></i></button>
             </div>
-
-            <!-- Sotto-tab Statistiche Convocazioni Partite -->
-            <div id="stat-subtab-convocazioni" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200 hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                    <div>
-                        <h2 class="text-lg font-bold text-gray-700">Statistiche Convocazioni Partite</h2>
-                        <p class="text-xs text-gray-500">Percentuale e numero di convocazioni ufficiali per ogni giocatore.</p>
-                    </div>
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <label class="text-xs font-semibold text-gray-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Ordina per:</label>
-                        <select id="ordinamento-convocazioni" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
-                            <option value="perc_desc">Percentuale (Alta ➔ Bassa)</option>
-                            <option value="perc_asc">Percentuale (Bassa ➔ Alta)</option>
-                            <option value="nome">Nome (A ➔ Z)</option>
-                            <option value="numero">Numero Maglia</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="statistiche-convocazioni-list" class="space-y-3"></div>
+            <div class="sm-overline">Aspetto</div>
+            <div class="sm-seg" role="group" aria-label="Tema">
+                <button class="sm-seg__opt" data-tema="auto" onclick="impostaTema('auto')"><i class="fa-solid fa-circle-half-stroke"></i>Auto</button>
+                <button class="sm-seg__opt" data-tema="light" onclick="impostaTema('light')"><i class="fa-regular fa-sun"></i>Chiaro</button>
+                <button class="sm-seg__opt" data-tema="dark" onclick="impostaTema('dark')"><i class="fa-regular fa-moon"></i>Scuro</button>
             </div>
+            <div class="app-version" id="app-version"></div>
+        </section>
 
-            <div id="stat-subtab-allenamenti" class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200 hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                    <h2 class="text-lg font-bold text-gray-700">Riepilogo per Sessione</h2>
-                    <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <label class="text-xs font-semibold text-gray-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Ordina per:</label>
-                        <select id="ordinamento-allenamenti" onchange="renderStatistiche()" class="border border-gray-300 rounded-xl px-3 py-1.5 text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none flex-1 sm:flex-none">
-                            <option value="data_desc">Data (Recente ➔ Meno recente)</option>
-                            <option value="data_asc">Data (Meno recente ➔ Recente)</option>
-                            <option value="perc_desc">Percentuale Presenza (Alta ➔ Bassa)</option>
-                            <option value="perc_asc">Percentuale Presenza (Bassa ➔ Alta)</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="statistiche-allenamenti-list" class="space-y-3"></div>
+        <!-- ================= ESERCIZI ================= -->
+        <section id="tab-esercizi" class="tab-content hidden">
+            <div class="screen-head"><button class="sm-iconbtn" onclick="switchTab('altro')" aria-label="Indietro"><i class="fa-solid fa-arrow-left"></i></button><h2 class="screen-title">Libreria esercizi</h2></div>
+            <div id="lista-esercizi" class="stack"></div>
+        </section>
+
+        <!-- ================= ANAGRAFICA ================= -->
+        <section id="tab-anagrafica" class="tab-content hidden">
+            <div class="screen-head"><button class="sm-iconbtn" onclick="switchTab('altro')" aria-label="Indietro"><i class="fa-solid fa-arrow-left"></i></button><h2 class="screen-title">Rosa giocatori</h2></div>
+            <div class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)">
+                <div id="lista-anagrafica" class="sm-list"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- ================= SEZIONE ANAGRAFICA ================= -->
-        <div id="tab-anagrafica" class="tab-content hidden">
-            <div class="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-200">
-                <h2 id="anagrafica-form-title" class="text-lg font-bold mb-4 text-gray-700">Aggiungi Giocatore</h2>
-                <form onsubmit="salvaGiocatore(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <input type="hidden" id="edit-giocatore-id">
-                    <input type="text" id="input-nome" placeholder="Nome *" required class="border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="text" id="input-cognome" placeholder="Cognome" class="border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="text" id="input-numero" placeholder="Num. Maglia / Rif." class="border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <div class="sm:col-span-3 flex gap-2">
-                        <button type="submit" id="btn-salva-giocatore" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl shadow transition">
-                            <i class="fa-solid fa-user-plus mr-1"></i> Aggiungi alla Rosa
-                        </button>
-                        <button type="button" id="btn-annulla-modifica" onclick="resetFormGiocatore()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition">Annulla</button>
-                    </div>
-                </form>
+        <!-- ================= UTENTI & LOG ================= -->
+        <section id="tab-utenti" class="tab-content hidden">
+            <div class="screen-head"><button class="sm-iconbtn" onclick="switchTab('altro')" aria-label="Indietro"><i class="fa-solid fa-arrow-left"></i></button><h2 class="screen-title">Utenti e log</h2></div>
+            <div class="sm-overline">Utenze</div>
+            <div class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)">
+                <div id="lista-utenti" class="sm-list"></div>
             </div>
-
-            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-gray-700">Rosa Giocatori</h2>
-                <div id="lista-anagrafica" class="space-y-2"></div>
+            <div class="sm-overline" style="display:flex;justify-content:space-between;align-items:center">
+                <span>Log attività</span>
+                <button onclick="pulisciLog()" class="sm-btn sm-btn--danger sm-btn--sm">Svuota</button>
             </div>
-        </div>
-
-        <!-- ================= SEZIONE UTENTI & LOG ================= -->
-        <div id="tab-utenti" class="tab-content hidden space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-gray-700"><i class="fa-solid fa-user-plus mr-2 text-indigo-600"></i>Crea Nuova Utenza</h2>
-                <form onsubmit="creaNuovoUtente(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input type="text" id="nuovo-user" placeholder="Username *" required class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <input type="password" id="nuovo-pass" placeholder="Password *" required class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <button type="submit" class="sm:col-span-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl shadow transition text-sm">Registra Nuovo Utente</button>
-                </form>
+            <div class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)">
+                <div id="lista-log" style="max-height: 50vh; overflow-y: auto"></div>
             </div>
-
-            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-gray-700"><i class="fa-solid fa-users-gear mr-2 text-indigo-600"></i>Gestione Utenze Esistenti</h2>
-                <div id="lista-utenti" class="space-y-2"></div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-gray-700"><i class="fa-solid fa-clock-rotate-left mr-2 text-indigo-600"></i>Log Attività</h2>
-                    <button onclick="pulisciLog()" class="text-xs text-red-500 hover:text-red-700 font-medium">Svuota Log</button>
-                </div>
-                <div id="lista-log" class="space-y-2 max-h-64 overflow-y-auto text-xs font-mono"></div>
-            </div>
-        </div>
-
+        </section>
     </main>
 
-    <!-- Modal Gestione Esercizi Sessione -->
-    <div id="modal-esercizi-allenamento" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden">
-            <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-                <h3 id="modal-es-title" class="font-bold text-lg">Preparazione Esercizi Sessione</h3>
-                <button onclick="chiudiModalEsercizi()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            
-            <div class="p-5 overflow-y-auto flex-1 space-y-4">
-                <div class="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100 space-y-3">
-                    <h4 class="font-bold text-xs text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-bookmark mr-1"></i> Richiama da Archivio</h4>
-                    <div class="flex gap-2">
-                        <select id="select-esercizio-archivio" class="flex-1 border border-indigo-200 rounded-xl px-3 py-2 text-xs bg-white outline-none">
-                            <option value="">-- Seleziona esercizio --</option>
-                        </select>
-                        <button onclick="aggiungiEsercizioDaArchivio()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-medium shadow"><i class="fa-solid fa-plus mr-1"></i> Aggiungi</button>
-                    </div>
-                </div>
+    <!-- ================= FAB ================= -->
+    <button id="app-fab" class="sm-fab app-fab" onclick="azioneFab()"><i class="fa-solid fa-plus"></i><span id="app-fab-label">Allenamento</span></button>
 
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-                    <h4 class="font-bold text-xs text-gray-700 uppercase tracking-wide"><i class="fa-solid fa-pen-to-square mr-1"></i> Oppure Inserisci al Volo</h4>
-                    <input type="text" id="modal-es-titolo" placeholder="Titolo esercizio *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs bg-white">
-                    <textarea id="modal-es-desc" rows="2" placeholder="Descrizione / note..." class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs bg-white"></textarea>
-                    <input type="url" id="modal-es-link" placeholder="Link video (opzionale)" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs bg-white">
-                    <button onclick="aggiungiEsercizioAlVolo()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 text-xs font-medium shadow"><i class="fa-solid fa-plus-circle mr-1"></i> Crea e Aggiungi alla Sessione</button>
-                </div>
+    <!-- ================= BOTTOM NAV ================= -->
+    <div class="app-nav">
+        <nav class="sm-bottomnav" aria-label="Sezioni">
+            <button class="sm-bottomnav__item" id="nav-allenamenti" onclick="switchTab('allenamenti')"><span class="sm-bottomnav__icon"><i class="fa-solid fa-clipboard-user"></i></span>Allenam.</button>
+            <button class="sm-bottomnav__item" id="nav-calendario" onclick="switchTab('calendario')"><span class="sm-bottomnav__icon"><i class="fa-solid fa-futbol"></i></span>Partite</button>
+            <button class="sm-bottomnav__item" id="nav-convocazioni" onclick="switchTab('convocazioni')"><span class="sm-bottomnav__icon"><i class="fa-brands fa-whatsapp"></i></span>Convoca</button>
+            <button class="sm-bottomnav__item" id="nav-statistiche" onclick="switchTab('statistiche')"><span class="sm-bottomnav__icon"><i class="fa-solid fa-chart-simple"></i></span>Statistiche</button>
+            <button class="sm-bottomnav__item" id="nav-altro" onclick="switchTab('altro')"><span class="sm-bottomnav__icon"><i class="fa-solid fa-bars"></i></span>Altro</button>
+        </nav>
+    </div>
 
-                <div>
-                    <h4 class="font-bold text-sm text-gray-700 mb-2">Esercizi in Programma</h4>
-                    <div id="modal-lista-esercizi-sessione" class="space-y-2"></div>
-                </div>
-            </div>
+    <!-- ================= SNACKBAR ================= -->
+    <div id="snackbar" class="app-snack out" role="status" aria-live="polite">
+        <div class="sm-snackbar"><i id="snackbar-icon" class="fa-solid fa-circle-check"></i><span id="snackbar-text"></span></div>
+    </div>
 
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
-                <button onclick="chiudiModalEsercizi()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-medium shadow hover:bg-indigo-700 transition">Chiudi</button>
+    <!-- ================= SHEET: Nuovo allenamento ================= -->
+    <div id="sheet-nuovo-allenamento" class="sm-scrim hidden" onclick="if(event.target===this) closeSheet(this.id)">
+        <div class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="t-nuovo-all">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 class="sm-sheet__title" id="t-nuovo-all">Nuovo allenamento</h3><button class="sm-iconbtn" onclick="closeSheet('sheet-nuovo-allenamento')" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body">
+                <button onclick="creaAllenamentoOggi()" class="sm-btn sm-btn--primary sm-btn--block"><i class="fa-solid fa-plus"></i> Crea per oggi</button>
+                <div class="sm-overline">Oppure scegli una data</div>
+                <div class="sm-row">
+                    <input type="date" id="input-data-allenamento" class="sm-input" aria-label="Data allenamento">
+                    <button onclick="creaAllenamentoData()" class="sm-btn sm-btn--tonal" style="flex: none"><i class="fa-solid fa-calendar-plus"></i> Crea</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Gestione Presenze -->
-    <div id="modal-presenze-allenamento" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden">
-            <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-                <h3 id="modal-presenze-title" class="font-bold text-lg">Gestione Presenze</h3>
-                <button onclick="chiudiModalPresenze()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <!-- ================= SHEET: Esercizi sessione ================= -->
+    <div id="modal-esercizi-allenamento" class="sm-scrim hidden" onclick="if(event.target===this) chiudiModalEsercizi()">
+        <div class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-es-title">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 id="modal-es-title" class="sm-sheet__title">Esercizi della sessione</h3><button class="sm-iconbtn" onclick="chiudiModalEsercizi()" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body">
+                <div class="sm-overline" style="margin-top: 0">In programma</div>
+                <div id="modal-lista-esercizi-sessione" class="stack"></div>
+
+                <div class="sm-overline">Dalla libreria</div>
+                <div class="sm-row">
+                    <select id="select-esercizio-archivio" class="sm-select" aria-label="Esercizio dalla libreria"><option value="">Seleziona esercizio</option></select>
+                    <button onclick="aggiungiEsercizioDaArchivio()" class="sm-btn sm-btn--tonal" style="flex: none"><i class="fa-solid fa-plus"></i> Aggiungi</button>
+                </div>
+
+                <div class="sm-overline">Oppure nuovo al volo</div>
+                <div class="sm-field"><label class="sm-label" for="modal-es-titolo">Titolo *</label><input type="text" id="modal-es-titolo" class="sm-input"></div>
+                <div class="sm-field"><label class="sm-label" for="modal-es-desc">Descrizione</label><textarea id="modal-es-desc" rows="2" class="sm-textarea"></textarea></div>
+                <div class="sm-field"><label class="sm-label" for="modal-es-link">Link video (opzionale)</label><input type="url" id="modal-es-link" class="sm-input" inputmode="url"></div>
+                <button onclick="aggiungiEsercizioAlVolo()" class="sm-btn sm-btn--tonal sm-btn--block" style="margin-top: var(--space-3)"><i class="fa-solid fa-plus"></i> Crea e aggiungi</button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 divide-y divide-gray-100" id="modal-presenze-list"></div>
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
-                <button onclick="chiudiModalPresenze()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl font-medium shadow hover:bg-indigo-700 transition">Salva e Chiudi</button>
-            </div>
+            <div class="sm-sheet__foot"><button onclick="chiudiModalEsercizi()" class="sm-btn sm-btn--primary">Fatto</button></div>
         </div>
     </div>
 
-    <!-- Modal Storico Convocazioni Partita -->
-    <div id="modal-storico-convocazioni" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-xl overflow-hidden">
-            <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-                <h3 id="modal-storico-title" class="font-bold text-lg">Storico Convocati</h3>
-                <button onclick="chiudiModalStorico()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-5 max-h-80 overflow-y-auto space-y-2" id="modal-storico-content"></div>
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
-                <button onclick="chiudiModalStorico()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium shadow">Chiudi</button>
-            </div>
+    <!-- ================= SHEET: Presenze ================= -->
+    <div id="modal-presenze-allenamento" class="sm-scrim hidden" onclick="if(event.target===this) chiudiModalPresenze()">
+        <div class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-presenze-title">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 id="modal-presenze-title" class="sm-sheet__title">Presenze</h3><button class="sm-iconbtn" onclick="chiudiModalPresenze()" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body" id="modal-presenze-list"></div>
+            <div class="sm-sheet__foot"><button onclick="chiudiModalPresenze()" class="sm-btn sm-btn--primary">Salva e chiudi</button></div>
         </div>
     </div>
 
-    <!-- Modal Modifica Partita -->
-    <div id="modal-partita" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-xl overflow-hidden">
-            <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-lg">Modifica Partita</h3>
-                <button onclick="chiudiModalPartita()" class="text-white hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-4 space-y-3">
+    <!-- ================= SHEET: Storico convocati ================= -->
+    <div id="modal-storico-convocazioni" class="sm-scrim hidden" onclick="if(event.target===this) chiudiModalStorico()">
+        <div class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-storico-title">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 id="modal-storico-title" class="sm-sheet__title">Convocati</h3><button class="sm-iconbtn" onclick="chiudiModalStorico()" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body"><div id="modal-storico-content" class="sm-list"></div></div>
+        </div>
+    </div>
+
+    <!-- ================= SHEET: Modifica partita ================= -->
+    <div id="modal-partita" class="sm-scrim hidden" onclick="if(event.target===this) chiudiModalPartita()">
+        <div class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="t-partita">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 class="sm-sheet__title" id="t-partita">Modifica partita</h3><button class="sm-iconbtn" onclick="chiudiModalPartita()" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body">
                 <input type="hidden" id="edit-partita-idx">
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Squadra in Casa</label>
-                    <input type="text" id="edit-casa" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                <div class="sm-field"><label class="sm-label" for="edit-casa">Squadra in casa</label><input type="text" id="edit-casa" class="sm-input"></div>
+                <div class="sm-field"><label class="sm-label" for="edit-fuori">Squadra fuori casa</label><input type="text" id="edit-fuori" class="sm-input"></div>
+                <div class="sm-row" style="margin-top: var(--space-3)">
+                    <div class="sm-field"><label class="sm-label" for="edit-data">Data</label><input type="date" id="edit-data" class="sm-input"></div>
+                    <div class="sm-field" style="margin-top: 0; flex: 0 0 110px"><label class="sm-label" for="edit-ora">Ora</label><input type="time" id="edit-ora" class="sm-input"></div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Squadra Fuori Casa</label>
-                    <input type="text" id="edit-fuori" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm">
-                </div>
-                <div class="flex gap-2">
-                    <div class="flex-1">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Data</label>
-                        <input type="date" id="edit-data" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm">
-                    </div>
-                    <div class="w-32">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Ora</label>
-                        <input type="text" id="edit-ora" placeholder="18:15" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Campo</label>
-                    <input type="text" id="edit-campo" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm">
-                </div>
+                <div class="sm-field"><label class="sm-label" for="edit-campo">Campo</label><input type="text" id="edit-campo" class="sm-input"></div>
             </div>
-            <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">
-                <button onclick="chiudiModalPartita()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium">Annulla</button>
-                <button onclick="salvaPartitaModificata()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-medium shadow hover:bg-indigo-700">Salva Modifiche</button>
-            </div>
+            <div class="sm-sheet__foot"><button onclick="chiudiModalPartita()" class="sm-btn sm-btn--ghost">Annulla</button><button onclick="salvaPartitaModificata()" class="sm-btn sm-btn--primary">Salva</button></div>
         </div>
     </div>
 
-    <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
+    <!-- ================= SHEET: Esercizio (libreria) ================= -->
+    <div id="sheet-esercizio" class="sm-scrim hidden" onclick="if(event.target===this) closeSheet(this.id)">
+        <form class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="esercizio-form-title" onsubmit="salvaEsercizio(event)">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 class="sm-sheet__title" id="esercizio-form-title">Nuovo esercizio</h3><button type="button" class="sm-iconbtn" onclick="closeSheet('sheet-esercizio')" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body">
+                <input type="hidden" id="edit-esercizio-id">
+                <div class="sm-field"><label class="sm-label" for="input-titolo-esercizio">Titolo *</label><input type="text" id="input-titolo-esercizio" placeholder="Es. Possesso palla 4v4 + 2" required class="sm-input"></div>
+                <div class="sm-field"><label class="sm-label" for="input-desc-esercizio">Descrizione / note</label><textarea id="input-desc-esercizio" rows="4" placeholder="Regole, obiettivi, varianti" class="sm-textarea"></textarea></div>
+                <div class="sm-field"><label class="sm-label" for="input-link-esercizio">Link video (YouTube / Instagram)</label><input type="url" id="input-link-esercizio" placeholder="https://" class="sm-input" inputmode="url"></div>
+            </div>
+            <div class="sm-sheet__foot">
+                <button type="button" id="btn-annulla-esercizio" onclick="resetFormEsercizio(); closeSheet('sheet-esercizio')" class="sm-btn sm-btn--ghost">Annulla</button>
+                <button type="submit" id="btn-salva-esercizio" class="sm-btn sm-btn--primary">Aggiungi</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ================= SHEET: Giocatore ================= -->
+    <div id="sheet-giocatore" class="sm-scrim hidden" onclick="if(event.target===this) closeSheet(this.id)">
+        <form class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="anagrafica-form-title" onsubmit="salvaGiocatore(event)">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 class="sm-sheet__title" id="anagrafica-form-title">Aggiungi giocatore</h3><button type="button" class="sm-iconbtn" onclick="closeSheet('sheet-giocatore')" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body">
+                <input type="hidden" id="edit-giocatore-id">
+                <div class="sm-field"><label class="sm-label" for="input-nome">Nome *</label><input type="text" id="input-nome" required class="sm-input" autocapitalize="words"></div>
+                <div class="sm-row" style="margin-top: var(--space-3)">
+                    <div class="sm-field"><label class="sm-label" for="input-cognome">Cognome</label><input type="text" id="input-cognome" class="sm-input" autocapitalize="words"></div>
+                    <div class="sm-field" style="margin-top: 0; flex: 0 0 96px"><label class="sm-label" for="input-numero">Maglia</label><input type="text" id="input-numero" class="sm-input" inputmode="numeric"></div>
+                </div>
+            </div>
+            <div class="sm-sheet__foot">
+                <button type="button" id="btn-annulla-modifica" onclick="resetFormGiocatore(); closeSheet('sheet-giocatore')" class="sm-btn sm-btn--ghost">Annulla</button>
+                <button type="submit" id="btn-salva-giocatore" class="sm-btn sm-btn--primary">Aggiungi alla rosa</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ================= SHEET: Nuovo utente ================= -->
+    <div id="sheet-utente" class="sm-scrim hidden" onclick="if(event.target===this) closeSheet(this.id)">
+        <form class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="t-utente" onsubmit="creaNuovoUtente(event)">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 class="sm-sheet__title" id="t-utente">Nuova utenza</h3><button type="button" class="sm-iconbtn" onclick="closeSheet('sheet-utente')" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body">
+                <div class="sm-field"><label class="sm-label" for="nuovo-user">Username *</label><input type="text" id="nuovo-user" required class="sm-input" autocapitalize="none"></div>
+                <div class="sm-field"><label class="sm-label" for="nuovo-pass">Password *</label><input type="password" id="nuovo-pass" required class="sm-input" autocomplete="new-password"></div>
+            </div>
+            <div class="sm-sheet__foot"><button type="submit" class="sm-btn sm-btn--primary">Registra utente</button></div>
+        </form>
+    </div>
+
+    <!-- ================= SHEET: Conferma (al posto di confirm) ================= -->
+    <div id="sheet-conferma" class="sm-scrim hidden" onclick="if(event.target===this) rispostaConferma(false)">
+        <div class="sm-sheet" role="alertdialog" aria-modal="true" aria-labelledby="conferma-titolo">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 class="sm-sheet__title" id="conferma-titolo">Confermi?</h3></div>
+            <div class="sm-sheet__body"><p id="conferma-testo" style="margin: 0; color: var(--ink-muted)"></p></div>
+            <div class="sm-sheet__foot"><button onclick="rispostaConferma(false)" class="sm-btn sm-btn--ghost">Annulla</button><button id="conferma-ok" onclick="rispostaConferma(true)" class="sm-btn sm-btn--primary">Conferma</button></div>
+        </div>
+    </div>
+
+    <!-- ================= SHEET: Input (al posto di prompt) ================= -->
+    <div id="sheet-input" class="sm-scrim hidden" onclick="if(event.target===this) rispostaInput(null)">
+        <form class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="input-titolo" onsubmit="event.preventDefault(); rispostaInput(document.getElementById('input-valore').value)">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 class="sm-sheet__title" id="input-titolo">Inserisci</h3></div>
+            <div class="sm-sheet__body"><div class="sm-field"><label class="sm-label" for="input-valore" id="input-etichetta"></label><input id="input-valore" class="sm-input" required></div></div>
+            <div class="sm-sheet__foot"><button type="button" onclick="rispostaInput(null)" class="sm-btn sm-btn--ghost">Annulla</button><button type="submit" class="sm-btn sm-btn--primary">Salva</button></div>
+        </form>
+    </div>
+
     <script>
-        const APP_VERSION = "3.1";
-        let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
+        const APP_VERSION = "4.0";
+        let utenteCorrente = null;
+        try { utenteCorrente = localStorage.getItem('sq_utente_corrente') || null; } catch (e) {}
 
         let giocatori = [];
         let allenamenti = [];
@@ -457,6 +632,7 @@
         let logAttivita = [];
         let convocazioniStorico = {};
         let allenamentoCorrenteId = null;
+        let tabCorrente = 'allenamenti';
 
         const DEFAULT_GIOCATORI = [
             { id: 1, nome: "Usman", cognome: "", numero: "12" },
@@ -503,63 +679,161 @@
             { username: "Anna", passwordHash: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92" }
         ];
 
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+        document.getElementById('current-date').innerText = (d => d.charAt(0).toUpperCase() + d.slice(1))(new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }));
+        document.getElementById('app-version').innerText = 'Versione ' + APP_VERSION;
 
-        // --- FUNZIONI CLOUD (FIREBASE) ---
+        // ================= UTILITÀ UI =================
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const nomeCompleto = g => esc(g.nome + (g.cognome ? ' ' + g.cognome : ''));
+        const jersey = g => g.numero ? `<span class="sm-jersey">${esc(g.numero)}</span>` : `<span class="sm-jersey sm-jersey--empty">–</span>`;
+        const vuoto = (icona, testo) => `<div class="sm-empty"><i class="fa-solid ${icona}"></i>${testo}</div>`;
+        const isNostra = nome => String(nome || '').toUpperCase().includes('MURIALDO');
+        const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+        const fmtData = (d, opt) => new Date(d).toLocaleDateString('it-IT', opt || { weekday: 'short', day: 'numeric', month: 'short' });
+        const livello = p => p >= 75 ? 'success' : (p >= 50 ? 'warning' : 'danger');
+        const oggiISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().split('T')[0]; };
+
+        // Snackbar (al posto di alert)
+        let snackTimer = null;
+        function toast(testo, tipo) {
+            const el = document.getElementById('snackbar');
+            document.getElementById('snackbar-text').innerText = testo;
+            document.getElementById('snackbar-icon').className = tipo === 'errore' ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-circle-check';
+            el.classList.remove('out');
+            clearTimeout(snackTimer);
+            snackTimer = setTimeout(() => el.classList.add('out'), 3200);
+        }
+
+        // Bottom sheet con supporto al tasto Indietro di Android
+        let sheetAperti = [];
+        let ignoraPop = false;
+        let pushInAttesa = [];
+        function openSheet(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.remove('hidden');
+            if (!sheetAperti.includes(id)) {
+                sheetAperti.push(id);
+                if (ignoraPop) pushInAttesa.push(id); else history.pushState({ sheet: id }, '');
+            }
+        }
+        function closeSheet(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+            if (sheetAperti.includes(id)) {
+                sheetAperti = sheetAperti.filter(x => x !== id);
+                ignoraPop = true;
+                history.back();
+            }
+        }
+        window.addEventListener('popstate', () => {
+            if (ignoraPop) { ignoraPop = false; pushInAttesa.forEach(id => history.pushState({ sheet: id }, '')); pushInAttesa = []; return; }
+            const top = sheetAperti.pop();
+            if (!top) return;
+            document.getElementById(top).classList.add('hidden');
+            if (top === 'sheet-conferma' && confermaResolve) { confermaResolve(false); confermaResolve = null; }
+            if (top === 'sheet-input' && inputResolve) { inputResolve(null); inputResolve = null; }
+            if (top === 'modal-esercizi-allenamento' || top === 'modal-presenze-allenamento') { allenamentoCorrenteId = null; renderAllenamenti(); }
+        });
+
+        // Conferma (al posto di confirm)
+        let confermaResolve = null;
+        function conferma(titolo, testo, etichettaOk, pericolo) {
+            document.getElementById('conferma-titolo').innerText = titolo;
+            document.getElementById('conferma-testo').innerText = testo || '';
+            const ok = document.getElementById('conferma-ok');
+            ok.innerText = etichettaOk || 'Conferma';
+            ok.className = 'sm-btn ' + (pericolo ? 'sm-btn--danger' : 'sm-btn--primary');
+            openSheet('sheet-conferma');
+            return new Promise(res => { confermaResolve = res; });
+        }
+        function rispostaConferma(v) {
+            const r = confermaResolve; confermaResolve = null;
+            closeSheet('sheet-conferma');
+            if (r) r(v);
+        }
+
+        // Input (al posto di prompt)
+        let inputResolve = null;
+        function chiediValore(titolo, etichetta, tipo) {
+            document.getElementById('input-titolo').innerText = titolo;
+            document.getElementById('input-etichetta').innerText = etichetta;
+            const inp = document.getElementById('input-valore');
+            inp.type = tipo || 'text'; inp.value = '';
+            openSheet('sheet-input');
+            setTimeout(() => inp.focus(), 50);
+            return new Promise(res => { inputResolve = res; });
+        }
+        function rispostaInput(v) {
+            const r = inputResolve; inputResolve = null;
+            closeSheet('sheet-input');
+            if (r) r(v);
+        }
+
+        // Tema
+        function impostaTema(scelta) {
+            try { localStorage.setItem('sm_tema', scelta); } catch (e) {}
+            const scuro = scelta === 'dark' || (scelta === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.setAttribute('data-theme', scuro ? 'dark' : 'light');
+            document.getElementById('meta-theme-color').setAttribute('content', scuro ? '#131B2E' : '#0D1C47');
+            document.querySelectorAll('[data-tema]').forEach(b => b.setAttribute('aria-pressed', b.dataset.tema === scelta ? 'true' : 'false'));
+        }
+        (function () {
+            let s = 'auto'; try { s = localStorage.getItem('sm_tema') || 'auto'; } catch (e) {}
+            impostaTema(s);
+            if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { let t = 'auto'; try { t = localStorage.getItem('sm_tema') || 'auto'; } catch (e) {} if (t === 'auto') impostaTema('auto'); });
+        })();
+
+        // ================= FUNZIONI CLOUD (FIREBASE) =================
         window.inizializzaDatiCloud = async function() {
+            const bar = document.getElementById('sync-bar');
+            bar.classList.add('on');
             try {
                 const { collection, getDocs, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
                 const db = window.db;
 
-                // Carica Giocatori
                 const snapG = await getDocs(collection(db, "giocatori"));
                 if (!snapG.empty) {
                     giocatori = snapG.docs.map(d => d.data());
                 } else {
                     giocatori = DEFAULT_GIOCATORI;
-                    for(let g of giocatori) await setDoc(doc(db, "giocatori", String(g.id)), g);
+                    for (let g of giocatori) await setDoc(doc(db, "giocatori", String(g.id)), g);
                 }
 
-                // Carica Allenamenti
                 const snapA = await getDocs(collection(db, "allenamenti"));
                 if (!snapA.empty) {
                     allenamenti = snapA.docs.map(d => d.data());
-                    allenamenti.sort((a,b) => new Date(b.data) - new Date(a.data));
+                    allenamenti.sort((a, b) => new Date(b.data) - new Date(a.data));
                 }
 
-                // Carica Calendario
                 const snapC = await getDocs(collection(db, "calendario"));
                 if (!snapC.empty) {
                     calendarioPartite = snapC.docs.map(d => d.data());
-                    calendarioPartite.sort((a,b) => a.giornata - b.giornata);
+                    calendarioPartite.sort((a, b) => a.giornata - b.giornata);
                 } else {
                     calendarioPartite = DEFAULT_CALENDARIO;
-                    for(let c of calendarioPartite) await setDoc(doc(db, "calendario", String(c.giornata)), c);
+                    for (let c of calendarioPartite) await setDoc(doc(db, "calendario", String(c.giornata)), c);
                 }
 
-                // Carica Esercizi
                 const snapE = await getDocs(collection(db, "esercizi"));
                 if (!snapE.empty) {
                     esercizi = snapE.docs.map(d => d.data());
                 }
 
-                // Carica Utenti
                 const snapU = await getDocs(collection(db, "utenti"));
                 if (!snapU.empty) {
                     utenti = snapU.docs.map(d => d.data());
                 } else {
                     utenti = DEFAULT_UTENTI;
-                    for(let u of utenti) await setDoc(doc(db, "utenti", u.username), u);
+                    for (let u of utenti) await setDoc(doc(db, "utenti", u.username), u);
                 }
 
-                // Carica Log
                 const snapL = await getDocs(collection(db, "log"));
                 if (!snapL.empty) {
                     logAttivita = snapL.docs.map(d => d.data());
-                    logAttivita.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    logAttivita.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 }
 
-                // Carica Storico Convocazioni Partite
                 const snapConv = await getDocs(collection(db, "convocazioni_storico"));
                 if (!snapConv.empty) {
                     snapConv.docs.forEach(d => {
@@ -570,54 +844,57 @@
                 renderTutto();
             } catch (e) {
                 console.error("Errore caricamento cloud:", e);
+                toast("Dati non sincronizzati: controlla la connessione", 'errore');
+            } finally {
+                bar.classList.remove('on');
             }
         };
 
         async function salvaCloud(collezione, id, dati) {
-            if(!window.firebaseEnabled) return;
+            if (!window.firebaseEnabled) return;
             try {
                 const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
                 await setDoc(doc(window.db, collezione, String(id)), dati);
-            } catch(e) { console.error("Errore salvataggio cloud:", e); }
+            } catch (e) { console.error("Errore salvataggio cloud:", e); toast("Salvataggio non riuscito: riprova", 'errore'); }
         }
 
         async function eliminaCloud(collezione, id) {
-            if(!window.firebaseEnabled) return;
+            if (!window.firebaseEnabled) return;
             try {
                 const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
                 await deleteDoc(doc(window.db, collezione, String(id)));
-            } catch(e) { console.error("Errore eliminazione cloud:", e); }
+            } catch (e) { console.error("Errore eliminazione cloud:", e); toast("Eliminazione non riuscita: riprova", 'errore'); }
         }
 
-        // --- SISTEMA DI LOG & UTENZE ---
+        // ================= LOG & UTENZE =================
         async function registraLog(azione) {
             const timestamp = new Date().toLocaleString('it-IT');
             const utente = utenteCorrente || 'Sistema';
             const logItem = { id: Date.now().toString() + Math.random().toString(36).substr(2, 5), utente, azione, timestamp };
             logAttivita.unshift(logItem);
-            if(logAttivita.length > 50) logAttivita.pop();
+            if (logAttivita.length > 50) logAttivita.pop();
             await salvaCloud("log", logItem.id, logItem);
             renderLog();
         }
 
         function renderLog() {
             const container = document.getElementById('lista-log');
-            if(!container) return;
-            if(logAttivita.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 italic">Nessuna attività registrata.</p>`;
+            if (!container) return;
+            if (logAttivita.length === 0) {
+                container.innerHTML = vuoto('fa-clock-rotate-left', 'Nessuna attività registrata');
                 return;
             }
             container.innerHTML = logAttivita.map(l => `
-                <div class="p-2 bg-gray-50 rounded-lg border border-gray-100 flex justify-between items-center">
-                    <span><strong class="text-indigo-600">${l.utente}</strong>: ${l.azione}</span>
-                    <span class="text-gray-400 text-[10px]">${l.timestamp}</span>
+                <div class="log-row">
+                    <span><strong style="color: var(--primary)">${esc(l.utente)}</strong> ${esc(l.azione)}</span>
+                    <time>${esc(l.timestamp)}</time>
                 </div>
             `).join('');
         }
 
         async function pulisciLog() {
-            if(confirm("Vuoi svuotare tutti i log delle attività?")) {
-                for(let l of logAttivita) {
+            if (await conferma("Svuotare il log?", "Tutte le attività registrate verranno eliminate.", "Svuota", true)) {
+                for (let l of logAttivita) {
                     await eliminaCloud("log", l.id);
                 }
                 logAttivita = [];
@@ -628,7 +905,7 @@
 
         function checkAuth() {
             const overlay = document.getElementById('auth-overlay');
-            if(!utenteCorrente) {
+            if (!utenteCorrente) {
                 overlay.classList.remove('hidden');
             } else {
                 overlay.classList.add('hidden');
@@ -652,21 +929,21 @@
 
             const pHash = await hashPassword(p);
             const trovato = utenti.find(x => x.username.toLowerCase() === u.toLowerCase() && x.passwordHash === pHash);
-            
-            if(trovato) {
+
+            if (trovato) {
                 utenteCorrente = trovato.username;
-                localStorage.setItem('sq_utente_corrente', utenteCorrente);
+                try { localStorage.setItem('sq_utente_corrente', utenteCorrente); } catch (err) {}
                 checkAuth();
                 registraLog("Login effettuato");
             } else {
-                alert("Username o password errati!");
+                toast("Username o password errati", 'errore');
             }
         }
 
-        function eseguiLogout() {
-            if(confirm("Vuoi effettuare il logout?")) {
+        async function eseguiLogout() {
+            if (await conferma("Vuoi uscire?", "Dovrai inserire di nuovo le credenziali.", "Esci")) {
                 registraLog("Logout effettuato");
-                localStorage.removeItem('sq_utente_corrente');
+                try { localStorage.removeItem('sq_utente_corrente'); } catch (e) {}
                 utenteCorrente = null;
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
@@ -678,10 +955,10 @@
             e.preventDefault();
             const u = document.getElementById('nuovo-user').value.trim();
             const p = document.getElementById('nuovo-pass').value.trim();
-            if(!u || !p) return;
+            if (!u || !p) return;
 
-            if(utenti.some(x => x.username.toLowerCase() === u.toLowerCase())) {
-                alert("Esiste già un utente con questo username!");
+            if (utenti.some(x => x.username.toLowerCase() === u.toLowerCase())) {
+                toast("Esiste già un utente con questo username", 'errore');
                 return;
             }
 
@@ -693,29 +970,30 @@
             document.getElementById('nuovo-pass').value = '';
             registraLog(`Creato nuovo utente: ${u}`);
             renderUtenti();
-            alert("Utente creato con successo!");
+            closeSheet('sheet-utente');
+            toast("Utente creato");
         }
 
         async function cambiaPasswordUtente(username) {
-            const nuovaPass = prompt(`Inserisci la nuova password per ${username}:`);
-            if(nuovaPass) {
+            const nuovaPass = await chiediValore(`Password di ${username}`, 'Nuova password', 'password');
+            if (nuovaPass) {
                 const u = utenti.find(x => x.username === username);
-                if(u) {
+                if (u) {
                     u.passwordHash = await hashPassword(nuovaPass);
                     await salvaCloud("utenti", u.username, u);
                     registraLog(`Modificata password per utente: ${username}`);
                     renderUtenti();
-                    alert("Password aggiornata con successo!");
+                    toast("Password aggiornata");
                 }
             }
         }
 
         async function eliminaUtente(username) {
-            if(username === utenteCorrente) {
-                alert("Non puoi eliminare l'utente con cui hai effettuato l'accesso!");
+            if (username === utenteCorrente) {
+                toast("Non puoi eliminare l'utente con cui sei collegato", 'errore');
                 return;
             }
-            if(confirm(`Vuoi eliminare l'utente ${username}?`)) {
+            if (await conferma(`Eliminare ${username}?`, "L'utente non potrà più accedere.", "Elimina", true)) {
                 utenti = utenti.filter(x => x.username !== username);
                 await eliminaCloud("utenti", username);
                 registraLog(`Eliminato utente: ${username}`);
@@ -725,68 +1003,77 @@
 
         function renderUtenti() {
             const container = document.getElementById('lista-utenti');
-            if(!container) return;
+            if (!container) return;
             container.innerHTML = utenti.map(u => `
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100 text-sm">
-                    <div>
-                        <span class="font-bold text-gray-800"><i class="fa-solid fa-user mr-2 text-indigo-600"></i>${u.username}</span>
-                        ${u.username === utenteCorrente ? '<span class="ml-2 text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Attivo</span>' : ''}
+                <div class="sm-item">
+                    <span class="sm-jersey"><i class="fa-solid fa-user"></i></span>
+                    <div class="sm-item__body">
+                        <div class="sm-item__title">${esc(u.username)}</div>
+                        ${u.username === utenteCorrente ? '<span class="sm-chip sm-chip--success"><i class="fa-solid fa-circle" style="font-size:6px"></i>Collegato</span>' : ''}
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="cambiaPasswordUtente('${u.username}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1 rounded-lg text-xs font-medium transition">Cambia Password</button>
-                        ${utenti.length > 1 ? `<button onclick="eliminaUtente('${u.username}')" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                    <div class="sm-item__trail">
+                        <button onclick="cambiaPasswordUtente('${esc(u.username)}')" class="sm-iconbtn" aria-label="Cambia password"><i class="fa-solid fa-key"></i></button>
+                        ${utenti.length > 1 ? `<button onclick="eliminaUtente('${esc(u.username)}')" class="sm-iconbtn sm-iconbtn--danger" aria-label="Elimina utente"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                     </div>
                 </div>
             `).join('');
         }
 
+        // ================= NAVIGAZIONE =================
+        const NAV_PADRE = { allenamenti: 'allenamenti', calendario: 'calendario', convocazioni: 'convocazioni', statistiche: 'statistiche', altro: 'altro', esercizi: 'altro', anagrafica: 'altro', utenti: 'altro' };
+        const FAB = {
+            allenamenti: { label: 'Allenamento', azione: () => { document.getElementById('input-data-allenamento').value = oggiISO(); openSheet('sheet-nuovo-allenamento'); } },
+            esercizi: { label: 'Esercizio', azione: () => { resetFormEsercizio(); openSheet('sheet-esercizio'); } },
+            anagrafica: { label: 'Giocatore', azione: () => { resetFormGiocatore(); openSheet('sheet-giocatore'); } },
+            utenti: { label: 'Utente', azione: () => openSheet('sheet-utente') }
+        };
+
         function switchTab(tabId) {
+            tabCorrente = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
 
-            ['allenamenti', 'esercizi', 'convocazioni', 'calendario', 'csi', 'statistiche', 'anagrafica', 'utenti'].forEach(t => {
-                const btn = document.getElementById('btn-tab-' + t);
-                if(btn) {
-                    if(t === tabId) {
-                        btn.className = "flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm bg-indigo-600 text-white transition whitespace-nowrap shadow-sm";
-                    } else {
-                        btn.className = "flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap";
-                    }
-                }
+            Object.keys({ allenamenti: 1, calendario: 1, convocazioni: 1, statistiche: 1, altro: 1 }).forEach(t => {
+                const btn = document.getElementById('nav-' + t);
+                if (t === NAV_PADRE[tabId]) btn.setAttribute('aria-current', 'page'); else btn.removeAttribute('aria-current');
             });
 
+            const fab = document.getElementById('app-fab');
+            if (FAB[tabId]) { fab.classList.remove('hidden'); document.getElementById('app-fab-label').innerText = FAB[tabId].label; }
+            else fab.classList.add('hidden');
+
+            window.scrollTo(0, 0);
             // Refresh automatico dei dati ogni volta che si cambia tab
             window.inizializzaDatiCloud();
         }
 
-        function switchStatSubTab(sub) {
-            document.getElementById('stat-subtab-ragazzi').classList.toggle('hidden', sub !== 'ragazzi');
-            document.getElementById('stat-subtab-convocazioni').classList.toggle('hidden', sub !== 'convocazioni');
-            document.getElementById('stat-subtab-allenamenti').classList.toggle('hidden', sub !== 'allenamenti');
+        function azioneFab() { if (FAB[tabCorrente]) FAB[tabCorrente].azione(); }
 
-            document.getElementById('btn-stat-ragazzi').className = sub === 'ragazzi' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
-            document.getElementById('btn-stat-convocazioni').className = sub === 'convocazioni' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
-            document.getElementById('btn-stat-allenamenti').className = sub === 'allenamenti' ? "flex-1 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium shadow transition" : "flex-1 py-2 bg-white text-gray-600 border border-gray-200 rounded-xl text-sm font-medium transition";
+        function switchStatSubTab(sub) {
+            ['ragazzi', 'convocazioni', 'allenamenti'].forEach(s => {
+                document.getElementById('stat-subtab-' + s).classList.toggle('hidden', s !== sub);
+                document.getElementById('btn-stat-' + s).setAttribute('aria-pressed', s === sub ? 'true' : 'false');
+            });
         }
 
-        // --- ESERCIZI ---
+        // ================= ESERCIZI =================
         async function salvaEsercizio(e) {
             e.preventDefault();
             const idEdit = document.getElementById('edit-esercizio-id').value;
             const titolo = document.getElementById('input-titolo-esercizio').value.trim();
             const descrizione = document.getElementById('input-desc-esercizio').value.trim();
             const link = document.getElementById('input-link-esercizio').value.trim();
-            if(!titolo) return;
+            if (!titolo) return;
 
             let esObj;
-            if(idEdit !== "") {
+            if (idEdit !== "") {
                 const es = esercizi.find(item => String(item.id) === String(idEdit));
-                if(es) { 
-                    es.titolo = titolo; 
-                    es.descrizione = descrizione; 
-                    es.link = link; 
-                    esObj = es; 
-                    registraLog(`Modificato esercizio: ${titolo}`); 
+                if (es) {
+                    es.titolo = titolo;
+                    es.descrizione = descrizione;
+                    es.link = link;
+                    esObj = es;
+                    registraLog(`Modificato esercizio: ${titolo}`);
                 } else {
                     esObj = { id: Number(idEdit), titolo, descrizione, link };
                     esercizi.push(esObj);
@@ -800,19 +1087,21 @@
 
             await salvaCloud("esercizi", esObj.id, esObj);
             resetFormEsercizio();
+            closeSheet('sheet-esercizio');
             renderEsercizi();
+            toast("Esercizio salvato");
         }
 
         function preparaModificaEsercizio(id) {
             const es = esercizi.find(item => String(item.id) === String(id));
-            if(!es) return;
+            if (!es) return;
             document.getElementById('edit-esercizio-id').value = es.id;
             document.getElementById('input-titolo-esercizio').value = es.titolo;
             document.getElementById('input-desc-esercizio').value = es.descrizione || '';
             document.getElementById('input-link-esercizio').value = es.link || '';
-            document.getElementById('btn-salva-esercizio').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Salva Modifiche`;
-            document.getElementById('btn-annulla-esercizio').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('esercizio-form-title').innerText = 'Modifica esercizio';
+            document.getElementById('btn-salva-esercizio').innerText = 'Salva modifiche';
+            openSheet('sheet-esercizio');
         }
 
         function resetFormEsercizio() {
@@ -820,13 +1109,13 @@
             document.getElementById('input-titolo-esercizio').value = '';
             document.getElementById('input-desc-esercizio').value = '';
             document.getElementById('input-link-esercizio').value = '';
-            document.getElementById('btn-salva-esercizio').innerHTML = `<i class="fa-solid fa-plus mr-1"></i> Aggiungi Esercizio`;
-            document.getElementById('btn-annulla-esercizio').classList.add('hidden');
+            document.getElementById('esercizio-form-title').innerText = 'Nuovo esercizio';
+            document.getElementById('btn-salva-esercizio').innerText = 'Aggiungi';
         }
 
         async function eliminaEsercizio(id) {
             const es = esercizi.find(item => String(item.id) === String(id));
-            if(confirm("Vuoi eliminare questo esercizio?")) {
+            if (await conferma("Eliminare l'esercizio?", es ? es.titolo : '', "Elimina", true)) {
                 esercizi = esercizi.filter(item => String(item.id) !== String(id));
                 await eliminaCloud("esercizi", id);
                 registraLog(`Eliminato esercizio: ${es ? es.titolo : id}`);
@@ -835,62 +1124,69 @@
         }
 
         function renderEsercizi() {
+            const meta = document.getElementById('menu-meta-esercizi');
+            if (meta) meta.innerText = esercizi.length + (esercizi.length === 1 ? ' esercizio' : ' esercizi');
             const container = document.getElementById('lista-esercizi');
-            if(!container) return;
-            if(esercizi.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm italic">Nessun esercizio inserito.</p>`;
+            if (!container) return;
+            if (esercizi.length === 0) {
+                container.innerHTML = vuoto('fa-dumbbell', 'Nessun esercizio: aggiungilo con il pulsante in basso');
                 return;
             }
             container.innerHTML = esercizi.map(es => `
-                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div class="space-y-1 flex-1">
-                        <h4 class="font-bold text-gray-800 text-base"><i class="fa-solid fa-futbol text-indigo-600 mr-2"></i>${es.titolo}</h4>
-                        ${es.descrizione ? `<p class="text-xs text-gray-600 whitespace-pre-line">${es.descrizione}</p>` : ''}
-                        ${es.link ? `<a href="${es.link}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-semibold px-2.5 py-1 rounded-lg mt-1 transition"><i class="fa-solid fa-video"></i> Guarda Video (YouTube / Instagram)</a>` : ''}
-                    </div>
-                    <div class="flex gap-1">
-                        <button onclick="preparaModificaEsercizio(${es.id})" class="text-indigo-600 hover:text-indigo-800 p-1.5"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="eliminaEsercizio(${es.id})" class="text-red-500 hover:text-red-700 p-1.5"><i class="fa-solid fa-trash-can"></i></button>
+                <div class="sm-card">
+                    <div class="sm-item" style="min-height: 0; padding: 0; align-items: flex-start">
+                        <div class="sm-item__body">
+                            <div class="sm-item__title">${esc(es.titolo)}</div>
+                            ${es.descrizione ? `<div class="desc">${esc(es.descrizione)}</div>` : ''}
+                            ${es.link ? `<a href="${esc(es.link)}" target="_blank" rel="noopener" class="ex-link"><i class="fa-solid fa-circle-play"></i> Guarda il video</a>` : ''}
+                        </div>
+                        <div class="sm-item__trail" style="margin: -8px -8px 0 0">
+                            <button onclick="preparaModificaEsercizio(${es.id})" class="sm-iconbtn" aria-label="Modifica"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="eliminaEsercizio(${es.id})" class="sm-iconbtn sm-iconbtn--danger" aria-label="Elimina"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // --- ANAGRAFICA ---
+        // ================= ANAGRAFICA =================
         async function salvaGiocatore(e) {
             e.preventDefault();
             const idEdit = document.getElementById('edit-giocatore-id').value;
             const nome = document.getElementById('input-nome').value.trim();
             const cognome = document.getElementById('input-cognome').value.trim();
             const numero = document.getElementById('input-numero').value.trim();
-            if(!nome) return;
+            if (!nome) return;
 
             let gObj;
-            if(idEdit) {
+            if (idEdit) {
                 const g = giocatori.find(item => item.id == idEdit);
-                if(g) { g.nome = nome; g.cognome = cognome; g.numero = numero; gObj = g; registraLog(`Modificato giocatore: ${nome} ${cognome}`); }
+                if (g) { g.nome = nome; g.cognome = cognome; g.numero = numero; gObj = g; registraLog(`Modificato giocatore: ${nome} ${cognome}`); }
             } else {
                 gObj = { id: Date.now(), nome, cognome, numero };
                 giocatori.push(gObj);
                 registraLog(`Aggiunto giocatore in rosa: ${nome} ${cognome}`);
             }
+            if (!gObj) return;
 
             await salvaCloud("giocatori", gObj.id, gObj);
             resetFormGiocatore();
+            closeSheet('sheet-giocatore');
             renderAnagrafica();
             renderConvocazioni();
+            toast("Rosa aggiornata");
         }
 
         function preparaModificaGiocatore(id) {
             const g = giocatori.find(item => item.id === id);
-            if(!g) return;
+            if (!g) return;
             document.getElementById('edit-giocatore-id').value = g.id;
             document.getElementById('input-nome').value = g.nome;
-            document.getElementById('input-cognome').value = g.cognome;
-            document.getElementById('input-numero').value = g.numero;
-            document.getElementById('anagrafica-form-title').innerText = "Modifica Giocatore";
-            document.getElementById('btn-salva-giocatore').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Salva Modifiche`;
-            document.getElementById('btn-annulla-modifica').classList.remove('hidden');
+            document.getElementById('input-cognome').value = g.cognome || '';
+            document.getElementById('input-numero').value = g.numero || '';
+            document.getElementById('anagrafica-form-title').innerText = "Modifica giocatore";
+            document.getElementById('btn-salva-giocatore').innerText = "Salva modifiche";
+            openSheet('sheet-giocatore');
         }
 
         function resetFormGiocatore() {
@@ -898,14 +1194,13 @@
             document.getElementById('input-nome').value = '';
             document.getElementById('input-cognome').value = '';
             document.getElementById('input-numero').value = '';
-            document.getElementById('anagrafica-form-title').innerText = "Aggiungi Giocatore";
-            document.getElementById('btn-salva-giocatore').innerHTML = `<i class="fa-solid fa-user-plus mr-1"></i> Aggiungi alla Rosa`;
-            document.getElementById('btn-annulla-modifica').classList.add('hidden');
+            document.getElementById('anagrafica-form-title').innerText = "Aggiungi giocatore";
+            document.getElementById('btn-salva-giocatore').innerText = "Aggiungi alla rosa";
         }
 
         async function eliminaGiocatore(id) {
             const g = giocatori.find(item => item.id === id);
-            if(confirm("Vuoi rimuovere questo giocatore?")) {
+            if (await conferma("Rimuovere dalla rosa?", g ? g.nome + (g.cognome ? ' ' + g.cognome : '') : '', "Rimuovi", true)) {
                 giocatori = giocatori.filter(item => item.id !== id);
                 await eliminaCloud("giocatori", id);
                 registraLog(`Eliminato giocatore: ${g ? g.nome : id}`);
@@ -915,40 +1210,41 @@
         }
 
         function renderAnagrafica() {
+            const meta = document.getElementById('menu-meta-rosa');
+            if (meta) meta.innerText = giocatori.length + ' giocatori';
             const container = document.getElementById('lista-anagrafica');
-            if(!container) return;
-            if(giocatori.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm italic">Nessun giocatore in rosa.</p>`;
+            if (!container) return;
+            if (giocatori.length === 0) {
+                container.innerHTML = vuoto('fa-users', 'Nessun giocatore in rosa');
                 return;
             }
-            container.innerHTML = giocatori.map(g => `
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
-                    <div>
-                        <span class="font-bold text-gray-800">${g.nome} ${g.cognome}</span>
-                        ${g.numero ? `<span class="ml-2 text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">#${g.numero}</span>` : ''}
-                    </div>
-                    <div class="flex gap-1">
-                        <button onclick="preparaModificaGiocatore(${g.id})" class="text-indigo-600 hover:text-indigo-800 p-1.5"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="eliminaGiocatore(${g.id})" class="text-red-500 hover:text-red-700 p-1.5"><i class="fa-solid fa-trash-can"></i></button>
+            const ordinati = [...giocatori].sort((a, b) => (parseInt(a.numero) || 999) - (parseInt(b.numero) || 999) || a.nome.localeCompare(b.nome));
+            container.innerHTML = ordinati.map(g => `
+                <div class="sm-item">
+                    ${jersey(g)}
+                    <div class="sm-item__body"><div class="sm-item__title">${nomeCompleto(g)}</div></div>
+                    <div class="sm-item__trail">
+                        <button onclick="preparaModificaGiocatore(${g.id})" class="sm-iconbtn" aria-label="Modifica"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="eliminaGiocatore(${g.id})" class="sm-iconbtn sm-iconbtn--danger" aria-label="Elimina"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // --- ALLENAMENTI ---
+        // ================= ALLENAMENTI =================
         function creaAllenamentoOggi() {
-            creaAllenamento(new Date().toISOString().split('T')[0]);
+            creaAllenamento(oggiISO());
         }
 
         function creaAllenamentoData() {
             const data = document.getElementById('input-data-allenamento').value;
-            if(!data) { alert("Seleziona una data!"); return; }
+            if (!data) { toast("Seleziona una data", 'errore'); return; }
             creaAllenamento(data);
         }
 
         async function creaAllenamento(data) {
-            if(allenamenti.some(a => a.data === data)) {
-                alert("Esiste già un allenamento in questa data!");
+            if (allenamenti.some(a => a.data === data)) {
+                toast("Esiste già un allenamento in questa data", 'errore');
                 return;
             }
             const presenzeIniziali = {};
@@ -956,15 +1252,17 @@
 
             const nuovo = { id: Date.now(), data, presenze: presenzeIniziali, eserciziSessione: [] };
             allenamenti.push(nuovo);
-            allenamenti.sort((a,b) => new Date(b.data) - new Date(a.data));
+            allenamenti.sort((a, b) => new Date(b.data) - new Date(a.data));
             await salvaCloud("allenamenti", nuovo.id, nuovo);
             registraLog(`Creato allenamento del ${data}`);
             renderAllenamenti();
-            apriModalEsercizi(nuovo.id);
+            closeSheet('sheet-nuovo-allenamento');
+            setTimeout(() => apriModalEsercizi(nuovo.id), 60);
         }
 
         async function eliminaAllenamento(id) {
-            if(confirm("Eliminare questo allenamento?")) {
+            const a = allenamenti.find(x => x.id === id);
+            if (await conferma("Eliminare l'allenamento?", a ? fmtData(a.data, { weekday: 'long', day: 'numeric', month: 'long' }) : '', "Elimina", true)) {
                 allenamenti = allenamenti.filter(a => a.id !== id);
                 await eliminaCloud("allenamenti", id);
                 registraLog("Eliminato un allenamento");
@@ -972,51 +1270,72 @@
             }
         }
 
+        function renderHero() {
+            const box = document.getElementById('hero-prossima');
+            if (!box) return;
+            const oggi = oggiISO();
+            const p = calendarioPartite.find(x => x.data >= oggi);
+            if (!p) { box.innerHTML = `<div class="sm-card">${vuoto('fa-flag-checkered', 'Nessuna partita in programma')}</div>`; return; }
+            const casa = isNostra(p.casa);
+            const avversario = casa ? p.fuori : p.casa;
+            box.innerHTML = `
+                <div class="sm-hero">
+                    <div class="sm-hero__label">Giornata ${p.giornata} · ${casa ? 'In casa' : 'Trasferta'}</div>
+                    <div class="sm-hero__teams">${esc(avversario)}<small>${casa ? 'ospite dello' : 'contro lo'} Sporting Murialdo</small></div>
+                    <div class="sm-hero__meta">
+                        <span><i class="fa-regular fa-calendar"></i> ${cap(fmtData(p.data))} · ${esc(p.ora)}</span>
+                        <span><i class="fa-solid fa-location-dot"></i> ${esc(p.campo)}</span>
+                    </div>
+                </div>`;
+        }
+
         function renderAllenamenti() {
+            renderHero();
             const container = document.getElementById('lista-allenamenti');
-            if(!container) return;
-            if(allenamenti.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm italic">Nessun allenamento registrato.</p>`;
+            if (!container) return;
+            if (allenamenti.length === 0) {
+                container.innerHTML = `<div class="sm-card">${vuoto('fa-clipboard-user', 'Nessun allenamento: crealo con il pulsante in basso')}</div>`;
                 return;
             }
+            const tot = giocatori.length || 1;
             container.innerHTML = allenamenti.map(a => {
-                const dataF = new Date(a.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
                 const presenti = Object.values(a.presenze || {}).filter(p => p === 'presente' || p === 'ritardo').length;
                 const numEs = (a.eserciziSessione || []).length;
+                const perc = Math.round(presenti / tot * 100);
                 return `
-                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <div>
-                            <h3 class="font-bold text-gray-800"><i class="fa-regular fa-calendar mr-2 text-indigo-600"></i>${dataF}</h3>
-                            <p class="text-xs text-gray-500 mt-0.5">Partecipanti: ${presenti}/${giocatori.length} | Esercizi sessione: ${numEs}</p>
+                    <div class="sm-card">
+                        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                            <div class="sm-card__title">${cap(fmtData(a.data, { weekday: 'long', day: 'numeric', month: 'long' }))}</div>
+                            <span class="sm-chip sm-chip--${livello(perc)}">${presenti}/${giocatori.length}</span>
                         </div>
-                        <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
-                            <button onclick="apriModalEsercizi(${a.id})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap"><i class="fa-solid fa-dumbbell mr-1"></i> Gestisci Esercizi</button>
-                            <button onclick="apriModalPresenze(${a.id})" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap"><i class="fa-solid fa-clipboard-user mr-1"></i> Gestisci Presenze</button>
-                            <button onclick="eliminaAllenamento(${a.id})" class="text-red-500 hover:text-red-700 px-2 py-1.5"><i class="fa-solid fa-trash-can"></i></button>
+                        <div class="sm-progress sm-progress--${livello(perc)}"><span style="width:${Math.min(perc, 100)}%"></span></div>
+                        <div class="sm-item__meta" style="margin-top: 6px">${perc}% presenti · ${numEs} ${numEs === 1 ? 'esercizio' : 'esercizi'}</div>
+                        <div class="actions">
+                            <button onclick="apriModalPresenze(${a.id})" class="sm-btn sm-btn--tonal sm-btn--sm"><i class="fa-solid fa-clipboard-user"></i> Presenze</button>
+                            <button onclick="apriModalEsercizi(${a.id})" class="sm-btn sm-btn--tonal sm-btn--sm"><i class="fa-solid fa-dumbbell"></i> Esercizi</button>
+                            <button onclick="eliminaAllenamento(${a.id})" class="sm-iconbtn sm-iconbtn--danger" aria-label="Elimina allenamento"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // --- GESTIONE ESERCIZI SESSIONE (MODALE) ---
+        // ================= ESERCIZI DELLA SESSIONE (SHEET) =================
         function apriModalEsercizi(id) {
             const allenamento = allenamenti.find(a => a.id === id);
-            if(!allenamento) return;
+            if (!allenamento) return;
             allenamentoCorrenteId = id;
-            document.getElementById('modal-es-title').innerText = "Esercizi - Allenamento del " + new Date(allenamento.data).toLocaleDateString('it-IT');
+            document.getElementById('modal-es-title').innerText = "Esercizi del " + new Date(allenamento.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long' });
 
             const selectArchivio = document.getElementById('select-esercizio-archivio');
-            selectArchivio.innerHTML = `<option value="">-- Seleziona esercizio --</option>` + esercizi.map(es => `
-                <option value="${es.id}">${es.titolo}</option>
-            `).join('');
+            selectArchivio.innerHTML = `<option value="">Seleziona esercizio</option>` + esercizi.map(es => `<option value="${es.id}">${esc(es.titolo)}</option>`).join('');
 
             renderEserciziSessioneModal();
-            document.getElementById('modal-esercizi-allenamento').classList.remove('hidden');
+            openSheet('modal-esercizi-allenamento');
         }
 
         function chiudiModalEsercizi() {
-            document.getElementById('modal-esercizi-allenamento').classList.add('hidden');
+            closeSheet('modal-esercizi-allenamento');
             allenamentoCorrenteId = null;
             renderAllenamenti();
         }
@@ -1024,14 +1343,14 @@
         async function aggiungiEsercizioDaArchivio() {
             const select = document.getElementById('select-esercizio-archivio');
             const esId = select.value;
-            if(!esId) { alert("Seleziona un esercizio dall'archivio!"); return; }
+            if (!esId) { toast("Seleziona un esercizio dalla libreria", 'errore'); return; }
             const esTrovato = esercizi.find(x => x.id == esId);
-            if(!esTrovato) return;
+            if (!esTrovato) return;
 
             const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
-            if(!a) return;
+            if (!a) return;
 
-            if(!a.eserciziSessione) a.eserciziSessione = [];
+            if (!a.eserciziSessione) a.eserciziSessione = [];
             a.eserciziSessione.push({ ...esTrovato, idIstanza: Date.now() });
 
             await salvaCloud("allenamenti", a.id, a);
@@ -1045,7 +1364,7 @@
             const titolo = document.getElementById('modal-es-titolo').value.trim();
             const descrizione = document.getElementById('modal-es-desc').value.trim();
             const link = document.getElementById('modal-es-link').value.trim();
-            if(!titolo) { alert("Inserisci almeno il titolo dell'esercizio!"); return; }
+            if (!titolo) { toast("Inserisci almeno il titolo dell'esercizio", 'errore'); return; }
 
             const nuovoEsLib = { id: Date.now(), titolo, descrizione, link };
             esercizi.push(nuovoEsLib);
@@ -1053,9 +1372,9 @@
             registraLog(`Creato nuovo esercizio in libreria (al volo): ${titolo}`);
 
             const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
-            if(!a) return;
+            if (!a) return;
 
-            if(!a.eserciziSessione) a.eserciziSessione = [];
+            if (!a.eserciziSessione) a.eserciziSessione = [];
             a.eserciziSessione.push({ ...nuovoEsLib, idIstanza: Date.now() });
 
             await salvaCloud("allenamenti", a.id, a);
@@ -1064,15 +1383,16 @@
             document.getElementById('modal-es-titolo').value = "";
             document.getElementById('modal-es-desc').value = "";
             document.getElementById('modal-es-link').value = "";
-            
+
             renderEserciziSessioneModal();
             renderEsercizi();
             renderAllenamenti();
+            toast("Esercizio aggiunto alla sessione");
         }
 
         async function rimuoviEsercizioSessione(idIstanza) {
             const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
-            if(!a) return;
+            if (!a) return;
 
             a.eserciziSessione = (a.eserciziSessione || []).filter(x => x.idIstanza !== idIstanza);
             await salvaCloud("allenamenti", a.id, a);
@@ -1084,52 +1404,57 @@
         function renderEserciziSessioneModal() {
             const container = document.getElementById('modal-lista-esercizi-sessione');
             const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
-            if(!container || !a) return;
+            if (!container || !a) return;
 
             const lista = a.eserciziSessione || [];
-            if(lista.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-xs italic">Nessun esercizio inserito in questa sessione.</p>`;
+            if (lista.length === 0) {
+                container.innerHTML = `<div class="sm-empty" style="padding: var(--space-3)">Nessun esercizio in questa sessione</div>`;
                 return;
             }
 
-            container.innerHTML = lista.map(es => `
-                <div class="bg-white p-3 rounded-xl border border-indigo-100 text-xs space-y-1">
-                    <div class="flex justify-between items-start">
-                        <strong class="text-gray-800 text-sm"><i class="fa-solid fa-futbol text-indigo-600 mr-1.5"></i>${es.titolo}</strong>
-                        <button onclick="rimuoviEsercizioSessione(${es.idIstanza})" class="text-red-500 hover:text-red-700 px-1.5 py-0.5"><i class="fa-solid fa-trash-can"></i></button>
+            container.innerHTML = lista.map((es, i) => `
+                <div class="sm-item" style="background: var(--surface-sunken); border-radius: var(--radius-md); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3); align-items: flex-start">
+                    <span class="sm-jersey" style="width:32px;height:32px;font-size:15px">${i + 1}</span>
+                    <div class="sm-item__body">
+                        <div class="sm-item__title" style="font-size:15px">${esc(es.titolo)}</div>
+                        ${es.descrizione ? `<div class="desc">${esc(es.descrizione)}</div>` : ''}
+                        ${es.link ? `<a href="${esc(es.link)}" target="_blank" rel="noopener" class="ex-link"><i class="fa-solid fa-circle-play"></i> Guarda il video</a>` : ''}
                     </div>
-                    ${es.descrizione ? `<p class="text-gray-600 whitespace-pre-line">${es.descrizione}</p>` : ''}
-                    ${es.link ? `<div><a href="${es.link}" target="_blank" class="inline-flex items-center gap-1 text-indigo-600 hover:underline font-semibold mt-1"><i class="fa-solid fa-video"></i> Guarda Video</a></div>` : ''}
+                    <button onclick="rimuoviEsercizioSessione(${es.idIstanza})" class="sm-iconbtn sm-iconbtn--danger" aria-label="Rimuovi dalla sessione"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             `).join('');
         }
 
-        // --- GESTIONE PRESENZE (MODALE) ---
-        function apriModalPresenze(id) {
+        // ================= PRESENZE (SHEET) =================
+        function renderPresenze(id) {
             const allenamento = allenamenti.find(a => a.id === id);
-            if(!allenamento) return;
-            allenamentoCorrenteId = id;
-            document.getElementById('modal-presenze-title').innerText = "Presenze del " + new Date(allenamento.data).toLocaleDateString('it-IT');
+            if (!allenamento) return;
             const container = document.getElementById('modal-presenze-list');
-
+            const opzioni = [['presente', 'fa-check', 'Presente'], ['ritardo', 'fa-clock', 'Ritardo'], ['assente', 'fa-xmark', 'Assente']];
             container.innerHTML = giocatori.map(g => {
                 const stato = (allenamento.presenze || {})[g.id] || 'presente';
                 return `
-                    <div class="py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <span class="font-medium text-gray-800">${g.nome} ${g.cognome} ${g.numero ? '('+g.numero+')' : ''}</span>
-                        <div class="flex gap-1 w-full sm:w-auto">
-                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'presente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'presente' ? 'bg-emerald-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Presente</button>
-                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'ritardo')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'ritardo' ? 'bg-amber-500 text-white shadow' : 'bg-gray-100 text-gray-600'}">In ritardo</button>
-                            <button onclick="setStatoPresenza(${id}, ${g.id}, 'assente')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-medium rounded-lg transition ${stato === 'assente' ? 'bg-red-600 text-white shadow' : 'bg-gray-100 text-gray-600'}">Assente</button>
+                    <div class="pres-row">
+                        <div class="sm-item__title">${nomeCompleto(g)} ${g.numero ? `<span class="sm-item__meta">#${esc(g.numero)}</span>` : ''}</div>
+                        <div class="sm-seg sm-seg--attendance" role="group" aria-label="Presenza di ${esc(g.nome)}">
+                            ${opzioni.map(([v, ic, lab]) => `<button class="sm-seg__opt" data-v="${v}" aria-pressed="${stato === v}" onclick="setStatoPresenza(${id}, ${g.id}, '${v}')"><i class="fa-solid ${ic}"></i>${lab}</button>`).join('')}
                         </div>
                     </div>
                 `;
             }).join('');
-            document.getElementById('modal-presenze-allenamento').classList.remove('hidden');
+        }
+
+        function apriModalPresenze(id) {
+            const allenamento = allenamenti.find(a => a.id === id);
+            if (!allenamento) return;
+            allenamentoCorrenteId = id;
+            document.getElementById('modal-presenze-title').innerText = "Presenze del " + new Date(allenamento.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long' });
+            renderPresenze(id);
+            openSheet('modal-presenze-allenamento');
         }
 
         function chiudiModalPresenze() {
-            document.getElementById('modal-presenze-allenamento').classList.add('hidden');
+            closeSheet('modal-presenze-allenamento');
             allenamentoCorrenteId = null;
             registraLog("Aggiornate presenze allenamento");
             renderAllenamenti();
@@ -1137,31 +1462,40 @@
 
         async function setStatoPresenza(allenamentoId, giocatoreId, stato) {
             const a = allenamenti.find(item => item.id === allenamentoId);
-            if(a) { 
-                if(!a.presenze) a.presenze = {};
-                a.presenze[giocatoreId] = stato; 
+            if (a) {
+                if (!a.presenze) a.presenze = {};
+                a.presenze[giocatoreId] = stato;
+                renderPresenze(allenamentoId);
                 await salvaCloud("allenamenti", a.id, a);
-                apriModalPresenze(allenamentoId); 
             }
         }
 
-        // --- CALENDARIO PARTITE ---
+        // ================= CALENDARIO PARTITE =================
         function renderCalendario() {
             const container = document.getElementById('lista-partite-calendario');
-            if(!container) return;
+            if (!container) return;
+            const oggi = oggiISO();
             container.innerHTML = calendarioPartite.map((p, idx) => {
                 const haConvocazioni = convocazioniStorico[p.giornata] && convocazioniStorico[p.giornata].length > 0;
+                const casa = isNostra(p.casa);
+                const passata = p.data < oggi;
+                const maps = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.campo);
                 return `
-                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <div>
-                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">Giornata ${p.giornata}</span>
-                            <h4 class="font-bold text-gray-800 mt-1">${p.casa} vs ${p.fuori}</h4>
-                            <p class="text-xs text-gray-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${new Date(p.data).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})} ore ${p.ora}</p>
-                            <p class="text-xs text-gray-400 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${p.campo}</p>
+                    <div class="sm-match ${passata ? 'sm-match--past' : ''}">
+                        <div class="sm-match__head">
+                            <span class="sm-chip sm-chip--primary">Giornata ${p.giornata}</span>
+                            ${casa ? '<span class="sm-chip">Casa</span>' : '<span class="sm-chip sm-chip--accent">Trasferta</span>'}
+                            <span class="sm-match__date">${fmtData(p.data)} · ${esc(p.ora)}</span>
                         </div>
-                        <div class="flex gap-2 w-full sm:w-auto justify-end">
-                            ${haConvocazioni ? `<button onclick="apriModalStoricoConvocazioni(${p.giornata})" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap"><i class="fa-solid fa-list-check mr-1"></i> Storico Convocazioni</button>` : ''}
-                            <button onclick="apriModalPartita(${idx})" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap"><i class="fa-solid fa-pen mr-1"></i> Modifica</button>
+                        <div class="sm-match__teams">
+                            <div class="sm-match__team ${isNostra(p.casa) ? 'sm-match__team--us' : ''}">${esc(p.casa)}</div>
+                            <div class="sm-match__vs">VS</div>
+                            <div class="sm-match__team ${isNostra(p.fuori) ? 'sm-match__team--us' : ''}">${esc(p.fuori)}</div>
+                        </div>
+                        <a class="sm-match__place" href="${maps}" target="_blank" rel="noopener" style="text-decoration:none"><i class="fa-solid fa-location-dot" style="margin-top:3px"></i><span>${esc(p.campo)}</span></a>
+                        <div class="sm-match__actions">
+                            ${haConvocazioni ? `<button onclick="apriModalStoricoConvocazioni(${p.giornata})" class="sm-btn sm-btn--tonal sm-btn--sm"><i class="fa-solid fa-list-check"></i> Convocati (${convocazioniStorico[p.giornata].length})</button>` : ''}
+                            <button onclick="apriModalPartita(${idx})" class="sm-btn sm-btn--ghost sm-btn--sm"><i class="fa-solid fa-pen"></i> Modifica</button>
                         </div>
                     </div>
                 `;
@@ -1170,22 +1504,22 @@
 
         function apriModalStoricoConvocazioni(giornata) {
             const convocatiIds = convocazioniStorico[giornata] || [];
-            document.getElementById('modal-storico-title').innerText = `Convocati Giornata ${giornata}`;
+            document.getElementById('modal-storico-title').innerText = `Convocati giornata ${giornata}`;
             const container = document.getElementById('modal-storico-content');
 
-            if(convocatiIds.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore storicizzato per questa partita.</p>`;
+            if (convocatiIds.length === 0) {
+                container.innerHTML = vuoto('fa-list-check', 'Nessun giocatore salvato per questa partita');
             } else {
                 container.innerHTML = convocatiIds.map(id => {
                     const g = giocatori.find(item => item.id === Number(id));
-                    return g ? `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100 text-sm font-medium"><i class="fa-solid fa-check text-emerald-600 mr-2"></i>${g.nome} ${g.cognome} ${g.numero ? '(# '+g.numero+')' : ''}</div>` : '';
+                    return g ? `<div class="sm-item">${jersey(g)}<div class="sm-item__body"><div class="sm-item__title">${nomeCompleto(g)}</div></div><span class="sm-chip sm-chip--success"><i class="fa-solid fa-check"></i>Convocato</span></div>` : '';
                 }).join('');
             }
-            document.getElementById('modal-storico-convocazioni').classList.remove('hidden');
+            openSheet('modal-storico-convocazioni');
         }
 
         function chiudiModalStorico() {
-            document.getElementById('modal-storico-convocazioni').classList.add('hidden');
+            closeSheet('modal-storico-convocazioni');
         }
 
         function apriModalPartita(idx) {
@@ -1196,11 +1530,11 @@
             document.getElementById('edit-data').value = p.data;
             document.getElementById('edit-ora').value = p.ora;
             document.getElementById('edit-campo').value = p.campo;
-            document.getElementById('modal-partita').classList.remove('hidden');
+            openSheet('modal-partita');
         }
 
         function chiudiModalPartita() {
-            document.getElementById('modal-partita').classList.add('hidden');
+            closeSheet('modal-partita');
         }
 
         async function salvaPartitaModificata() {
@@ -1218,16 +1552,18 @@
             chiudiModalPartita();
             renderCalendario();
             renderConvocazioni();
+            renderHero();
+            toast("Partita aggiornata");
         }
 
-        // --- CONVOCAZIONI & STORICIZZAZIONE ---
+        // ================= CONVOCAZIONI =================
         function calcolaPercentuali(giocatoreId) {
             const oggi = new Date();
             const anno = oggi.getFullYear(), mese = oggi.getMonth();
             const giornoSett = oggi.getDay() || 7;
             const inizioSett = new Date(oggi);
             inizioSett.setDate(oggi.getDate() - giornoSett + 1);
-            inizioSett.setHours(0,0,0,0);
+            inizioSett.setHours(0, 0, 0, 0);
 
             let allSett = 0, presSett = 0, allMese = 0, presMese = 0;
 
@@ -1237,10 +1573,10 @@
                 const partecipato = (stato === 'presente' || stato === 'ritardo');
 
                 if (dataAll >= inizioSett) {
-                    allSett++; if(partecipato) presSett++;
+                    allSett++; if (partecipato) presSett++;
                 }
                 if (dataAll.getFullYear() === anno && dataAll.getMonth() === mese) {
-                    allMese++; if(partecipato) presMese++;
+                    allMese++; if (partecipato) presMese++;
                 }
             });
 
@@ -1255,9 +1591,9 @@
             let presenti = 0, ritardi = 0, assenti = 0;
             allenamenti.forEach(a => {
                 const s = (a.presenze || {})[g.id];
-                if(s === 'presente') presenti++;
-                if(s === 'ritardo') ritardi++;
-                if(s === 'assente') assenti++;
+                if (s === 'presente') presenti++;
+                if (s === 'ritardo') ritardi++;
+                if (s === 'assente') assenti++;
             });
             const presTot = presenti + ritardi;
             const percGlobal = totalAll > 0 ? Math.round((presTot / totalAll) * 100) : 0;
@@ -1266,7 +1602,7 @@
             let partiteTotaliConvocabili = Object.keys(convocazioniStorico).length;
 
             Object.values(convocazioniStorico).forEach(convList => {
-                if(convList.includes(g.id) || convList.includes(String(g.id))) totaleConvocazioni++;
+                if (convList.includes(g.id) || convList.includes(String(g.id))) totaleConvocazioni++;
             });
 
             const percConvocazione = partiteTotaliConvocabili > 0 ? Math.round((totaleConvocazioni / partiteTotaliConvocabili) * 100) : 0;
@@ -1276,25 +1612,37 @@
 
         function renderConvocazioni() {
             const select = document.getElementById('select-partita-convocazione');
-            if(select) {
+            if (select) {
                 const selectedVal = select.value;
                 select.innerHTML = calendarioPartite.map((p, idx) => `
-                    <option value="${idx}">Giornata ${p.giornata}: ${p.casa} vs ${p.fuori} (${new Date(p.data).toLocaleDateString('it-IT')} ore ${p.ora})</option>
+                    <option value="${idx}">G${p.giornata} · ${esc(p.casa)} vs ${esc(p.fuori)} · ${new Date(p.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })} ${esc(p.ora)}</option>
                 `).join('');
-                if(selectedVal !== "" && select.options[selectedVal]) {
+                if (selectedVal !== "" && select.options[selectedVal]) {
                     select.value = selectedVal;
+                } else {
+                    // Preseleziona la prossima partita
+                    const oggi = oggiISO();
+                    const prossima = calendarioPartite.findIndex(p => p.data >= oggi);
+                    if (prossima >= 0) select.value = String(prossima);
                 }
             }
             renderConvocazioniCheckboxes();
         }
 
+        function aggiornaConteggioConvocati() {
+            const n = document.querySelectorAll('.convocato-checkbox:checked').length;
+            const el = document.getElementById('conteggio-convocati');
+            if (el) el.innerText = n + ' convocati';
+        }
+
         function renderConvocazioniCheckboxes() {
             const selectPartita = document.getElementById('select-partita-convocazione');
             const container = document.getElementById('lista-convocazioni-checkbox');
-            if(!container || !selectPartita) return;
+            if (!container || !selectPartita) return;
 
-            if(giocatori.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm p-4">Nessun giocatore in anagrafica.</p>`;
+            if (giocatori.length === 0) {
+                container.innerHTML = vuoto('fa-users', 'Nessun giocatore in rosa');
+                aggiornaConteggioConvocati();
                 return;
             }
 
@@ -1305,34 +1653,47 @@
             container.innerHTML = giocatori.map(g => {
                 const { sett, mese } = calcolaPercentuali(g.id);
                 let isChecked = true;
-                if(convocatiEsistenti !== null) {
+                if (convocatiEsistenti !== null) {
                     isChecked = convocatiEsistenti.includes(g.id) || convocatiEsistenti.includes(String(g.id));
                 }
-
                 return `
-                    <div class="py-3 flex items-center justify-between">
-                        <label class="flex items-center gap-3 cursor-pointer flex-1">
-                            <input type="checkbox" data-giocatore-id="${g.id}" class="convocato-checkbox w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" ${isChecked ? 'checked' : ''}>
-                            <div>
-                                <span class="font-bold text-gray-800">${g.nome} ${g.cognome}</span>
-                                ${g.numero ? `<span class="ml-1 text-xs text-gray-500 font-semibold">#${g.numero}</span>` : ''}
+                    <label class="conv-item">
+                        <input type="checkbox" data-giocatore-id="${g.id}" class="convocato-checkbox sm-check" ${isChecked ? 'checked' : ''} onchange="aggiornaConteggioConvocati()">
+                        ${jersey(g)}
+                        <div class="sm-item__body">
+                            <div class="sm-item__title">${nomeCompleto(g)}</div>
+                            <div class="conv-chips">
+                                <span class="sm-chip sm-chip--${livello(sett)}">Sett ${sett}%</span>
+                                <span class="sm-chip sm-chip--${livello(mese)}">Mese ${mese}%</span>
                             </div>
-                        </label>
-                        <div class="flex gap-2 text-xs">
-                            <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg font-medium">Sett: <strong>${sett}%</strong></span>
-                            <span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-lg font-medium">Mese: <strong>${mese}%</strong></span>
                         </div>
-                    </div>
+                    </label>
                 `;
             }).join('');
+            aggiornaConteggioConvocati();
         }
 
         function calcolaOrarioRitrovo(oraPartita) {
-            if(!oraPartita || !oraPartita.includes(':')) return '30 minuti prima';
+            if (!oraPartita || !oraPartita.includes(':')) return '30 minuti prima';
             const [ore, minuti] = oraPartita.split(':').map(Number);
             let d = new Date();
             d.setHours(ore, minuti - 30, 0, 0);
             return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
+        async function copiaTesto(testo) {
+            try {
+                await navigator.clipboard.writeText(testo);
+                return true;
+            } catch (e) {
+                // Fallback per WebView Android senza permesso clipboard
+                const ta = document.createElement('textarea');
+                ta.value = testo; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                let ok = false; try { ok = document.execCommand('copy'); } catch (err) {}
+                ta.remove();
+                return ok;
+            }
         }
 
         async function copiaConvocazioniWhatsApp() {
@@ -1345,23 +1706,23 @@
             const convocatiNomi = [];
 
             checkboxes.forEach(cb => {
-                if(cb.checked) {
+                if (cb.checked) {
                     const id = Number(cb.getAttribute('data-giocatore-id'));
                     const g = giocatori.find(item => item.id === id);
-                    if(g) {
+                    if (g) {
                         convocatiIds.push(g.id);
                         convocatiNomi.push(`• ${g.nome}${g.cognome ? ' ' + g.cognome : ''}`);
                     }
                 }
             });
 
-            if(convocatiNomi.length === 0) { alert("Seleziona almeno un convocato!"); return; }
+            if (convocatiNomi.length === 0) { toast("Seleziona almeno un convocato", 'errore'); return; }
 
             convocazioniStorico[partita.giornata] = convocatiIds;
             await salvaCloud("convocazioni_storico", partita.giornata, { giornata: partita.giornata, convocati: convocatiIds });
 
             let testo = `⚽ *CONVOCAZIONI PARTITA* ⚽\n\n`;
-            if(partita) {
+            if (partita) {
                 const orarioRitrovo = calcolaOrarioRitrovo(partita.ora);
                 testo += `📅 *Giornata ${partita.giornata}* - ${partita.casa} vs ${partita.fuori}\n`;
                 testo += `⏰ Data: ${new Date(partita.data).toLocaleDateString('it-IT')} ore ${partita.ora}\n`;
@@ -1370,152 +1731,96 @@
             }
             testo += `*I convocati:*\n` + convocatiNomi.join('\n') + `\n\nForza Sporting Murialdo ❤️💙`;
 
-            navigator.clipboard.writeText(testo).then(() => {
-                registraLog(`Generate/Aggiornate convocazioni WhatsApp Giornata ${partita.giornata}`);
-                alert("Convocazioni salvate nello storico, dettagli partita e orario ritrovo copiati negli appunti per WhatsApp!");
-                renderCalendario();
-                renderStatistiche();
-            }).catch(() => alert("Errore durante la copia."));
+            registraLog(`Generate/Aggiornate convocazioni WhatsApp Giornata ${partita.giornata}`);
+            renderCalendario();
+            renderStatistiche();
+
+            if (await copiaTesto(testo)) {
+                toast("Convocazioni salvate e copiate: incollale su WhatsApp");
+            } else if (navigator.share) {
+                try { await navigator.share({ text: testo }); } catch (e) {}
+            } else {
+                toast("Convocazioni salvate, ma la copia non è riuscita", 'errore');
+            }
         }
 
-        // --- STATISTICHE ---
+        // ================= STATISTICHE =================
+        function ordinaGiocatori(tipo, campo) {
+            return [...giocatori].sort((a, b) => {
+                const statA = calcolaStatisticheGiocatore(a);
+                const statB = calcolaStatisticheGiocatore(b);
+                if (tipo === 'perc_desc') return statB[campo] - statA[campo] || a.nome.localeCompare(b.nome);
+                if (tipo === 'perc_asc') return statA[campo] - statB[campo] || a.nome.localeCompare(b.nome);
+                if (tipo === 'nome') return a.nome.localeCompare(b.nome);
+                if (tipo === 'numero') return (parseInt(a.numero) || 999) - (parseInt(b.numero) || 999) || a.nome.localeCompare(b.nome);
+                return 0;
+            });
+        }
+
+        function statRow(lead, nome, perc, dettaglio) {
+            return `
+                <div class="sm-stat">
+                    ${lead}
+                    <div class="sm-stat__body">
+                        <div class="sm-stat__name">${nome}</div>
+                        <div class="sm-progress sm-progress--${livello(perc)}"><span style="width:${Math.min(perc, 100)}%"></span></div>
+                        <div class="sm-stat__detail">${dettaglio}</div>
+                    </div>
+                    <div class="sm-stat__value">${perc}%</div>
+                </div>`;
+        }
+
         function renderStatistiche() {
-            // 1. Tab Statistiche Ragazzi (Allenamenti)
+            // 1. Per ragazzo (allenamenti)
             const containerRagazzi = document.getElementById('statistiche-ragazzi-list');
-            if(containerRagazzi) {
-                if(giocatori.length === 0) {
-                    containerRagazzi.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
+            if (containerRagazzi) {
+                if (giocatori.length === 0) {
+                    containerRagazzi.innerHTML = vuoto('fa-users', 'Nessun giocatore');
                 } else {
-                    const tipoOrdinamento = document.getElementById('ordinamento-ragazzi') ? document.getElementById('ordinamento-ragazzi').value : 'perc_desc';
-
-                    let giocatoriOrdinati = [...giocatori].sort((a, b) => {
-                        const statA = calcolaStatisticheGiocatore(a);
-                        const statB = calcolaStatisticheGiocatore(b);
-
-                        if (tipoOrdinamento === 'perc_desc') {
-                            return statB.percGlobal - statA.percGlobal || a.nome.localeCompare(b.nome);
-                        } else if (tipoOrdinamento === 'perc_asc') {
-                            return statA.percGlobal - statB.percGlobal || a.nome.localeCompare(b.nome);
-                        } else if (tipoOrdinamento === 'nome') {
-                            return a.nome.localeCompare(b.nome);
-                        } else if (tipoOrdinamento === 'numero') {
-                            const numA = parseInt(a.numero) || 999;
-                            const numB = parseInt(b.numero) || 999;
-                            return numA - numB || a.nome.localeCompare(b.nome);
-                        }
-                        return 0;
-                    });
-
-                    containerRagazzi.innerHTML = giocatoriOrdinati.map(g => {
+                    const tipo = document.getElementById('ordinamento-ragazzi').value || 'perc_desc';
+                    containerRagazzi.innerHTML = ordinaGiocatori(tipo, 'percGlobal').map(g => {
                         const { totalAll, presenti, ritardi, assenti, percGlobal } = calcolaStatisticheGiocatore(g);
-                        return `
-                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                <div>
-                                    <h4 class="font-bold text-gray-800 text-base">${g.nome} ${g.cognome} ${g.numero ? '(# '+g.numero+')' : ''}</h4>
-                                    <p class="text-xs text-gray-500 mt-0.5">Allenamenti registrati: ${totalAll} | Presenti: ${presenti} | In ritardo: ${ritardi} | Assenti: ${assenti}</p>
-                                </div>
-                                <div class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-center font-bold text-sm">
-                                    ${percGlobal}% <span class="text-xs font-normal block opacity-80">Presenza</span>
-                                </div>
-                            </div>
-                        `;
+                        return statRow(jersey(g), nomeCompleto(g), percGlobal, `${presenti} presenze · ${ritardi} ritardi · ${assenti} assenze su ${totalAll}`);
                     }).join('');
                 }
             }
 
-            // 2. Tab Statistiche Convocazioni Partite
+            // 2. Convocazioni partite
             const containerConv = document.getElementById('statistiche-convocazioni-list');
-            if(containerConv) {
-                if(giocatori.length === 0) {
-                    containerConv.innerHTML = `<p class="text-gray-400 text-sm">Nessun giocatore.</p>`;
+            if (containerConv) {
+                if (giocatori.length === 0) {
+                    containerConv.innerHTML = vuoto('fa-users', 'Nessun giocatore');
                 } else {
-                    const tipoOrdinamentoConv = document.getElementById('ordinamento-convocazioni') ? document.getElementById('ordinamento-convocazioni').value : 'perc_desc';
-
-                    let giocatoriConvOrdinati = [...giocatori].sort((a, b) => {
-                        const statA = calcolaStatisticheGiocatore(a);
-                        const statB = calcolaStatisticheGiocatore(b);
-
-                        if (tipoOrdinamentoConv === 'perc_desc') {
-                            return statB.percConvocazione - statA.percConvocazione || a.nome.localeCompare(b.nome);
-                        } else if (tipoOrdinamentoConv === 'perc_asc') {
-                            return statA.percConvocazione - statB.percConvocazione || a.nome.localeCompare(b.nome);
-                        } else if (tipoOrdinamentoConv === 'nome') {
-                            return a.nome.localeCompare(b.nome);
-                        } else if (tipoOrdinamentoConv === 'numero') {
-                            const numA = parseInt(a.numero) || 999;
-                            const numB = parseInt(b.numero) || 999;
-                            return numA - numB || a.nome.localeCompare(b.nome);
-                        }
-                        return 0;
-                    });
-
-                    containerConv.innerHTML = giocatoriConvOrdinati.map(g => {
+                    const tipo = document.getElementById('ordinamento-convocazioni').value || 'perc_desc';
+                    containerConv.innerHTML = ordinaGiocatori(tipo, 'percConvocazione').map(g => {
                         const { totaleConvocazioni, partiteTotaliConvocabili, percConvocazione } = calcolaStatisticheGiocatore(g);
-                        return `
-                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                <div>
-                                    <h4 class="font-bold text-gray-800 text-base">${g.nome} ${g.cognome} ${g.numero ? '(# '+g.numero+')' : ''}</h4>
-                                    <p class="text-xs text-gray-500 mt-0.5">Convocazioni ufficiali: <strong class="text-indigo-600">${totaleConvocazioni}</strong> su ${partiteTotaliConvocabili} partite generate</p>
-                                </div>
-                                <div class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-center font-bold text-sm">
-                                    ${percConvocazione}% <span class="text-xs font-normal block opacity-80">Convocazione</span>
-                                </div>
-                            </div>
-                        `;
+                        return statRow(jersey(g), nomeCompleto(g), percConvocazione, `Convocato ${totaleConvocazioni} volte su ${partiteTotaliConvocabili} partite`);
                     }).join('');
                 }
             }
 
-            // 3. Tab Statistiche per Allenamento (con ordinamento dedicato)
+            // 3. Per allenamento
             const containerAll = document.getElementById('statistiche-allenamenti-list');
-            if(containerAll) {
-                if(allenamenti.length === 0) {
-                    containerAll.innerHTML = `<p class="text-gray-400 text-sm">Nessun allenamento.</p>`;
+            if (containerAll) {
+                if (allenamenti.length === 0) {
+                    containerAll.innerHTML = vuoto('fa-clipboard-user', 'Nessun allenamento');
                 } else {
-                    const tipoOrdinamentoAll = document.getElementById('ordinamento-allenamenti') ? document.getElementById('ordinamento-allenamenti').value : 'data_desc';
-
-                    let allenamentiOrdinati = [...allenamenti].sort((a, b) => {
-                        let presA = 0, ritA = 0, presB = 0, ritB = 0;
-                        Object.values(a.presenze || {}).forEach(s => { if(s === 'presente') presA++; if(s === 'ritardo') ritA++; });
-                        Object.values(b.presenze || {}).forEach(s => { if(s === 'presente') presB++; if(s === 'ritardo') ritB++; });
-                        const totRosa = giocatori.length > 0 ? giocatori.length : 1;
-                        const percA = Math.round(((presA + ritA) / totRosa) * 100);
-                        const percB = Math.round(((presB + ritB) / totRosa) * 100);
-
-                        if (tipoOrdinamentoAll === 'data_desc') {
-                            return new Date(b.data) - new Date(a.data);
-                        } else if (tipoOrdinamentoAll === 'data_asc') {
-                            return new Date(a.data) - new Date(b.data);
-                        } else if (tipoOrdinamentoAll === 'perc_desc') {
-                            return percB - percA || new Date(b.data) - new Date(a.data);
-                        } else if (tipoOrdinamentoAll === 'perc_asc') {
-                            return percA - percB || new Date(b.data) - new Date(a.data);
-                        }
+                    const tipo = document.getElementById('ordinamento-allenamenti').value || 'data_desc';
+                    const totRosa = giocatori.length > 0 ? giocatori.length : 1;
+                    const conta = a => { let p = 0, r = 0, s = 0; Object.values(a.presenze || {}).forEach(x => { if (x === 'presente') p++; if (x === 'ritardo') r++; if (x === 'assente') s++; }); return { p, r, s, perc: Math.round(((p + r) / totRosa) * 100) }; };
+                    const ordinati = [...allenamenti].sort((a, b) => {
+                        const A = conta(a), B = conta(b);
+                        if (tipo === 'data_desc') return new Date(b.data) - new Date(a.data);
+                        if (tipo === 'data_asc') return new Date(a.data) - new Date(b.data);
+                        if (tipo === 'perc_desc') return B.perc - A.perc || new Date(b.data) - new Date(a.data);
+                        if (tipo === 'perc_asc') return A.perc - B.perc || new Date(b.data) - new Date(a.data);
                         return 0;
                     });
-
-                    containerAll.innerHTML = allenamentiOrdinati.map(a => {
-                        const dataF = new Date(a.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
-                        let pres = 0, rit = 0, ass = 0;
-                        Object.values(a.presenze || {}).forEach(s => {
-                            if(s === 'presente') pres++;
-                            if(s === 'ritardo') rit++;
-                            if(s === 'assente') ass++;
-                        });
-                        const totRosa = giocatori.length > 0 ? giocatori.length : 1;
-                        const percPresenze = Math.round(((pres + rit) / totRosa) * 100);
-
-                        return `
-                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                <div>
-                                    <h4 class="font-bold text-gray-800 text-base"><i class="fa-regular fa-calendar mr-2 text-indigo-600"></i>${dataF}</h4>
-                                    <p class="text-xs text-gray-500 mt-1">Presenti: <strong class="text-emerald-600">${pres}</strong> | In ritardo: <strong class="text-amber-500">${rit}</strong> | Assenti: <strong class="text-red-500">${ass}</strong> (Tot. Rosa: ${giocatori.length})</p>
-                                </div>
-                                <div class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-center font-bold text-sm">
-                                    ${percPresenze}% <span class="text-xs font-normal block opacity-80">Presenza Squadra</span>
-                                </div>
-                            </div>
-                        `;
+                    containerAll.innerHTML = ordinati.map(a => {
+                        const { p, r, s, perc } = conta(a);
+                        const d = new Date(a.data);
+                        const lead = `<span class="sm-jersey" style="flex-direction:column;line-height:1;font-size:16px">${d.getDate()}<small style="font-size:10px;font-family:var(--font-sans);text-transform:uppercase">${d.toLocaleDateString('it-IT', { month: 'short' })}</small></span>`;
+                        return statRow(lead, cap(fmtData(a.data, { weekday: 'long', day: 'numeric', month: 'long' })), perc, `${p} presenti · ${r} in ritardo · ${s} assenti`);
                     }).join('');
                 }
             }
@@ -1534,8 +1839,13 @@
 
         window.onload = function() {
             checkAuth();
+            switchStatSubTab('ragazzi');
+            const fab = document.getElementById('app-fab');
+            document.getElementById('nav-allenamenti').setAttribute('aria-current', 'page');
+            fab.classList.remove('hidden');
             renderTutto();
         };
+
     </script>
 </body>
 </html>
