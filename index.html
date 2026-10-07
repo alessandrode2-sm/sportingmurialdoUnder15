@@ -96,6 +96,9 @@
             <button onclick="switchTab('calendario')" id="btn-tab-calendario" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
                 <i class="fa-regular fa-calendar-days mr-1"></i> Partite
             </button>
+            <button onclick="switchTab('csi')" id="btn-tab-csi" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
+                <i class="fa-solid fa-globe mr-1"></i> CSI Milano
+            </button>
             <button onclick="switchTab('statistiche')" id="btn-tab-statistiche" class="flex-1 py-2 px-3 text-center font-medium rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 transition whitespace-nowrap">
                 <i class="fa-solid fa-chart-pie mr-1"></i> Statistiche
             </button>
@@ -193,6 +196,31 @@
                 <h2 class="text-lg font-bold mb-1 text-gray-700">Calendario Ufficiale - Sporting Murialdo Under 15 A 7 (Andata e Ritorno)</h2>
                 <p class="text-xs text-gray-500 mb-4">Partite ufficiali della squadra con campi invertiti nel girone di ritorno.</p>
                 <div id="lista-partite-calendario" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <!-- ================= SEZIONE CSI MILANO ================= -->
+        <div id="tab-csi" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-200 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-700"><i class="fa-solid fa-globe text-indigo-600 mr-2"></i>CSI Milano - Portale Ufficiale</h2>
+                        <p class="text-xs text-gray-500">Risultati, calendari e classifiche ufficiali con i filtri preselezionati per il girone.</p>
+                    </div>
+                    <a href="https://www.csi.milano.it/albo/risultati-calendario-classifiche-squadre.html?q=cal" target="_blank" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-external-link-alt"></i> Apri in nuova scheda
+                    </a>
+                </div>
+
+                <div class="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100 text-xs text-indigo-900 space-y-1">
+                    <p class="font-bold"><i class="fa-solid fa-info-circle mr-1"></i> Filtri preimpostati sul portale CSI:</p>
+                    <p>• <strong>Sport:</strong> Calcio a 7 &nbsp;|&nbsp; <strong>Campionato:</strong> Under 15 a 7 &nbsp;|&nbsp; <strong>Girone:</strong> Girone B &nbsp;|&nbsp; <strong>Squadra:</strong> Sporting Murialdo</p>
+                </div>
+
+                <!-- Iframe incorporato con filtri -->
+                <div class="w-full h-[650px] rounded-xl border border-gray-200 overflow-hidden bg-white shadow-inner">
+                    <iframe src="https://www.csi.milano.it/albo/risultati-calendario-classifiche-squadre.html?q=cal" class="w-full h-full border-0"></iframe>
+                </div>
             </div>
         </div>
 
@@ -416,7 +444,7 @@
 
     <!-- Script Logica con Firebase e Sincronizzazione Cloud -->
     <script>
-        const APP_VERSION = "2.9.1";
+        const APP_VERSION = "3.0";
         let utenteCorrente = localStorage.getItem('sq_utente_corrente') || null;
 
         let giocatori = [];
@@ -714,7 +742,7 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
 
-            ['allenamenti', 'esercizi', 'convocazioni', 'calendario', 'statistiche', 'anagrafica', 'utenti'].forEach(t => {
+            ['allenamenti', 'esercizi', 'convocazioni', 'calendario', 'csi', 'statistiche', 'anagrafica', 'utenti'].forEach(t => {
                 const btn = document.getElementById('btn-tab-' + t);
                 if(btn) {
                     if(t === tabId) {
@@ -749,9 +777,19 @@
             if(!titolo) return;
 
             let esObj;
-            if(idEdit) {
-                const es = esercizi.find(item => item.id == idEdit);
-                if(es) { es.titolo = titolo; es.descrizione = descrizione; es.link = link; esObj = es; registraLog(`Modificato esercizio: ${titolo}`); }
+            if(idEdit !== "") {
+                const es = esercizi.find(item => String(item.id) === String(idEdit));
+                if(es) { 
+                    es.titolo = titolo; 
+                    es.descrizione = descrizione; 
+                    es.link = link; 
+                    esObj = es; 
+                    registraLog(`Modificato esercizio: ${titolo}`); 
+                } else {
+                    esObj = { id: Number(idEdit), titolo, descrizione, link };
+                    esercizi.push(esObj);
+                    registraLog(`Aggiunto esercizio in libreria: ${titolo}`);
+                }
             } else {
                 esObj = { id: Date.now(), titolo, descrizione, link };
                 esercizi.push(esObj);
@@ -764,7 +802,7 @@
         }
 
         function preparaModificaEsercizio(id) {
-            const es = esercizi.find(item => item.id == id);
+            const es = esercizi.find(item => String(item.id) === String(id));
             if(!es) return;
             document.getElementById('edit-esercizio-id').value = es.id;
             document.getElementById('input-titolo-esercizio').value = es.titolo;
@@ -772,6 +810,7 @@
             document.getElementById('input-link-esercizio').value = es.link || '';
             document.getElementById('btn-salva-esercizio').innerHTML = `<i class="fa-solid fa-floppy-disk mr-1"></i> Salva Modifiche`;
             document.getElementById('btn-annulla-esercizio').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function resetFormEsercizio() {
@@ -784,9 +823,9 @@
         }
 
         async function eliminaEsercizio(id) {
-            const es = esercizi.find(item => item.id == id);
+            const es = esercizi.find(item => String(item.id) === String(id));
             if(confirm("Vuoi eliminare questo esercizio?")) {
-                esercizi = esercizi.filter(item => item.id != id);
+                esercizi = esercizi.filter(item => String(item.id) !== String(id));
                 await eliminaCloud("esercizi", id);
                 registraLog(`Eliminato esercizio: ${es ? es.titolo : id}`);
                 renderEsercizi();
@@ -1006,7 +1045,6 @@
             const link = document.getElementById('modal-es-link').value.trim();
             if(!titolo) { alert("Inserisci almeno il titolo dell'esercizio!"); return; }
 
-            // Crea l'esercizio nella libreria generale se non esiste già
             const nuovoEsLib = { id: Date.now(), titolo, descrizione, link };
             esercizi.push(nuovoEsLib);
             await salvaCloud("esercizi", nuovoEsLib.id, nuovoEsLib);
