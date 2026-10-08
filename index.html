@@ -416,9 +416,22 @@ body { overscroll-behavior-y: contain; }
                         <div class="sm-item" style="min-height: 0; padding: var(--space-3) 0 0">
                             <span class="sm-jersey"><i class="fa-solid fa-battery-half"></i></span>
                             <div class="sm-item__body">
-                                <div class="sm-item__title">Controllo ogni 5 minuti</div>
+                                <div class="sm-item__title">Controllo con l'app chiusa</div>
                                 <div class="sm-item__meta" id="stato-background">—</div>
                             </div>
+                        </div>
+                        <div class="sm-field" style="margin-top: var(--space-3)">
+                            <label class="sm-label" for="minuti-controllo">Frequenza del controllo</label>
+                            <select id="minuti-controllo" class="sm-select" onchange="impostaFrequenza(this.value)">
+                                <option value="1">Ogni minuto</option>
+                                <option value="2">Ogni 2 minuti</option>
+                                <option value="5">Ogni 5 minuti</option>
+                                <option value="10">Ogni 10 minuti</option>
+                                <option value="15">Ogni 15 minuti (risparmio batteria)</option>
+                                <option value="30">Ogni 30 minuti</option>
+                                <option value="60">Ogni ora</option>
+                            </select>
+                            <div class="sm-item__meta">Sotto i 15 minuti l'app consuma un po' più batteria. Con il telefono inattivo a lungo Android può comunque ritardare i controlli.</div>
                         </div>
                         <div class="actions">
                             <button class="sm-btn sm-btn--tonal sm-btn--sm" onclick="provaNotifica()"><i class="fa-solid fa-paper-plane"></i> Prova</button>
@@ -949,12 +962,24 @@ body { overscroll-behavior-y: contain; }
             document.getElementById('stato-notifiche').innerHTML = attive
                 ? '<span class="sm-chip sm-chip--success"><i class="fa-solid fa-check"></i>Attive</span>'
                 : '<span class="sm-chip sm-chip--danger"><i class="fa-solid fa-xmark"></i>Bloccate: tocca Impostazioni</span>';
+            const sel = document.getElementById('minuti-controllo');
+            if (window.AndroidApp.leggiMinuti) {
+                const m = String(window.AndroidApp.leggiMinuti());
+                if (![...sel.options].some(o => o.value === m)) sel.add(new Option(`Ogni ${m} minuti`, m));
+                sel.value = m;
+            } else sel.closest('.sm-field').classList.add('hidden');
             const bg = document.getElementById('stato-background');
             if (window.AndroidApp.backgroundLibero) {
                 bg.innerHTML = window.AndroidApp.backgroundLibero()
                     ? '<span class="sm-chip sm-chip--success"><i class="fa-solid fa-check"></i>Senza limiti batteria</span>'
                     : '<span class="sm-chip sm-chip--warning"><i class="fa-solid fa-triangle-exclamation"></i>Limitato dal risparmio batteria</span> <div class="sm-item__meta" style="margin-top:6px">Tocca <b>Impostazioni batteria</b>, scegli «Tutte le app», cerca Murialdo U15 e seleziona «Non ottimizzare».</div><button class="sm-btn sm-btn--ghost sm-btn--sm" style="padding-left:0" onclick="AndroidApp.chiediBackgroundLibero()">Impostazioni batteria</button>';
             }
+        }
+        function impostaFrequenza(v) {
+            if (!window.AndroidApp || !window.AndroidApp.impostaMinuti) return;
+            const m = parseInt(v, 10);
+            window.AndroidApp.impostaMinuti(m);
+            toast(m === 60 ? 'Controllo novità ogni ora' : `Controllo novità ogni ${m} ${m === 1 ? 'minuto' : 'minuti'}`);
         }
         function provaNotifica() {
             if (!window.AndroidApp) return;
