@@ -401,6 +401,34 @@ body { overscroll-behavior-y: contain; }
 
         <!-- ================= ALTRO (menu) ================= -->
         <section id="tab-altro" class="tab-content hidden">
+            <div id="sezione-notifiche">
+                <div class="sm-overline">Notifiche</div>
+                <div class="sm-card">
+                    <div id="notifiche-web" class="sm-item__meta hidden">Le notifiche arrivano sul telefono con l'app Android Murialdo U15.</div>
+                    <div id="notifiche-app">
+                        <div class="sm-item" style="min-height: 0; padding: 0">
+                            <span class="sm-jersey"><i class="fa-solid fa-bell"></i></span>
+                            <div class="sm-item__body">
+                                <div class="sm-item__title">Notifiche sul telefono</div>
+                                <div class="sm-item__meta" id="stato-notifiche">—</div>
+                            </div>
+                        </div>
+                        <div class="sm-item" style="min-height: 0; padding: var(--space-3) 0 0">
+                            <span class="sm-jersey"><i class="fa-solid fa-battery-half"></i></span>
+                            <div class="sm-item__body">
+                                <div class="sm-item__title">Controllo ogni 5 minuti</div>
+                                <div class="sm-item__meta" id="stato-background">—</div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="sm-btn sm-btn--tonal sm-btn--sm" onclick="provaNotifica()"><i class="fa-solid fa-paper-plane"></i> Prova</button>
+                            <button class="sm-btn sm-btn--tonal sm-btn--sm" onclick="controllaNovita()"><i class="fa-solid fa-rotate"></i> Controlla ora</button>
+                            <button class="sm-btn sm-btn--ghost sm-btn--sm" onclick="AndroidApp.apriImpostazioniNotifiche()">Impostazioni</button>
+                        </div>
+                        <div class="sm-item__meta" id="esito-controllo" style="margin-top: var(--space-2)"></div>
+                    </div>
+                </div>
+            </div>
             <div class="sm-overline">Squadra</div>
             <div class="sm-card" style="padding-top: var(--space-1); padding-bottom: var(--space-1)">
                 <button class="menu-item" onclick="switchTab('esercizi')"><span class="sm-jersey"><i class="fa-solid fa-dumbbell"></i></span><div class="sm-item__body"><div class="sm-item__title">Libreria esercizi</div><div class="sm-item__meta" id="menu-meta-esercizi"></div></div><i class="fa-solid fa-chevron-right"></i></button>
@@ -691,6 +719,7 @@ body { overscroll-behavior-y: contain; }
         const isNostra = nome => String(nome || '').toUpperCase().includes('MURIALDO');
         const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
         const fmtData = (d, opt) => new Date(d).toLocaleDateString('it-IT', opt || { weekday: 'short', day: 'numeric', month: 'short' });
+        const linkMappa = indirizzo => (window.AndroidApp ? 'geo:0,0?q=' : 'https://www.google.com/maps/search/?api=1&query=') + encodeURIComponent(indirizzo);
         const livello = p => p >= 75 ? 'success' : (p >= 50 ? 'warning' : 'danger');
         const oggiISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().split('T')[0]; };
 
@@ -891,7 +920,7 @@ body { overscroll-behavior-y: contain; }
             try {
                 const { doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
                 onSnapshot(doc(window.db, "notifiche", "ultima"), snap => {
-                    if (!snap.exists()) { ultimaSeqVista = 0; return; }
+                    if (!snap.exists()) { ultimaSeqVista = 0; if (window.AndroidApp && window.AndroidApp.segnaVisto) window.AndroidApp.segnaVisto('0'); return; }
                     const d = snap.data();
                     const seq = Number(d.seq || 0);
                     const mia = d.autore === utenteCorrente;
@@ -909,6 +938,37 @@ body { overscroll-behavior-y: contain; }
                 });
             } catch (e) { ascoltoAttivo = false; console.error("Errore ascolto notifiche:", e); }
         }
+
+        // Diagnostica notifiche (solo nell'app Android)
+        function aggiornaStatoNotifiche() {
+            const inApp = !!(window.AndroidApp && window.AndroidApp.notificheAttive);
+            document.getElementById('notifiche-web').classList.toggle('hidden', inApp);
+            document.getElementById('notifiche-app').classList.toggle('hidden', !inApp);
+            if (!inApp) return;
+            const attive = window.AndroidApp.notificheAttive();
+            document.getElementById('stato-notifiche').innerHTML = attive
+                ? '<span class="sm-chip sm-chip--success"><i class="fa-solid fa-check"></i>Attive</span>'
+                : '<span class="sm-chip sm-chip--danger"><i class="fa-solid fa-xmark"></i>Bloccate: tocca Impostazioni</span>';
+            const bg = document.getElementById('stato-background');
+            if (window.AndroidApp.backgroundLibero) {
+                bg.innerHTML = window.AndroidApp.backgroundLibero()
+                    ? '<span class="sm-chip sm-chip--success"><i class="fa-solid fa-check"></i>Senza limiti batteria</span>'
+                    : '<span class="sm-chip sm-chip--warning"><i class="fa-solid fa-triangle-exclamation"></i>Limitato dal risparmio batteria</span> <button class="sm-btn sm-btn--ghost sm-btn--sm" onclick="AndroidApp.chiediBackgroundLibero()">Consenti</button>';
+            }
+        }
+        function provaNotifica() {
+            if (!window.AndroidApp) return;
+            if (!window.AndroidApp.notificheAttive()) { toast("Notifiche bloccate: attivale nelle impostazioni", 'errore'); aggiornaStatoNotifiche(); return; }
+            window.AndroidApp.notifica("Notifica di prova", "Se la vedi, le notifiche funzionano");
+            toast("Notifica di prova inviata");
+        }
+        function controllaNovita() {
+            if (!window.AndroidApp || !window.AndroidApp.controllaOra) return;
+            const el = document.getElementById('esito-controllo');
+            el.innerText = 'Controllo in corso…';
+            setTimeout(() => { el.innerText = 'Esito: ' + window.AndroidApp.controllaOra(); }, 30);
+        }
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') aggiornaStatoNotifiche(); });
 
         function comunicaUtenteAllApp() {
             if (window.AndroidApp && window.AndroidApp.impostaUtente) window.AndroidApp.impostaUtente(notificaSempre() ? '' : (utenteCorrente || ''));
@@ -1336,7 +1396,7 @@ body { overscroll-behavior-y: contain; }
                     <div class="sm-hero__teams">${esc(avversario)}<small>${casa ? 'ospite dello' : 'contro lo'} Sporting Murialdo</small></div>
                     <div class="sm-hero__meta">
                         <span><i class="fa-regular fa-calendar"></i> ${cap(fmtData(p.data))} · ${esc(p.ora)}</span>
-                        <span><i class="fa-solid fa-location-dot"></i> ${esc(p.campo)}</span>
+                        <a href="${linkMappa(p.campo)}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline; text-underline-offset: 3px"><i class="fa-solid fa-location-dot"></i> ${esc(p.campo)}</a>
                     </div>
                 </div>`;
         }
@@ -1532,7 +1592,7 @@ body { overscroll-behavior-y: contain; }
                 const haConvocazioni = convocazioniStorico[p.giornata] && convocazioniStorico[p.giornata].length > 0;
                 const casa = isNostra(p.casa);
                 const passata = p.data < oggi;
-                const maps = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.campo);
+                const maps = linkMappa(p.campo);
                 return `
                     <div class="sm-match ${passata ? 'sm-match--past' : ''}">
                         <div class="sm-match__head">
@@ -1545,7 +1605,7 @@ body { overscroll-behavior-y: contain; }
                             <div class="sm-match__vs">VS</div>
                             <div class="sm-match__team ${isNostra(p.fuori) ? 'sm-match__team--us' : ''}">${esc(p.fuori)}</div>
                         </div>
-                        <a class="sm-match__place" href="${maps}" target="_blank" rel="noopener" style="text-decoration:none"><i class="fa-solid fa-location-dot" style="margin-top:3px"></i><span>${esc(p.campo)}</span></a>
+                        <a class="sm-match__place" href="${maps}" target="_blank" rel="noopener" style="text-decoration:none"><i class="fa-solid fa-location-dot" style="margin-top:3px"></i><span style="text-decoration: underline; text-underline-offset: 3px">${esc(p.campo)}</span><i class="fa-solid fa-diamond-turn-right" style="margin-left:auto;margin-top:3px;color:var(--primary)"></i></a>
                         <div class="sm-match__actions">
                             ${haConvocazioni ? `<button onclick="apriModalStoricoConvocazioni(${p.giornata})" class="sm-btn sm-btn--tonal sm-btn--sm"><i class="fa-solid fa-list-check"></i> Convocati (${convocazioniStorico[p.giornata].length})</button>` : ''}
                             <button onclick="apriModalPartita(${idx})" class="sm-btn sm-btn--ghost sm-btn--sm"><i class="fa-solid fa-pen"></i> Modifica</button>
@@ -1780,6 +1840,7 @@ body { overscroll-behavior-y: contain; }
                 testo += `📅 *Giornata ${partita.giornata}* - ${partita.casa} vs ${partita.fuori}\n`;
                 testo += `⏰ Data: ${new Date(partita.data).toLocaleDateString('it-IT')} ore ${partita.ora}\n`;
                 testo += `📍 Campo: ${partita.campo}\n`;
+                testo += `🗺️ https://maps.google.com/?q=${encodeURIComponent(partita.campo)}\n`;
                 testo += `⏱️ *Ritrovo:* Ore ${orarioRitrovo} direttamente sul campo di gioco\n\n`;
             }
             testo += `*I convocati:*\n` + convocatiNomi.join('\n') + `\n\nForza Sporting Murialdo ❤️💙`;
@@ -1902,6 +1963,7 @@ body { overscroll-behavior-y: contain; }
             document.getElementById('nav-allenamenti').setAttribute('aria-current', 'page');
             fab.classList.remove('hidden');
             renderTutto();
+            aggiornaStatoNotifiche();
         };
 
     </script>
