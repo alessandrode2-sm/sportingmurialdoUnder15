@@ -843,6 +843,7 @@ body { overscroll-behavior-y: contain; }
                 }
 
                 renderTutto();
+                ascoltaNotifiche();
             } catch (e) {
                 console.error("Errore caricamento cloud:", e);
                 toast("Dati non sincronizzati: controlla la connessione", 'errore');
@@ -865,6 +866,46 @@ body { overscroll-behavior-y: contain; }
                 const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
                 await deleteDoc(doc(window.db, collezione, String(id)));
             } catch (e) { console.error("Errore eliminazione cloud:", e); toast("Eliminazione non riuscita: riprova", 'errore'); }
+        }
+
+        // ================= NOTIFICHE =================
+        // Ogni novità aggiorna il documento notifiche/ultima (contatore seq).
+        // L'app Android lo controlla ogni ~15 minuti anche da chiusa; con la pagina aperta lo ascolta in tempo reale.
+        async function pubblicaNotifica(titolo, testo) {
+            if (!window.firebaseEnabled) return;
+            try {
+                const { doc, setDoc, increment } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                await setDoc(doc(window.db, "notifiche", "ultima"), { seq: increment(1), ts: Date.now(), titolo, testo, autore: utenteCorrente || '' }, { merge: true });
+            } catch (e) { console.error("Errore notifica:", e); }
+        }
+
+        let ultimaSeqVista = null;
+        let ascoltoAttivo = false;
+        async function ascoltaNotifiche() {
+            if (ascoltoAttivo || !window.firebaseEnabled) return;
+            ascoltoAttivo = true;
+            try {
+                const { doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                onSnapshot(doc(window.db, "notifiche", "ultima"), snap => {
+                    if (!snap.exists()) return;
+                    const d = snap.data();
+                    const seq = Number(d.seq || 0);
+                    if (ultimaSeqVista !== null && seq > ultimaSeqVista && d.autore !== utenteCorrente) {
+                        if (document.visibilityState === 'visible') {
+                            toast(`${d.titolo}: ${d.testo} · da ${d.autore}`);
+                            window.inizializzaDatiCloud();
+                        } else if (window.AndroidApp && window.AndroidApp.notifica) {
+                            window.AndroidApp.notifica(d.titolo, `${d.testo} · da ${d.autore}`);
+                        }
+                    }
+                    ultimaSeqVista = seq;
+                    if (window.AndroidApp && window.AndroidApp.segnaVisto) window.AndroidApp.segnaVisto(String(seq));
+                });
+            } catch (e) { ascoltoAttivo = false; console.error("Errore ascolto notifiche:", e); }
+        }
+
+        function comunicaUtenteAllApp() {
+            if (window.AndroidApp && window.AndroidApp.impostaUtente) window.AndroidApp.impostaUtente(utenteCorrente || '');
         }
 
         // ================= LOG & UTENZE =================
@@ -911,6 +952,7 @@ body { overscroll-behavior-y: contain; }
             } else {
                 overlay.classList.add('hidden');
                 document.getElementById('logged-user-label').innerText = utenteCorrente;
+                comunicaUtenteAllApp();
                 renderUtenti();
                 renderLog();
             }
@@ -946,6 +988,7 @@ body { overscroll-behavior-y: contain; }
                 registraLog("Logout effettuato");
                 try { localStorage.removeItem('sq_utente_corrente'); } catch (e) {}
                 utenteCorrente = null;
+                comunicaUtenteAllApp();
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
                 checkAuth();
@@ -1084,6 +1127,7 @@ body { overscroll-behavior-y: contain; }
                 esObj = { id: Date.now(), titolo, descrizione, link };
                 esercizi.push(esObj);
                 registraLog(`Aggiunto esercizio in libreria: ${titolo}`);
+                pubblicaNotifica("Nuovo esercizio", titolo);
             }
 
             await salvaCloud("esercizi", esObj.id, esObj);
@@ -1256,6 +1300,7 @@ body { overscroll-behavior-y: contain; }
             allenamenti.sort((a, b) => new Date(b.data) - new Date(a.data));
             await salvaCloud("allenamenti", nuovo.id, nuovo);
             registraLog(`Creato allenamento del ${data}`);
+            pubblicaNotifica("Nuovo allenamento", cap(fmtData(data, { weekday: 'long', day: 'numeric', month: 'long' })));
             renderAllenamenti();
             closeSheet('sheet-nuovo-allenamento');
             setTimeout(() => apriModalEsercizi(nuovo.id), 60);
@@ -1371,6 +1416,7 @@ body { overscroll-behavior-y: contain; }
             esercizi.push(nuovoEsLib);
             await salvaCloud("esercizi", nuovoEsLib.id, nuovoEsLib);
             registraLog(`Creato nuovo esercizio in libreria (al volo): ${titolo}`);
+            pubblicaNotifica("Nuovo esercizio", titolo);
 
             const a = allenamenti.find(item => item.id === allenamentoCorrenteId);
             if (!a) return;
@@ -1733,6 +1779,7 @@ body { overscroll-behavior-y: contain; }
             testo += `*I convocati:*\n` + convocatiNomi.join('\n') + `\n\nForza Sporting Murialdo ❤️💙`;
 
             registraLog(`Generate/Aggiornate convocazioni WhatsApp Giornata ${partita.giornata}`);
+            pubblicaNotifica("Convocazioni pronte", `Giornata ${partita.giornata} · ${partita.casa} vs ${partita.fuori} · ${convocatiIds.length} convocati`);
             renderCalendario();
             renderStatistiche();
 
