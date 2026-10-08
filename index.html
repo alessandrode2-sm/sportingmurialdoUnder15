@@ -879,6 +879,10 @@ body { overscroll-behavior-y: contain; }
             } catch (e) { console.error("Errore notifica:", e); }
         }
 
+        // Utenze che ricevono la notifica anche per le proprie azioni (utile per i test)
+        const NOTIFICHE_SEMPRE = ['alessandro'];
+        const notificaSempre = () => NOTIFICHE_SEMPRE.includes(String(utenteCorrente || '').toLowerCase());
+
         let ultimaSeqVista = null;
         let ascoltoAttivo = false;
         async function ascoltaNotifiche() {
@@ -887,13 +891,15 @@ body { overscroll-behavior-y: contain; }
             try {
                 const { doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
                 onSnapshot(doc(window.db, "notifiche", "ultima"), snap => {
-                    if (!snap.exists()) return;
+                    if (!snap.exists()) { ultimaSeqVista = 0; return; }
                     const d = snap.data();
                     const seq = Number(d.seq || 0);
-                    if (ultimaSeqVista !== null && seq > ultimaSeqVista && d.autore !== utenteCorrente) {
+                    const mia = d.autore === utenteCorrente;
+                    if (ultimaSeqVista !== null && seq > ultimaSeqVista && (!mia || notificaSempre())) {
                         if (document.visibilityState === 'visible') {
                             toast(`${d.titolo}: ${d.testo} · da ${d.autore}`);
-                            window.inizializzaDatiCloud();
+                            if (mia && window.AndroidApp && window.AndroidApp.notifica) window.AndroidApp.notifica(d.titolo, `${d.testo} · da ${d.autore}`);
+                            if (!mia) window.inizializzaDatiCloud();
                         } else if (window.AndroidApp && window.AndroidApp.notifica) {
                             window.AndroidApp.notifica(d.titolo, `${d.testo} · da ${d.autore}`);
                         }
@@ -905,7 +911,7 @@ body { overscroll-behavior-y: contain; }
         }
 
         function comunicaUtenteAllApp() {
-            if (window.AndroidApp && window.AndroidApp.impostaUtente) window.AndroidApp.impostaUtente(utenteCorrente || '');
+            if (window.AndroidApp && window.AndroidApp.impostaUtente) window.AndroidApp.impostaUtente(notificaSempre() ? '' : (utenteCorrente || ''));
         }
 
         // ================= LOG & UTENZE =================
