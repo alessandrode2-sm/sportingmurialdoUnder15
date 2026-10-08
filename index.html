@@ -964,6 +964,8 @@ body { overscroll-behavior-y: contain; }
                 : '<span class="sm-chip sm-chip--danger"><i class="fa-solid fa-xmark"></i>Bloccate: tocca Impostazioni</span>';
             const sel = document.getElementById('minuti-controllo');
             if (window.AndroidApp.leggiMinuti) {
+                const minimo = window.AndroidApp.minimoMinuti ? window.AndroidApp.minimoMinuti() : 1;
+                [...sel.options].forEach(o => { if (parseInt(o.value, 10) < minimo) o.remove(); });
                 const m = String(window.AndroidApp.leggiMinuti());
                 if (![...sel.options].some(o => o.value === m)) sel.add(new Option(`Ogni ${m} minuti`, m));
                 sel.value = m;
