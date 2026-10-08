@@ -968,7 +968,16 @@ body { overscroll-behavior-y: contain; }
             el.innerText = 'Controllo in corso…';
             setTimeout(() => { el.innerText = 'Esito: ' + window.AndroidApp.controllaOra(); }, 30);
         }
-        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') aggiornaStatoNotifiche(); });
+        // Quando si torna sull'app (es. tocco su una notifica) ricarica i dati, al massimo una volta ogni 5 secondi
+        let ultimoAggiornamento = Date.now();
+        window.aggiornaAlRitorno = function () {
+            aggiornaStatoNotifiche();
+            if (!window.firebaseEnabled || !utenteCorrente) return;
+            if (Date.now() - ultimoAggiornamento < 5000) return;
+            ultimoAggiornamento = Date.now();
+            window.inizializzaDatiCloud();
+        };
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') window.aggiornaAlRitorno(); });
 
         function comunicaUtenteAllApp() {
             if (window.AndroidApp && window.AndroidApp.impostaUtente) window.AndroidApp.impostaUtente(notificaSempre() ? '' : (utenteCorrente || ''));
