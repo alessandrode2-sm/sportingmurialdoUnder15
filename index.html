@@ -953,7 +953,7 @@ body { overscroll-behavior-y: contain; }
             if (window.AndroidApp.backgroundLibero) {
                 bg.innerHTML = window.AndroidApp.backgroundLibero()
                     ? '<span class="sm-chip sm-chip--success"><i class="fa-solid fa-check"></i>Senza limiti batteria</span>'
-                    : '<span class="sm-chip sm-chip--warning"><i class="fa-solid fa-triangle-exclamation"></i>Limitato dal risparmio batteria</span> <button class="sm-btn sm-btn--ghost sm-btn--sm" onclick="AndroidApp.chiediBackgroundLibero()">Consenti</button>';
+                    : '<span class="sm-chip sm-chip--warning"><i class="fa-solid fa-triangle-exclamation"></i>Limitato dal risparmio batteria</span> <div class="sm-item__meta" style="margin-top:6px">Tocca <b>Impostazioni batteria</b>, scegli «Tutte le app», cerca Murialdo U15 e seleziona «Non ottimizzare».</div><button class="sm-btn sm-btn--ghost sm-btn--sm" style="padding-left:0" onclick="AndroidApp.chiediBackgroundLibero()">Impostazioni batteria</button>';
             }
         }
         function provaNotifica() {
