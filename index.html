@@ -702,8 +702,9 @@ body { overscroll-behavior-y: contain; }
                 <div id="schiera-panchina" class="sm-bench"></div>
             </div>
             <div class="sm-sheet__foot">
-                <button class="sm-btn sm-btn--tonal" onclick="schieraAutomatica()"><i class="fa-solid fa-wand-magic-sparkles"></i> Automatica</button>
+                <button class="sm-btn sm-btn--tonal" style="flex: none; padding: 0 var(--space-4)" onclick="schieraAutomatica()" aria-label="Schiera automaticamente"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
                 <button class="sm-btn sm-btn--success" onclick="condividiFormazione()"><i class="fa-brands fa-whatsapp"></i> Condividi</button>
+                <button class="sm-btn sm-btn--primary" onclick="salvaEChiudiFormazione()"><i class="fa-solid fa-floppy-disk"></i> Salva</button>
             </div>
         </div>
     </div>
@@ -1987,6 +1988,21 @@ body { overscroll-behavior-y: contain; }
                 renderCalendario();
                 renderHero();
             }, 700);
+        }
+
+        async function salvaEChiudiFormazione() {
+            if (!schiera) return;
+            clearTimeout(timerSalvaFormazione);
+            const dati = { giornata: schiera.giornata, modulo: schiera.modulo, posti: schiera.posti.slice(), autore: utenteCorrente || '', ts: Date.now() };
+            formazioni[schiera.giornata] = dati;
+            document.getElementById('schiera-stato').innerText = 'Salvataggio…';
+            await salvaCloud('formazioni', dati.giornata, dati);
+            const n = dati.posti.filter(v => v != null).length;
+            registraLog(`Salvata formazione Giornata ${dati.giornata} (${dati.modulo})`);
+            closeSheet('sheet-schiera');
+            renderCalendario();
+            renderHero();
+            toast(n === 7 ? `Formazione ${dati.modulo} salvata` : `Formazione salvata (${n}/7 in campo)`);
         }
 
         async function condividiFormazione() {
