@@ -34,8 +34,8 @@
 
     <style>
 /* ===== Token: Murialdo U15 design system (tokens.json) ===== */
-:root, [data-theme="light"] {--surface:#F3F5FA;--surface-raised:#FFFFFF;--surface-sunken:#E8ECF5;--ink:#111A2E;--ink-muted:#525D75;--border:#D5DBE8;--border-strong:#7A849A;--primary:#1C3D99;--on-primary:#FFFFFF;--primary-tint:#E4EAFA;--accent:#C8102E;--on-accent:#FFFFFF;--accent-tint:#FCE7EA;--appbar:#0D1C47;--on-appbar:#FFFFFF;--success:#0B7356;--on-success:#FFFFFF;--success-tint:#DFF3EC;--warning:#A84E06;--on-warning:#FFFFFF;--warning-tint:#FDF0DC;--danger:#B4232A;--on-danger:#FFFFFF;--danger-tint:#FBE5E4;--focus:#1C3D99;--scrim:rgba(8, 14, 32, 0.56);--inverse-surface:#1B2337;--inverse-ink:#EDF1FA;--inverse-accent:#8DAAFF;--shadow-card:0 1px 2px rgba(13, 28, 71, 0.06);--shadow-fab:0 6px 16px rgba(200, 16, 46, 0.32);--shadow-sheet:0 -8px 32px rgba(13, 28, 71, 0.18);}
-[data-theme="dark"] {--surface:#0A1020;--surface-raised:#131B2E;--surface-sunken:#1B2540;--ink:#EDF1FA;--ink-muted:#9BA6BE;--border:#26314B;--border-strong:#6B7896;--primary:#8DAAFF;--on-primary:#0A1020;--primary-tint:#1B2A55;--accent:#FF6E7E;--on-accent:#1A0408;--accent-tint:#3A1520;--appbar:#131B2E;--on-appbar:#EDF1FA;--success:#4FD8A0;--on-success:#0A1020;--success-tint:#103328;--warning:#F4B248;--on-warning:#1A1000;--warning-tint:#3A2A0C;--danger:#FF8A80;--on-danger:#0A1020;--danger-tint:#3D1716;--focus:#8DAAFF;--scrim:rgba(0, 0, 0, 0.64);--inverse-surface:#EDF1FA;--inverse-ink:#111A2E;--inverse-accent:#1C3D99;--shadow-card:none;--shadow-fab:0 6px 16px rgba(0, 0, 0, 0.5);--shadow-sheet:0 -8px 32px rgba(0, 0, 0, 0.6);}
+:root, [data-theme="light"] {--surface:#F3F5FA;--surface-raised:#FFFFFF;--surface-sunken:#E8ECF5;--ink:#111A2E;--ink-muted:#525D75;--border:#D5DBE8;--border-strong:#7A849A;--primary:#1C3D99;--on-primary:#FFFFFF;--primary-tint:#E4EAFA;--accent:#C8102E;--on-accent:#FFFFFF;--accent-tint:#FCE7EA;--appbar:#0D1C47;--on-appbar:#FFFFFF;--success:#0B7356;--on-success:#FFFFFF;--success-tint:#DFF3EC;--warning:#A84E06;--on-warning:#FFFFFF;--warning-tint:#FDF0DC;--danger:#B4232A;--on-danger:#FFFFFF;--danger-tint:#FBE5E4;--focus:#1C3D99;--scrim:rgba(8, 14, 32, 0.56);--inverse-surface:#1B2337;--inverse-ink:#EDF1FA;--inverse-accent:#8DAAFF;--pitch:#2E7D4F;--pitch-stripe:#2A7448;--pitch-line:rgba(255, 255, 255, 0.72);--kit-red:#C8102E;--kit-blue:#1C3D99;--kit-gk:#F2C200;--shadow-card:0 1px 2px rgba(13, 28, 71, 0.06);--shadow-fab:0 6px 16px rgba(200, 16, 46, 0.32);--shadow-sheet:0 -8px 32px rgba(13, 28, 71, 0.18);}
+[data-theme="dark"] {--surface:#0A1020;--surface-raised:#131B2E;--surface-sunken:#1B2540;--ink:#EDF1FA;--ink-muted:#9BA6BE;--border:#26314B;--border-strong:#6B7896;--primary:#8DAAFF;--on-primary:#0A1020;--primary-tint:#1B2A55;--accent:#FF6E7E;--on-accent:#1A0408;--accent-tint:#3A1520;--appbar:#131B2E;--on-appbar:#EDF1FA;--success:#4FD8A0;--on-success:#0A1020;--success-tint:#103328;--warning:#F4B248;--on-warning:#1A1000;--warning-tint:#3A2A0C;--danger:#FF8A80;--on-danger:#0A1020;--danger-tint:#3D1716;--focus:#8DAAFF;--scrim:rgba(0, 0, 0, 0.64);--inverse-surface:#EDF1FA;--inverse-ink:#111A2E;--inverse-accent:#1C3D99;--pitch:#1F5C3A;--pitch-stripe:#1B5334;--pitch-line:rgba(255, 255, 255, 0.55);--kit-red:#C8102E;--kit-blue:#1C3D99;--kit-gk:#F2C200;--shadow-card:none;--shadow-fab:0 6px 16px rgba(0, 0, 0, 0.5);--shadow-sheet:0 -8px 32px rgba(0, 0, 0, 0.6);}
 :root {--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--radius-sm:6px;--radius-md:12px;--radius-lg:16px;--radius-xl:24px;--radius-pill:999px;--size-touch:48px;--size-appbar:56px;--size-bottomnav:56px;--font-display:"Barlow Condensed", "Arial Narrow", sans-serif;--font-sans:"Barlow", system-ui, sans-serif;}
 
 
@@ -188,6 +188,29 @@
 /* ---------- Empty state ---------- */
 .sm-empty { text-align: center; padding: var(--space-6) var(--space-4); color: var(--ink-muted); font-size: 14px; line-height: 20px; }
 .sm-empty i { display: block; font-size: 28px; margin-bottom: var(--space-2); color: var(--border-strong); }
+
+/* ---------- Schieramento (formazione su campo) ---------- */
+.sm-modchips { display: flex; gap: var(--space-2); overflow-x: auto; padding: 2px 0 var(--space-1); scrollbar-width: none; }
+.sm-modchips::-webkit-scrollbar { display: none; }
+.sm-modchip { flex: none; min-height: 40px; padding: 0 var(--space-4); border-radius: var(--radius-pill); border: 1px solid var(--border-strong); background: var(--surface-raised); color: var(--ink); font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: .02em; cursor: pointer; }
+.sm-modchip[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.sm-pitch { position: relative; width: min(100%, calc(56vh * 0.68)); aspect-ratio: 68 / 100; margin: var(--space-3) auto 0; border-radius: var(--radius-lg); overflow: hidden; background: repeating-linear-gradient(180deg, var(--pitch) 0 10%, var(--pitch-stripe) 10% 20%); box-shadow: var(--shadow-card); user-select: none; -webkit-user-select: none; }
+.sm-pitch__lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sm-pitch__lines * { fill: none; stroke: var(--pitch-line); stroke-width: 0.5; }
+.sm-pitch__lines .dot { fill: var(--pitch-line); stroke: none; }
+.sm-slot { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; width: 78px; padding: 0; border: 0; background: none; cursor: pointer; font: inherit; -webkit-tap-highlight-color: transparent; }
+.sm-slot__shirt { position: relative; display: grid; place-items: center; width: 46px; height: 44px; background: repeating-linear-gradient(90deg, var(--kit-red) 0 7px, var(--kit-blue) 7px 14px); clip-path: polygon(24% 0, 38% 7%, 62% 7%, 76% 0, 100% 16%, 90% 40%, 80% 35%, 80% 100%, 20% 100%, 20% 35%, 10% 40%, 0 16%); color: #ffffff; font-family: var(--font-display); font-weight: 700; font-size: 18px; line-height: 1; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7); padding-top: 6px; transition: transform .15s; }
+.sm-slot--gk .sm-slot__shirt { background: var(--kit-gk); color: var(--appbar); text-shadow: none; }
+.sm-slot__name { max-width: 78px; padding: 1px 6px; border-radius: var(--radius-pill); background: rgba(0, 0, 0, 0.62); color: #ffffff; font-size: 12px; line-height: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm-slot--empty .sm-slot__shirt { clip-path: none; width: 42px; height: 42px; border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.16); border: 2px dashed rgba(255, 255, 255, 0.85); padding: 0; font-family: var(--font-sans); font-size: 18px; text-shadow: none; color: #ffffff; }
+.sm-slot--empty .sm-slot__name { background: rgba(0, 0, 0, 0.38); font-weight: 700; letter-spacing: .06em; font-size: 11px; }
+.sm-pitch--target .sm-slot__shirt { animation: sm-pulse 1s ease-in-out infinite; }
+@keyframes sm-pulse { 50% { transform: scale(1.1); } }
+.sm-slot:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; border-radius: var(--radius-md); }
+.sm-bench { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.sm-benchp { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 4px var(--space-3) 4px 4px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--surface-raised); color: var(--ink); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.sm-benchp .sm-jersey { width: 34px; height: 34px; font-size: 15px; }
+.sm-benchp[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-tint); color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
 
 
 /* ===== Layout dell'app ===== */
@@ -641,6 +664,59 @@ body { overscroll-behavior-y: contain; }
         </form>
     </div>
 
+    <!-- ================= SHEET: Schiera formazione ================= -->
+    <div id="sheet-schiera" class="sm-scrim hidden" onclick="if(event.target===this) closeSheet(this.id)">
+        <div class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="schiera-titolo" style="max-height: 96vh">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head">
+                <div style="flex: 1; min-width: 0">
+                    <h3 class="sm-sheet__title" id="schiera-titolo">Schiera</h3>
+                    <div class="sm-item__meta" id="schiera-sottotitolo"></div>
+                </div>
+                <button class="sm-iconbtn" onclick="svuotaFormazione()" aria-label="Svuota il campo"><i class="fa-solid fa-eraser"></i></button>
+                <button class="sm-iconbtn" onclick="closeSheet('sheet-schiera')" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="sm-sheet__body">
+                <div class="sm-modchips" id="schiera-moduli" role="group" aria-label="Modulo"></div>
+                <div class="sm-pitch" id="schiera-campo">
+                    <svg class="sm-pitch__lines" viewBox="0 0 68 100" preserveAspectRatio="none" aria-hidden="true">
+                        <rect x="3" y="3" width="62" height="94" rx="1"/>
+                        <line x1="3" y1="50" x2="65" y2="50"/>
+                        <circle cx="34" cy="50" r="8"/>
+                        <circle class="dot" cx="34" cy="50" r="0.8"/>
+                        <rect x="18" y="3" width="32" height="13"/>
+                        <rect x="27" y="3" width="14" height="5"/>
+                        <rect x="18" y="84" width="32" height="13"/>
+                        <rect x="27" y="92" width="14" height="5"/>
+                        <circle class="dot" cx="34" cy="12" r="0.6"/>
+                        <circle class="dot" cx="34" cy="88" r="0.6"/>
+                    </svg>
+                    <div id="schiera-posti"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-3)">
+                    <span id="schiera-conteggio" class="sm-chip sm-chip--primary"></span>
+                    <span id="schiera-stato" class="sm-item__meta"></span>
+                </div>
+                <div class="sm-overline" id="schiera-panchina-titolo">Panchina</div>
+                <div class="sm-item__meta" id="schiera-suggerimento" style="margin: calc(var(--space-1) * -1) var(--space-1) var(--space-2)">Tocca un giocatore e poi un posto in campo, oppure tocca direttamente un posto.</div>
+                <div id="schiera-panchina" class="sm-bench"></div>
+            </div>
+            <div class="sm-sheet__foot">
+                <button class="sm-btn sm-btn--tonal" onclick="schieraAutomatica()"><i class="fa-solid fa-wand-magic-sparkles"></i> Automatica</button>
+                <button class="sm-btn sm-btn--success" onclick="condividiFormazione()"><i class="fa-brands fa-whatsapp"></i> Condividi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SHEET: Scegli giocatore per un posto ================= -->
+    <div id="sheet-scegli" class="sm-scrim hidden" onclick="if(event.target===this) closeSheet(this.id)">
+        <div class="sm-sheet" role="dialog" aria-modal="true" aria-labelledby="scegli-titolo">
+            <div class="sm-sheet__handle"></div>
+            <div class="sm-sheet__head"><h3 class="sm-sheet__title" id="scegli-titolo">Scegli</h3><button class="sm-iconbtn" onclick="closeSheet('sheet-scegli')" aria-label="Chiudi"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="sm-sheet__body"><div id="scegli-lista" class="sm-list"></div></div>
+        </div>
+    </div>
+
     <!-- ================= SHEET: Conferma (al posto di confirm) ================= -->
     <div id="sheet-conferma" class="sm-scrim hidden" onclick="if(event.target===this) rispostaConferma(false)">
         <div class="sm-sheet" role="alertdialog" aria-modal="true" aria-labelledby="conferma-titolo">
@@ -673,6 +749,7 @@ body { overscroll-behavior-y: contain; }
         let utenti = [];
         let logAttivita = [];
         let convocazioniStorico = {};
+        let formazioni = {};
         let allenamentoCorrenteId = null;
         let tabCorrente = 'allenamenti';
 
@@ -883,6 +960,9 @@ body { overscroll-behavior-y: contain; }
                         convocazioniStorico[d.id] = d.data().convocati;
                     });
                 }
+
+                const snapF = await getDocs(collection(db, "formazioni"));
+                snapF.docs.forEach(d => { formazioni[d.id] = d.data(); });
 
                 renderTutto();
                 ascoltaNotifiche();
@@ -1434,6 +1514,10 @@ body { overscroll-behavior-y: contain; }
                         <span><i class="fa-regular fa-calendar"></i> ${cap(fmtData(p.data))} · ${esc(p.ora)}</span>
                         <a href="${linkMappa(p.campo)}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline; text-underline-offset: 3px"><i class="fa-solid fa-location-dot"></i> ${esc(p.campo)}</a>
                     </div>
+                </div>
+                <div class="actions" style="margin-top: var(--space-2)">
+                    <button class="sm-btn sm-btn--tonal sm-btn--sm" onclick="switchTab('convocazioni')"><i class="fa-brands fa-whatsapp"></i> Convoca</button>
+                    <button class="sm-btn sm-btn--primary sm-btn--sm" onclick="apriSchiera(${p.giornata})"><i class="fa-solid fa-people-group"></i> ${formazioni[p.giornata] ? 'Formazione ' + esc(formazioni[p.giornata].modulo) : 'Schiera'}</button>
                 </div>`;
         }
 
@@ -1634,6 +1718,7 @@ body { overscroll-behavior-y: contain; }
                         <div class="sm-match__head">
                             <span class="sm-chip sm-chip--primary">Giornata ${p.giornata}</span>
                             ${casa ? '<span class="sm-chip">Casa</span>' : '<span class="sm-chip sm-chip--accent">Trasferta</span>'}
+                            ${formazioni[p.giornata] ? `<span class="sm-chip sm-chip--success"><i class="fa-solid fa-people-group"></i>${esc(formazioni[p.giornata].modulo)}</span>` : ''}
                             <span class="sm-match__date">${fmtData(p.data)} · ${esc(p.ora)}</span>
                         </div>
                         <div class="sm-match__teams">
@@ -1643,6 +1728,7 @@ body { overscroll-behavior-y: contain; }
                         </div>
                         <a class="sm-match__place" href="${maps}" target="_blank" rel="noopener" style="text-decoration:none"><i class="fa-solid fa-location-dot" style="margin-top:3px"></i><span style="text-decoration: underline; text-underline-offset: 3px">${esc(p.campo)}</span><i class="fa-solid fa-diamond-turn-right" style="margin-left:auto;margin-top:3px;color:var(--primary)"></i></a>
                         <div class="sm-match__actions">
+                            <button onclick="apriSchiera(${p.giornata})" class="sm-btn sm-btn--primary sm-btn--sm"><i class="fa-solid fa-people-group"></i> Schiera</button>
                             ${haConvocazioni ? `<button onclick="apriModalStoricoConvocazioni(${p.giornata})" class="sm-btn sm-btn--tonal sm-btn--sm"><i class="fa-solid fa-list-check"></i> Convocati (${convocazioniStorico[p.giornata].length})</button>` : ''}
                             <button onclick="apriModalPartita(${idx})" class="sm-btn sm-btn--ghost sm-btn--sm"><i class="fa-solid fa-pen"></i> Modifica</button>
                         </div>
@@ -1703,6 +1789,224 @@ body { overscroll-behavior-y: contain; }
             renderConvocazioni();
             renderHero();
             toast("Partita aggiornata");
+        }
+
+
+        // ================= SCHIERA (formazione in stile fantacalcio, calcio a 7) =================
+        const MODULI = { '2-3-1': [2, 3, 1], '3-2-1': [3, 2, 1], '3-1-2': [3, 1, 2], '2-2-2': [2, 2, 2], '2-1-2-1': [2, 1, 2, 1], '1-3-2': [1, 3, 2] };
+        const MODULO_DEFAULT = '2-3-1';
+        let schiera = null;           // { giornata, modulo, posti: [id|null x7] }
+        let selPanchina = null;       // id giocatore selezionato in panchina
+        let postoInScelta = null;     // indice del posto per cui si sta scegliendo
+        let timerSalvaFormazione = null;
+
+        const nomeBreve = g => g.nome + (g.cognome ? ' ' + g.cognome.charAt(0) + '.' : '');
+        const trovaGiocatore = id => giocatori.find(g => Number(g.id) === Number(id));
+
+        function ruoliLinee(n) {
+            if (n === 3) return ['DIF', 'CEN', 'ATT'];
+            if (n === 4) return ['DIF', 'MED', 'TRQ', 'ATT'];
+            return Array.from({ length: n }, (_, i) => i === 0 ? 'DIF' : (i === n - 1 ? 'ATT' : 'CEN'));
+        }
+
+        // Posizioni dei 7 posti: 0 = portiere (in basso), poi le linee dalla difesa all'attacco
+        function posizioniModulo(modulo) {
+            const linee = MODULI[modulo] || MODULI[MODULO_DEFAULT];
+            const ruoli = ruoliLinee(linee.length);
+            const out = [{ x: 50, y: 89, ruolo: 'POR' }];
+            linee.forEach((n, li) => {
+                const y = linee.length === 1 ? 45 : 71 - li * (52 / (linee.length - 1));
+                for (let i = 0; i < n; i++) out.push({ x: (i + 1) * 100 / (n + 1), y, ruolo: ruoli[li] });
+            });
+            return out;
+        }
+
+        function convocatiPartita(giornata) {
+            const ids = convocazioniStorico[giornata];
+            if (ids && ids.length) return { lista: ids.map(trovaGiocatore).filter(Boolean), tutti: false };
+            return { lista: [...giocatori], tutti: true };
+        }
+
+        function apriSchiera(giornata) {
+            const p = calendarioPartite.find(x => x.giornata === giornata);
+            if (!p) return;
+            const salvata = formazioni[giornata];
+            let posti, modulo, proposta = false;
+            if (salvata) {
+                modulo = MODULI[salvata.modulo] ? salvata.modulo : MODULO_DEFAULT;
+                posti = (salvata.posti || []).slice(0, 7);
+            } else {
+                // Proposta: l'ultima formazione salvata, tenendo solo i convocati di questa partita
+                const ultima = Object.values(formazioni).sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
+                const conv = new Set(convocatiPartita(giornata).lista.map(g => Number(g.id)));
+                modulo = ultima && MODULI[ultima.modulo] ? ultima.modulo : MODULO_DEFAULT;
+                posti = ultima ? (ultima.posti || []).map(id => (id != null && conv.has(Number(id))) ? Number(id) : null) : [];
+                proposta = !!ultima && posti.some(Boolean);
+            }
+            while (posti.length < 7) posti.push(null);
+            schiera = { giornata, modulo, posti: posti.map(v => v == null ? null : Number(v)) };
+            selPanchina = null;
+            const casa = isNostra(p.casa);
+            document.getElementById('schiera-titolo').innerText = `Schiera · Giornata ${giornata}`;
+            document.getElementById('schiera-sottotitolo').innerText = `${casa ? 'In casa' : 'Trasferta'} contro ${casa ? p.fuori : p.casa} · ${cap(fmtData(p.data))} ${p.ora}`;
+            document.getElementById('schiera-stato').innerText = salvata ? 'Formazione salvata' : (proposta ? "Proposta dall'ultima formazione" : '');
+            renderSchiera();
+            openSheet('sheet-schiera');
+        }
+
+        function renderSchiera() {
+            if (!schiera) return;
+            // moduli
+            document.getElementById('schiera-moduli').innerHTML = Object.keys(MODULI).map(m =>
+                `<button class="sm-modchip" aria-pressed="${m === schiera.modulo}" onclick="cambiaModulo('${m}')">${m}</button>`).join('');
+            // campo
+            const pos = posizioniModulo(schiera.modulo);
+            document.getElementById('schiera-campo').classList.toggle('sm-pitch--target', selPanchina !== null);
+            document.getElementById('schiera-posti').innerHTML = pos.map((p, i) => {
+                const g = schiera.posti[i] != null ? trovaGiocatore(schiera.posti[i]) : null;
+                const cls = 'sm-slot' + (i === 0 ? ' sm-slot--gk' : '') + (g ? '' : ' sm-slot--empty');
+                const label = g ? `${nomeCompleto(g)}, ${p.ruolo}` : `Posto libero ${p.ruolo}`;
+                return `<button class="${cls}" style="left:${p.x}%;top:${p.y}%" onclick="toccaPosto(${i})" aria-label="${label}">
+                    <span class="sm-slot__shirt">${g ? esc(g.numero || '') : '<i class="fa-solid fa-plus"></i>'}</span>
+                    <span class="sm-slot__name">${g ? esc(nomeBreve(g)) : p.ruolo}</span>
+                </button>`;
+            }).join('');
+            // panchina
+            const { lista, tutti } = convocatiPartita(schiera.giornata);
+            const inCampo = new Set(schiera.posti.filter(v => v != null).map(Number));
+            const panchina = lista.filter(g => !inCampo.has(Number(g.id)));
+            document.getElementById('schiera-panchina-titolo').innerText = tutti ? `Rosa (nessuna convocazione salvata) · ${panchina.length}` : `Panchina · ${panchina.length} convocati`;
+            document.getElementById('schiera-panchina').innerHTML = panchina.length ? panchina.map(g =>
+                `<button class="sm-benchp" aria-pressed="${Number(g.id) === selPanchina}" onclick="toccaPanchina(${g.id})">${jersey(g)}${nomeCompleto(g)}</button>`).join('')
+                : '<div class="sm-item__meta">Tutti i convocati sono in campo.</div>';
+            const n = inCampo.size;
+            const c = document.getElementById('schiera-conteggio');
+            c.innerText = `${n}/7 in campo`;
+            c.className = 'sm-chip ' + (n === 7 ? 'sm-chip--success' : 'sm-chip--primary');
+            document.getElementById('schiera-suggerimento').innerText = selPanchina !== null
+                ? 'Ora tocca il posto in campo dove schierarlo.'
+                : 'Tocca un giocatore e poi un posto in campo, oppure tocca direttamente un posto.';
+        }
+
+        function cambiaModulo(m) {
+            if (!schiera || !MODULI[m]) return;
+            schiera.modulo = m;   // i giocatori restano nello stesso ordine: scorrono sulle nuove linee
+            renderSchiera();
+            salvaFormazione();
+        }
+
+        function toccaPanchina(id) {
+            selPanchina = (selPanchina === Number(id)) ? null : Number(id);
+            renderSchiera();
+        }
+
+        function assegnaPosto(i, id) {
+            const prima = schiera.posti.indexOf(Number(id));
+            if (prima >= 0) schiera.posti[prima] = schiera.posti[i];   // scambio tra due posti in campo
+            schiera.posti[i] = Number(id);
+            selPanchina = null;
+            renderSchiera();
+            salvaFormazione();
+        }
+
+        function toccaPosto(i) {
+            if (selPanchina !== null) { assegnaPosto(i, selPanchina); return; }
+            postoInScelta = i;
+            const ruolo = posizioniModulo(schiera.modulo)[i].ruolo;
+            const occupante = schiera.posti[i] != null ? trovaGiocatore(schiera.posti[i]) : null;
+            const { lista } = convocatiPartita(schiera.giornata);
+            const inCampo = new Set(schiera.posti.filter(v => v != null).map(Number));
+            const panchina = lista.filter(g => !inCampo.has(Number(g.id)));
+            const altriInCampo = schiera.posti.map((id, k) => ({ id, k })).filter(o => o.id != null && o.k !== i).map(o => ({ g: trovaGiocatore(o.id), k: o.k })).filter(o => o.g);
+            const ruoli = posizioniModulo(schiera.modulo);
+            document.getElementById('scegli-titolo').innerText = occupante ? `${ruolo} · ${nomeCompleto(occupante)}` : `Scegli ${ruolo === 'POR' ? 'il portiere' : 'per ' + ruolo}`;
+            let h = '';
+            if (occupante) h += `<button class="menu-item" onclick="liberaPosto()"><span class="sm-jersey"><i class="fa-solid fa-chair"></i></span><div class="sm-item__body"><div class="sm-item__title">Manda in panchina</div></div></button>`;
+            h += `<div class="sm-overline">${panchina.length ? 'Dalla panchina' : 'Panchina vuota'}</div>`;
+            h += panchina.map(g => {
+                const st = calcolaStatisticheGiocatore(g);
+                return `<button class="menu-item" onclick="scegliGiocatore(${g.id})">${jersey(g)}<div class="sm-item__body"><div class="sm-item__title">${nomeCompleto(g)}</div><div class="sm-item__meta">Presenze allenamento ${st.percGlobal}%</div></div></button>`;
+            }).join('');
+            if (altriInCampo.length) {
+                h += `<div class="sm-overline">Scambia con chi è in campo</div>`;
+                h += altriInCampo.map(o => `<button class="menu-item" onclick="scegliGiocatore(${o.g.id})">${jersey(o.g)}<div class="sm-item__body"><div class="sm-item__title">${nomeCompleto(o.g)}</div><div class="sm-item__meta">Ora ${ruoli[o.k].ruolo}</div></div><i class="fa-solid fa-right-left"></i></button>`).join('');
+            }
+            document.getElementById('scegli-lista').innerHTML = h;
+            openSheet('sheet-scegli');
+        }
+
+        function scegliGiocatore(id) {
+            const i = postoInScelta;
+            closeSheet('sheet-scegli');
+            if (i != null) assegnaPosto(i, id);
+        }
+
+        function liberaPosto() {
+            const i = postoInScelta;
+            closeSheet('sheet-scegli');
+            if (i == null) return;
+            schiera.posti[i] = null;
+            renderSchiera();
+            salvaFormazione();
+        }
+
+        async function svuotaFormazione() {
+            if (!schiera || !schiera.posti.some(v => v != null)) return;
+            if (await conferma('Svuotare il campo?', 'Tutti i giocatori tornano in panchina.', 'Svuota', true)) {
+                schiera.posti = Array(7).fill(null);
+                selPanchina = null;
+                renderSchiera();
+                salvaFormazione();
+            }
+        }
+
+        // Riempie i posti liberi con i convocati che si allenano di più
+        function schieraAutomatica() {
+            if (!schiera) return;
+            const { lista } = convocatiPartita(schiera.giornata);
+            const inCampo = new Set(schiera.posti.filter(v => v != null).map(Number));
+            const disponibili = lista.filter(g => !inCampo.has(Number(g.id)))
+                .sort((a, b) => calcolaStatisticheGiocatore(b).percGlobal - calcolaStatisticheGiocatore(a).percGlobal);
+            let k = 0;
+            for (let i = 0; i < 7 && k < disponibili.length; i++) if (schiera.posti[i] == null) schiera.posti[i] = Number(disponibili[k++].id);
+            selPanchina = null;
+            renderSchiera();
+            salvaFormazione();
+            toast(k ? `Schierati ${k} giocatori per presenze` : 'Nessun posto libero da riempire');
+        }
+
+        function salvaFormazione() {
+            if (!schiera) return;
+            const dati = { giornata: schiera.giornata, modulo: schiera.modulo, posti: schiera.posti.slice(), autore: utenteCorrente || '', ts: Date.now() };
+            formazioni[schiera.giornata] = dati;
+            document.getElementById('schiera-stato').innerText = 'Salvataggio…';
+            clearTimeout(timerSalvaFormazione);
+            timerSalvaFormazione = setTimeout(async () => {
+                await salvaCloud('formazioni', dati.giornata, dati);
+                document.getElementById('schiera-stato').innerText = 'Formazione salvata';
+                renderCalendario();
+                renderHero();
+            }, 700);
+        }
+
+        async function condividiFormazione() {
+            if (!schiera) return;
+            const p = calendarioPartite.find(x => x.giornata === schiera.giornata);
+            const pos = posizioniModulo(schiera.modulo);
+            const per = r => schiera.posti.map((id, i) => ({ id, r: pos[i].ruolo })).filter(o => o.r === r && o.id != null).map(o => trovaGiocatore(o.id)).filter(Boolean).map(g => g.nome + (g.cognome ? ' ' + g.cognome : '') + (g.numero ? ` (${g.numero})` : ''));
+            const righe = [['🧤 Portiere', per('POR')], ['🛡️ Difesa', per('DIF')], ['⚙️ Mediano', per('MED')], ['⚙️ Centrocampo', per('CEN')], ['🎯 Trequarti', per('TRQ')], ['🎯 Attacco', per('ATT')]].filter(r => r[1].length);
+            const { lista } = convocatiPartita(schiera.giornata);
+            const inCampo = new Set(schiera.posti.filter(v => v != null).map(Number));
+            const panchina = lista.filter(g => !inCampo.has(Number(g.id))).map(g => g.nome);
+            let testo = `⚽ *FORMAZIONE* ⚽\n\n`;
+            if (p) testo += `📅 *Giornata ${p.giornata}* - ${p.casa} vs ${p.fuori}\n`;
+            testo += `📋 Modulo *${schiera.modulo}*\n\n`;
+            testo += righe.map(r => `${r[0]}: ${r[1].join(', ')}`).join('\n');
+            if (panchina.length) testo += `\n\n🪑 Panchina: ${panchina.join(', ')}`;
+            testo += `\n\nForza Sporting Murialdo ❤️💙`;
+            if (window.AndroidApp && window.AndroidApp.condividi) { window.AndroidApp.condividi(testo); return; }
+            if (await copiaTesto(testo)) toast('Formazione copiata: incollala su WhatsApp');
+            else toast('Copia non riuscita', 'errore');
         }
 
         // ================= CONVOCAZIONI =================
